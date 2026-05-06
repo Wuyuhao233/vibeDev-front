@@ -4,7 +4,6 @@ import * as authApi from '../../api/auth';
 import { EMAIL_PATTERN } from '../../utils/patterns';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import { toast } from '../../components/ui/Toast';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');

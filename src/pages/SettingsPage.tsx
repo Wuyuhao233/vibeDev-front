@@ -9,13 +9,14 @@ import Input from '../components/ui/Input';
 import Avatar from '../components/ui/Avatar';
 import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
-import ErrorState from '../components/ui/ErrorState';
 import Pagination from '../components/ui/Pagination';
 import Skeleton from '../components/ui/Skeleton';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { toast } from '../components/ui/Toast';
 import { formatRelativeTime } from '../utils/relativeTime';
+import * as notificationApi from '../api/notification';
 
-type SettingsTab = 'profile' | 'security' | 'data';
+type SettingsTab = 'profile' | 'security' | 'notifications' | 'data';
 
 interface SettingsTabItem {
   key: SettingsTab;
@@ -25,6 +26,7 @@ interface SettingsTabItem {
 const SETTINGS_TABS: SettingsTabItem[] = [
   { key: 'profile', label: '个人信息' },
   { key: 'security', label: '安全设置' },
+  { key: 'notifications', label: '通知设置' },
   { key: 'data', label: '数据管理' },
 ];
 
@@ -57,6 +59,7 @@ export default function SettingsPage() {
       <div className="flex-1 min-w-0">
         {activeTab === 'profile' && <ProfileSection />}
         {activeTab === 'security' && <SecuritySection />}
+        {activeTab === 'notifications' && <NotificationSection />}
         {activeTab === 'data' && <DataSection />}
       </div>
     </div>
@@ -757,6 +760,148 @@ function DataSection() {
           <p className="text-sm text-gray-500 mb-4">导出过程中发生错误，请稍后重试。</p>
           <Button onClick={() => setStatus('idle')}>重新申请导出</Button>
         </div>
+      )}
+    </div>
+  );
+}
+
+/* ========== Notification Section ========== */
+
+const EVENT_LABELS: Record<string, string> = {
+  reply: '帖子被回复',
+  like: '获得点赞',
+  collect: '帖子被收藏',
+  system: '系统通知',
+  mention: '被 @提及',
+  follow: '有人关注',
+  user_banned: '账号状态变更',
+};
+
+const CHANNELS = [
+  { key: 'site', label: '站内通知' },
+  { key: 'email', label: '邮件通知' },
+] as const;
+
+function NotificationSection() {
+  const [preferences, setPreferences] = useState<notificationApi.NotificationPreference[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await notificationApi.getNotificationPreferences();
+        setPreferences(data);
+      } catch {
+        toast.error('加载通知设置失败');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handleToggle = async (eventType: string, channel: 'site' | 'email', enabled: boolean) => {
+    const key = `${eventType}-${channel}`;
+    setUpdating(key);
+    try {
+      await notificationApi.updateNotificationPreference(eventType, channel, enabled);
+      setPreferences((prev) =>
+        prev.map((p) =>
+          p.eventType === eventType ? { ...p, [channel]: enabled } : p,
+        ),
+      );
+    } catch {
+      toast.error('更新失败，请稍后重试');
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-card p-6">
+        <Skeleton variant="table-row" rows={7} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-card p-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-6">通知设置</h2>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-gray-200 text-left text-gray-500">
+              <th className="pb-3 font-medium">事件</th>
+              {CHANNELS.map((ch) => (
+                <th key={ch.key} className="pb-3 font-medium text-center w-28">
+                  {ch.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {preferences.map((pref) => {
+              const isBanned = pref.eventType === 'user_banned';
+              return (
+                <tr
+                  key={pref.eventType}
+                  className={`border-b border-gray-100 ${isBanned ? 'bg-gray-50 text-gray-400' : ''}`}
+                >
+                  <td className="py-3">
+                    <span className="inline-flex items-center gap-2">
+                      {isBanned && (
+                        <svg className="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="11" width="18" height="11" rx="2" />
+                          <path d="M7 11V7a5 5 0 0110 0v4" />
+                        </svg>
+                      )}
+                      {EVENT_LABELS[pref.eventType] || pref.eventType}
+                    </span>
+                  </td>
+                  {CHANNELS.map((ch) => (
+                    <td key={ch.key} className="py-3 text-center">
+                      <label className={`inline-flex items-center cursor-pointer ${isBanned ? 'cursor-not-allowed' : ''}`}>
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={!!pref[ch.key as keyof typeof pref]}
+                          disabled={isBanned || updating === `${pref.eventType}-${ch.key}`}
+                          onChange={(e) =>
+                            handleToggle(pref.eventType, ch.key, e.target.checked)
+                          }
+                        />
+                        <span
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ${
+                            isBanned
+                              ? 'bg-gray-200'
+                              : pref[ch.key as keyof typeof pref]
+                                ? 'bg-primary-500'
+                                : 'bg-gray-200'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
+                              pref[ch.key as keyof typeof pref] ? 'translate-x-4' : 'translate-x-0.5'
+                            }`}
+                          />
+                        </span>
+                      </label>
+                      {updating === `${pref.eventType}-${ch.key}` && (
+                        <LoadingSpinner size="sm" className="ml-1 inline-block align-middle" />
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {preferences.length === 0 && (
+        <EmptyState title="暂无通知设置数据" />
       )}
     </div>
   );

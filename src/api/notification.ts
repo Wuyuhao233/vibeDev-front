@@ -29,3 +29,22 @@ export async function getUnreadCount() {
   const res = await client.get<{ data: { count: number } }>('/notifications/unread-count');
   return res.data.data.count;
 }
+
+// ---- Notification Preferences ----
+
+export interface NotificationPreference {
+  eventType: string;
+  site: boolean;
+  email: boolean;
+}
+
+export async function getNotificationPreferences() {
+  const res = await client.get<{ data: { preferences: NotificationPreference[] } }>(
+    '/users/me/notification-preferences',
+  );
+  return res.data.data.preferences;
+}
+
+export async function updateNotificationPreference(eventType: string, channel: 'site' | 'email', enabled: boolean) {
+  await client.patch(`/users/me/notification-preferences/${eventType}`, { channel, enabled });
+}
