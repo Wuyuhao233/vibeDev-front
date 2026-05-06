@@ -18,7 +18,7 @@ export default {
         essence: '#f59e0b',
       },
       fontFamily: {
-        sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"',
+        sans: ['"Inter"', '"Noto Sans SC"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"',
                '"PingFang SC"', '"Microsoft YaHei"', '"Helvetica Neue"', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"Fira Code"', '"Consolas"', '"Courier New"', 'monospace'],
       },

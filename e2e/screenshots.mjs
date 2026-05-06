@@ -21,13 +21,26 @@ const PAGES = [
 async function main() {
   const browser = await firefox.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+
   const page = await context.newPage();
 
   for (const { name, path: route } of PAGES) {
     console.log(`Navigating to ${route}...`);
     await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle' });
-    // Wait a bit for React to render
-    await page.waitForTimeout(500);
+
+    // Wait for Noto Sans SC font to be ready (loaded via index.html link)
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      const fonts = [];
+      document.fonts.forEach((f) => fonts.push(f.family));
+      return fonts;
+    }).then((fonts) => {
+      const hasNoto = fonts.some((f) => f.includes('Noto'));
+      if (!hasNoto) console.log('  ⚠ Noto Sans SC not loaded, trying fallback...');
+    });
+
+    await page.waitForTimeout(800);
+
     await page.screenshot({
       path: path.join(OUT_DIR, `${name}.png`),
       fullPage: true,
