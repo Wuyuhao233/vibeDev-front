@@ -52,6 +52,13 @@ export async function forgotPassword(email: string) {
   return res.data.data;
 }
 
+export async function checkUsername(username: string) {
+  const res = await client.get<{ data: { available: boolean } }>(
+    `/auth/check-username?username=${encodeURIComponent(username)}`,
+  );
+  return res.data.data;
+}
+
 export async function resetPassword(token: string, newPassword: string) {
   const res = await client.post<{ data: { success: boolean } }>(
     '/auth/reset-password',

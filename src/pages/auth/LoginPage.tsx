@@ -1,8 +1,218 @@
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
+import * as authApi from '../../api/auth';
+import { ApiError } from '../../utils/error';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import { toast } from '../../components/ui/Toast';
+
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const login = useAuthStore((s) => s.login);
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [cooldown, setCooldown] = useState(0);
+
+  // Locked countdown timer
+  useEffect(() => {
+    if (!lockedUntil) return;
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((lockedUntil - Date.now()) / 1000));
+      if (remaining <= 0) {
+        setLockedUntil(null);
+        setError('');
+      } else {
+        setCooldown(remaining);
+      }
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [lockedUntil]);
+
+  // Rate limit cooldown
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) return 0;
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  const redirect = searchParams.get('redirect') || '/';
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    // Frontend validation
+    if (!username.trim()) {
+      setError('请输入用户名或邮箱');
+      return;
+    }
+    if (!password) {
+      setError('请输入密码');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await authApi.login({ username: username.trim(), password });
+      login(res.user, res.accessToken, res.refreshToken);
+      toast.success('登录成功');
+      navigate(redirect, { replace: true });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const code = err.code;
+        if (code === 'ACCOUNT_LOCKED (10003)') {
+          setLockedUntil(Date.now() + 15 * 60 * 1000);
+          setError('账号已锁定，请 15 分钟后重试');
+        } else if (code === 'ACCOUNT_NOT_ACTIVATED (10004)') {
+          setError('账号未激活，请检查邮箱中的验证邮件');
+        } else if (code === 'PASSWORD_WRONG (10005)') {
+          setError('密码不正确');
+          setPassword('');
+        } else if (code === 'NOT_FOUND (30001)') {
+          setError('该账号不存在，请检查输入或前往注册');
+        } else if (code === 'RATE_LIMITED (40001)') {
+          setCooldown(60);
+          setError('操作过于频繁，请稍后重试');
+        } else if (code === 'BANNED (20002)') {
+          setError('你的账号已被封禁，如有疑问请联系管理员');
+        } else {
+          setError(err.message);
+        }
+      } else {
+        toast.error('网络连接失败，请检查网络');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m} 分 ${s} 秒`;
+  };
+
   return (
     <div className="max-w-md mx-auto mt-16">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">登录</h1>
-      <p className="text-gray-500 text-center">登录表单将在此展示。</p>
+      <h1 className="text-2xl font-bold text-gray-900 mb-8 text-center">登录</h1>
+
+      {lockedUntil ? (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center">
+          <div className="mb-3 text-2xl">⚠</div>
+          <h2 className="text-lg font-semibold text-amber-800 mb-2">账号已临时锁定</h2>
+          <p className="text-sm text-amber-700 mb-4">
+            由于密码错误次数过多，你的账号已被锁定 15 分钟。请稍后再试。
+          </p>
+          <p className="text-sm font-medium text-amber-800 mb-4">
+            剩余解锁时间：{formatTime(cooldown)}
+          </p>
+          <div className="flex justify-center gap-3">
+            <Link to="/forgot-password" className="text-sm text-primary-500 hover:underline">
+              忘记密码？
+            </Link>
+            <Link to="/" className="text-sm text-gray-500 hover:underline">
+              返回首页
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-card p-6">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600">
+              {error}
+              {error.includes('未激活') && (
+                <div className="mt-2">
+                  <Link to="/register" className="text-primary-500 hover:underline text-sm">
+                    重新注册
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-4">
+            <Input
+              label="用户名 / 邮箱"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="请输入用户名或邮箱"
+              disabled={loading || cooldown > 0}
+              autoComplete="username"
+            />
+
+            <div className="relative">
+              <Input
+                label="密码"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="请输入密码"
+                disabled={loading || cooldown > 0}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 text-sm"
+                tabIndex={-1}
+              >
+                {showPassword ? '隐藏' : '显示'}
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                />
+                <span className="text-sm text-gray-600">记住我</span>
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-primary-500 hover:underline"
+              >
+                忘记密码？
+              </Link>
+            </div>
+
+            <Button
+              type="submit"
+              loading={loading}
+              disabled={cooldown > 0}
+              size="lg"
+              className="w-full mt-2"
+            >
+              {loading ? '登录中...' : cooldown > 0 ? `请等待 ${cooldown}s` : '登录'}
+            </Button>
+          </div>
+
+          <div className="mt-6 text-center text-sm text-gray-500">
+            还没有账号？
+            <Link to="/register" className="text-primary-500 hover:underline ml-1">
+              注册
+            </Link>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

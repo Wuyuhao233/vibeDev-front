@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { setTokens as setClientTokens, clearTokens } from '../api/client';
+import * as authApi from '../api/auth';
 
 interface User {
   id: number;
@@ -14,7 +16,7 @@ interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   login: (user: User, accessToken: string, refreshToken: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   setTokens: (accessToken: string, refreshToken: string) => void;
 }
 
@@ -23,9 +25,21 @@ export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
-  login: (user, accessToken, refreshToken) =>
-    set({ user, accessToken, refreshToken, isAuthenticated: true }),
-  logout: () =>
-    set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),
-  setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
+  login: (user, accessToken, refreshToken) => {
+    setClientTokens(accessToken, refreshToken);
+    set({ user, accessToken, refreshToken, isAuthenticated: true });
+  },
+  logout: async () => {
+    try {
+      await authApi.logout();
+    } catch {
+      // Ignore logout API errors
+    }
+    clearTokens();
+    set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
+  },
+  setTokens: (accessToken, refreshToken) => {
+    setClientTokens(accessToken, refreshToken);
+    set({ accessToken, refreshToken });
+  },
 }));
