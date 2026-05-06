@@ -66,3 +66,10 @@ export async function resetPassword(token: string, newPassword: string) {
   );
   return res.data.data;
 }
+
+export async function casLogin(ticket: string, service: string) {
+  const res = await client.get<{ data: AuthResponse }>(
+    `/auth/cas-login?ticket=${encodeURIComponent(ticket)}&service=${encodeURIComponent(service)}`,
+  );
+  return res.data.data;
+}

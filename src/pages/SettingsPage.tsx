@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import * as userApi from '../api/user';
 import { ApiError } from '../utils/error';
@@ -8,6 +8,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Avatar from '../components/ui/Avatar';
 import Modal from '../components/ui/Modal';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
 import EmptyState from '../components/ui/EmptyState';
 import Pagination from '../components/ui/Pagination';
 import Skeleton from '../components/ui/Skeleton';
@@ -31,7 +32,17 @@ const SETTINGS_TABS: SettingsTabItem[] = [
 ];
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
+  const [searchParams] = useSearchParams();
+
+  const getInitialTab = (): SettingsTab => {
+    const tab = searchParams.get('tab');
+    if (tab === 'security' || tab === 'notifications' || tab === 'data') {
+      return tab;
+    }
+    return 'profile';
+  };
+
+  const [activeTab, setActiveTab] = useState<SettingsTab>(getInitialTab);
 
   return (
     <div className="flex gap-6">
@@ -215,6 +226,7 @@ function ProfileSection() {
 function SecuritySection() {
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -225,6 +237,80 @@ function SecuritySection() {
   const [confirmError, setConfirmError] = useState('');
   const [savingPwd, setSavingPwd] = useState(false);
   const [pwdSuccess, setPwdSuccess] = useState(false);
+
+  // CAS binding
+  const [casInfo, setCasInfo] = useState<userApi.CasBindingInfo | null>(null);
+  const [casLoading, setCasLoading] = useState(false);
+  const [unbindDialogOpen, setUnbindDialogOpen] = useState(false);
+  const [unbinding, setUnbinding] = useState(false);
+
+  // Handle CAS bind callback (code param)
+  useEffect(() => {
+    const code = searchParams.get('code');
+    if (!code) return;
+
+    setCasLoading(true);
+    (async () => {
+      try {
+        const redirectUri = window.location.origin + '/settings';
+        await userApi.bindCas(code, redirectUri);
+        toast.success('CAS 账号绑定成功');
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('code');
+        setSearchParams(newParams, { replace: true });
+        await fetchCasBinding();
+      } catch (err) {
+        setCasLoading(false);
+        if (err instanceof ApiError) {
+          toast.error(err.message);
+        } else {
+          toast.error('CAS 绑定失败，请稍后重试');
+        }
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('code');
+        setSearchParams(newParams, { replace: true });
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
+    fetchCasBinding();
+  }, []);
+
+  const fetchCasBinding = async () => {
+    try {
+      const data = await userApi.getCasBinding();
+      setCasInfo(data);
+    } catch {
+      // Silently fail
+    } finally {
+      setCasLoading(false);
+    }
+  };
+
+  const handleCasBind = () => {
+    const redirectUri = window.location.origin + '/settings';
+    window.location.href = `/api/v1/auth/cas/authorize?redirect=${encodeURIComponent(redirectUri)}`;
+  };
+
+  const handleUnbindCas = async () => {
+    setUnbinding(true);
+    try {
+      await userApi.unbindCas();
+      toast.success('CAS 账号已解绑');
+      setCasInfo(null);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message);
+      } else {
+        toast.error('解绑失败，请稍后重试');
+      }
+    } finally {
+      setUnbinding(false);
+      setUnbindDialogOpen(false);
+    }
+  };
 
   // Login history
   const [loginHistory, setLoginHistory] = useState<any[]>([]);
@@ -397,6 +483,60 @@ function SecuritySection() {
           </Button>
         </div>
       </div>
+
+      {/* CAS Binding */}
+      <div className="bg-white rounded-lg shadow-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">CAS 账号绑定</h2>
+
+        {casInfo === null && casLoading && (
+          <div className="flex items-center gap-3 text-sm text-gray-500">
+            <span className="inline-block animate-spin-slow w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
+            加载中...
+          </div>
+        )}
+
+        {casInfo?.is_bound && (
+          <div>
+            <p className="text-sm text-gray-700 mb-1">
+              已绑定 CAS 账号：<span className="font-medium text-gray-900">{casInfo.cas_username}</span>
+            </p>
+            {casInfo.bound_at && (
+              <p className="text-sm text-gray-500 mb-4">
+                绑定时间：{formatRelativeTime(casInfo.bound_at)}
+              </p>
+            )}
+            <button
+              onClick={() => setUnbindDialogOpen(true)}
+              className="text-sm text-red-500 hover:text-red-600 font-medium transition-colors duration-150"
+            >
+              解绑
+            </button>
+          </div>
+        )}
+
+        {casInfo && !casInfo.is_bound && (
+          <div>
+            <p className="text-sm text-gray-500 mb-4">
+              绑定 CAS 账号后，可使用 CAS 单点登录
+            </p>
+            <Button variant="secondary" onClick={handleCasBind}>
+              绑定 CAS 账号
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <ConfirmDialog
+        open={unbindDialogOpen}
+        onClose={() => setUnbindDialogOpen(false)}
+        onConfirm={handleUnbindCas}
+        title="确认解绑 CAS"
+        description={
+          <p>解绑后你将无法使用 CAS 登录，仅能通过邮箱密码登录。<br />请确认你已设置过密码。</p>
+        }
+        confirmLabel="确认解绑"
+        loading={unbinding}
+      />
 
       {/* Login History */}
       <div className="bg-white rounded-lg shadow-card p-6">

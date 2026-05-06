@@ -9,7 +9,7 @@ import { toast } from '../../components/ui/Toast';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const login = useAuthStore((s) => s.login);
 
   const [username, setUsername] = useState('');
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [cooldown, setCooldown] = useState(0);
+  const [casLoading, setCasLoading] = useState(false);
 
   // Locked countdown timer
   useEffect(() => {
@@ -50,7 +51,48 @@ export default function LoginPage() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
+  // CAS ticket callback handling
+  useEffect(() => {
+    const ticket = searchParams.get('ticket');
+    const service = searchParams.get('service');
+    if (!ticket || !service) return;
+
+    setCasLoading(true);
+    (async () => {
+      try {
+        const res = await authApi.casLogin(ticket, service);
+        login(res.user, res.accessToken, res.refreshToken);
+        toast.success('CAS 登录成功');
+        // Clean URL params and navigate
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('ticket');
+        newParams.delete('service');
+        setSearchParams(newParams, { replace: true });
+        const redirectTo = newParams.get('redirect') || '/';
+        navigate(redirectTo, { replace: true });
+      } catch (err) {
+        setCasLoading(false);
+        if (err instanceof ApiError) {
+          toast.error(err.message);
+        } else {
+          toast.error('CAS 登录失败，请重试');
+        }
+        // Clean URL params
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('ticket');
+        newParams.delete('service');
+        setSearchParams(newParams, { replace: true });
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   const redirect = searchParams.get('redirect') || '/';
+
+  const handleCasLogin = () => {
+    const redirectUri = window.location.origin + '/login';
+    window.location.href = `/api/v1/auth/cas/authorize?redirect=${encodeURIComponent(redirectUri)}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,6 +252,31 @@ export default function LoginPage() {
             <Link to="/register" className="text-primary-500 hover:underline ml-1">
               注册
             </Link>
+          </div>
+
+          <div className="mt-4 flex items-center gap-3">
+            <div className="flex-1 border-t border-gray-200" />
+            <span className="text-xs text-gray-400">或</span>
+            <div className="flex-1 border-t border-gray-200" />
+          </div>
+
+          <div className="mt-4">
+            {casLoading ? (
+              <div className="text-center text-sm text-gray-500">
+                <span className="inline-block animate-spin-slow w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full mr-2 align-middle" />
+                CAS 登录中...
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                className="w-full"
+                onClick={handleCasLogin}
+              >
+                CAS 登录
+              </Button>
+            )}
           </div>
         </form>
       )}

@@ -96,3 +96,23 @@ export async function getExportStatus(taskId: string) {
   const res = await client.get<{ data: any }>(`/users/me/export-data/${taskId}`);
   return res.data.data;
 }
+
+export interface CasBindingInfo {
+  is_bound: boolean;
+  cas_username: string | null;
+  bound_at: string | null;
+}
+
+export async function getCasBinding() {
+  const res = await client.get<{ data: CasBindingInfo }>('/users/me/cas-binding');
+  return res.data.data;
+}
+
+export async function bindCas(code: string, redirectUri: string) {
+  const res = await client.post<{ data: any }>('/users/me/cas-bind', { code, redirect_uri: redirectUri });
+  return res.data.data;
+}
+
+export async function unbindCas() {
+  await client.delete('/users/me/cas-bind');
+}
