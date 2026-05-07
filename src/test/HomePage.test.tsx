@@ -147,7 +147,6 @@ describe('HomePage', () => {
 
   it('redirects to login for following tab when not authenticated', () => {
     setAuth(false);
-    const navigateSpy = vi.fn();
     // Use a router that lets us spy on navigation
     const { container } = render(
       <MemoryRouter initialEntries={['/?tab=following']}>

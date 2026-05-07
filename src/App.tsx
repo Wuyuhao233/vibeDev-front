@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import ToastProvider from './components/ui/Toast';
+import { Toaster } from 'sonner';
 import AuthGuard from './components/AuthGuard';
 import MainLayout from './components/MainLayout';
 import AdminLayout from './components/AdminLayout';
@@ -31,8 +31,8 @@ import ReportsPage from './pages/admin/ReportsPage';
 export default function App() {
   return (
     <BrowserRouter>
-      <ToastProvider>
-        <Routes>
+      <Toaster position="top-center" richColors />
+      <Routes>
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -90,7 +90,6 @@ export default function App() {
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
-      </ToastProvider>
     </BrowserRouter>
   );
 }

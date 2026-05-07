@@ -1,5 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
-import Avatar from './ui/Avatar';
+import { /*Link,*/ useNavigate } from 'react-router-dom';
+import { Avatar } from './ui';
 import LevelBadge from './ui/LevelBadge';
 import RelativeTime from './ui/RelativeTime';
 import { formatCount } from '../utils/formatCount';
@@ -107,7 +107,7 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
               onClick={handleAuthorClick}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleAuthorClick(e); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleAuthorClick(e as any); }}
             >
               <Avatar
                 src={post.author.avatar || undefined}

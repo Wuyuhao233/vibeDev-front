@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { uploadFile } from '../api/upload';
-import { toast } from './ui/Toast';
+import { toast } from './ui';
 
 interface ImageUploaderProps {
   images: string[];

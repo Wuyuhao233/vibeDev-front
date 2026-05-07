@@ -3,7 +3,7 @@ import { Link, useParams, useLocation } from 'react-router-dom';
 import { getBoards, type Board } from '../api/board';
 import { getFollowedTags, unfollowTag, type FollowedTag } from '../api/tag';
 import { useAuthStore } from '../store/authStore';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/ui';
 
 interface CachedBoards {
   boards: Board[];

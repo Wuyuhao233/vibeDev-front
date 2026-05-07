@@ -10,16 +10,16 @@ import {
   type CollectionItem,
 } from '../../api/collection';
 import { ApiError } from '../../utils/error';
-import Avatar from '../../components/ui/Avatar';
-import LevelBadge from '../../components/ui/LevelBadge';
-import Skeleton from '../../components/ui/Skeleton';
-import EmptyState from '../../components/ui/EmptyState';
-import ErrorState from '../../components/ui/ErrorState';
-import Pagination from '../../components/ui/Pagination';
+import { Avatar } from '../../components/ui';
+import { LevelBadge } from '../../components/ui';
+import { Skeleton } from '../../components/ui';
+import { Empty } from '../../components/ui';
+import { ErrorState } from '../../components/ui';
+import { Pagination } from '../../components/ui';
 import CollectionList from '../../components/CollectionList';
 import CollectionFolderManager from '../../components/CollectionFolderManager';
 import BatchMoveBar from '../../components/BatchMoveBar';
-import { toast } from '../../components/ui/Toast';
+import { toast } from '../../components/ui';
 import { formatRelativeTime } from '../../utils/relativeTime';
 
 interface UserProfile {
@@ -245,12 +245,12 @@ export default function UserProfilePage() {
     return (
       <div>
         <div className="bg-white rounded-lg shadow-card p-6 mb-6">
-          <Skeleton variant="profile" />
+          <Skeleton className="h-40 w-full rounded-md" />
         </div>
         <div className="bg-white rounded-lg shadow-card">
-          <Skeleton variant="text" width="100%" height="40px" className="mb-4" />
+          <Skeleton className="h-4 mb-4" />
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} variant="post-card" className="mb-3" />
+            <Skeleton key={i} className="mb-3" />
           ))}
         </div>
       </div>
@@ -282,7 +282,7 @@ export default function UserProfilePage() {
           <Avatar
             src={profile.avatar || undefined}
             name={profile.username}
-            size={64}
+            size="lg"
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-2">
@@ -358,11 +358,11 @@ export default function UserProfilePage() {
           ) : tabLoading ? (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} variant="post-card" />
+                <Skeleton key={i} />
               ))}
             </div>
           ) : items.length === 0 ? (
-            <EmptyState
+            <Empty
               title={EMPTY_TITLES[activeTab]}
               description={EMPTY_DESCRIPTIONS[activeTab]}
               action={

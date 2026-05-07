@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { toast } from './ui/Toast';
+import { toast } from './ui';
 import ShareCardModal from './ShareCardModal';
 import type { ShareCardData } from './ShareCard';
 
@@ -10,7 +10,7 @@ interface SharePanelProps {
   cardData?: ShareCardData;
 }
 
-export default function SharePanel({ url, title, className = '', cardData }: SharePanelProps) {
+export default function SharePanel({ url, title: _title, className = '', cardData }: SharePanelProps) {
   const [copied, setCopied] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);

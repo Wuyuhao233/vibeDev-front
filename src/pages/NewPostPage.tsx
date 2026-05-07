@@ -3,8 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getBoards, type Board } from '../api/board';
 import { createPost, getSensitiveWords } from '../api/post';
 import { useAuthStore } from '../store/authStore';
-import Button from '../components/ui/Button';
-import { toast } from '../components/ui/Toast';
+import { Button, toast } from '../components/ui';
 import MarkdownSplitEditor from '../components/MarkdownSplitEditor';
 import TagSelector from '../components/TagSelector';
 import ImageUploader from '../components/ImageUploader';
@@ -41,7 +40,7 @@ export default function NewPostPage() {
 
   // Form state
   const [boards, setBoards] = useState<Board[]>([]);
-  const [boardsLoading, setBoardsLoading] = useState(true);
+  const [_boardsLoading, setBoardsLoading] = useState(true);
   const [selectedBoardId, setSelectedBoardId] = useState<number | null>(
     boardIdParam ? parseInt(boardIdParam, 10) : null,
   );
@@ -356,10 +355,9 @@ export default function NewPostPage() {
           {selectedBoardId ? '已选择版块' : '请选择版块'} · {selectedTags.length} 个标签 · {content.length} 字
         </span>
         <Button
-          variant="primary"
+          variant="default"
           size="lg"
-          loading={publishing}
-          disabled={sensitiveHits.length > 0}
+          disabled={publishing || sensitiveHits.length > 0}
           onClick={handlePublish}
         >
           {publishing ? '发布中...' : sensitiveHits.length > 0 ? '内容包含违规词汇' : '发布'}

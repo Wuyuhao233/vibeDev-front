@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { addFavorite, removeFavorite } from '../api/favorite';
 import { addToFolder } from '../api/collection';
-import { toast } from './ui/Toast';
+import { toast } from './ui';
 import FolderSelector from './FolderSelector';
 
 interface CollectButtonProps {
@@ -30,7 +30,6 @@ export default function CollectButton({
     if (collected) {
       // Uncollect
       setLoading(true);
-      const prevCollected = collected;
       const prevCount = count;
       setCollected(false);
       setCount(prevCount - 1);
@@ -56,7 +55,6 @@ export default function CollectButton({
     async (folderId: number, folderName: string) => {
       setFolderSelectorOpen(false);
       setLoading(true);
-      const prevCollected = collected;
       const prevCount = count;
       setCollected(true);
       setCount(prevCount + 1);

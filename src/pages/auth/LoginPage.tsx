@@ -3,9 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import * as authApi from '../../api/auth';
 import { ApiError } from '../../utils/error';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import { toast } from '../../components/ui/Toast';
+import { Button, Input, toast } from '../../components/ui';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -238,8 +236,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              loading={loading}
-              disabled={cooldown > 0}
+              disabled={loading || cooldown > 0}
               size="lg"
               className="w-full mt-2"
             >
@@ -269,8 +266,8 @@ export default function LoginPage() {
             ) : (
               <Button
                 type="button"
-                variant="secondary"
-                size="md"
+                variant="outline"
+                size="default"
                 className="w-full"
                 onClick={handleCasLogin}
               >

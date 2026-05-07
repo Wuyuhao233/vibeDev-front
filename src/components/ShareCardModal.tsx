@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import html2canvas from 'html2canvas';
-import Modal from './ui/Modal';
-import { toast } from './ui/Toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, toast } from './ui';
 import ShareCard, { type ShareCardData } from './ShareCard';
 
 interface ShareCardModalProps {
@@ -95,60 +94,62 @@ export default function ShareCardModal({ open, onClose, cardData, postUrl }: Sha
         </div>
       )}
 
-      <Modal
+      <Dialog
         open={open}
-        onClose={handleClose}
-        title="分享卡片"
-        size="lg"
-        closeOnBackdrop={stage !== 'generating'}
+        onOpenChange={(o) => !o && handleClose()}
       >
-        <div className="flex flex-col items-center">
-          {stage === 'generating' && (
-            <div className="flex flex-col items-center gap-3 py-12">
-              <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin-slow" />
-              <span className="text-sm text-gray-400">生成中...</span>
-            </div>
-          )}
-
-          {stage === 'preview' && imageUrl && (
-            <>
-              <div className="w-full max-h-[400px] overflow-auto rounded-lg border border-gray-200">
-                <img
-                  src={imageUrl}
-                  alt="分享卡片"
-                  className="w-full"
-                />
+        <DialogContent className="max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>分享卡片</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center">
+            {stage === 'generating' && (
+              <div className="flex flex-col items-center gap-3 py-12">
+                <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin-slow" />
+                <span className="text-sm text-gray-400">生成中...</span>
               </div>
-              <div className="flex items-center justify-center gap-3 mt-6">
+            )}
+
+            {stage === 'preview' && imageUrl && (
+              <>
+                <div className="w-full max-h-[400px] overflow-auto rounded-lg border border-gray-200">
+                  <img
+                    src={imageUrl}
+                    alt="分享卡片"
+                    className="w-full"
+                  />
+                </div>
+                <div className="flex items-center justify-center gap-3 mt-6">
+                  <button
+                    onClick={handleDownload}
+                    className="px-5 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                  >
+                    下载图片
+                  </button>
+                  <button
+                    onClick={handleCopyLink}
+                    className="px-5 py-2.5 text-sm font-medium text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-150"
+                  >
+                    复制链接
+                  </button>
+                </div>
+              </>
+            )}
+
+            {stage === 'error' && (
+              <div className="flex flex-col items-center gap-3 py-12">
+                <p className="text-sm text-gray-500">生成失败</p>
                 <button
-                  onClick={handleDownload}
-                  className="px-5 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                  onClick={generate}
+                  className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
                 >
-                  下载图片
-                </button>
-                <button
-                  onClick={handleCopyLink}
-                  className="px-5 py-2.5 text-sm font-medium text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-150"
-                >
-                  复制链接
+                  重试
                 </button>
               </div>
-            </>
-          )}
-
-          {stage === 'error' && (
-            <div className="flex flex-col items-center gap-3 py-12">
-              <p className="text-sm text-gray-500">生成失败</p>
-              <button
-                onClick={generate}
-                className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
-              >
-                重试
-              </button>
-            </div>
-          )}
-        </div>
-      </Modal>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

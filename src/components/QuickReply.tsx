@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import Button from './ui/Button';
+import { Button } from './ui';
 
 interface QuickReplyProps {
   onSubmit: (content: string) => Promise<void>;
@@ -146,10 +146,9 @@ export default function QuickReply({
           </span>
         ) : (
           <Button
-            variant="primary"
-            size="md"
-            loading={loading}
-            disabled={!content.trim() || disabled}
+            variant="default"
+            size="default"
+            disabled={loading || !content.trim() || disabled}
             onClick={handleSubmit}
           >
             {loading ? '提交中...' : '发布回复'}

@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom';
 import * as authApi from '../../api/auth';
 import { ApiError } from '../../utils/error';
 import { USERNAME_PATTERN, EMAIL_PATTERN, PASSWORD_PATTERN } from '../../utils/patterns';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import { toast } from '../../components/ui/Toast';
+import { Button, Input, toast } from '../../components/ui';
 
 type PageState = 'form' | 'sent';
 
@@ -301,8 +299,7 @@ export default function RegisterPage() {
 
           <Button
             type="submit"
-            loading={loading}
-            disabled={!agreed}
+            disabled={loading || !agreed}
             size="lg"
             className="w-full mt-2"
           >

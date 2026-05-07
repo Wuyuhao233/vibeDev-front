@@ -6,8 +6,8 @@ import { useAuthStore } from '../store/authStore';
 import PostCard from '../components/PostCard';
 import SortSwitcher from '../components/SortSwitcher';
 import TagFilterBar from '../components/TagFilterBar';
-import { Pagination, EmptyState, ErrorState } from '../components/ui';
-import { toast } from '../components/ui/Toast';
+import { Pagination, Empty, ErrorState } from '../components/ui';
+import { toast } from '../components/ui';
 import type { PostCardData } from '../types/board';
 
 type SortValue = 'hot' | 'latest' | 'trending';
@@ -156,7 +156,7 @@ export default function BoardPage() {
   if (boardNotFound) {
     return (
       <div className="board-content__not-found">
-        <EmptyState
+        <Empty
           icon={
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
@@ -280,7 +280,7 @@ export default function BoardPage() {
         />
       ) : posts.length === 0 ? (
         activeTagId ? (
-          <EmptyState
+          <Empty
             icon={
               <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="text-gray-300">
                 <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" strokeWidth="2" />
@@ -298,7 +298,7 @@ export default function BoardPage() {
             }
           />
         ) : (
-          <EmptyState
+          <Empty
             title="该版块暂无帖子"
             action={
               <Link

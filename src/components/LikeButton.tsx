@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { addLike, removeLike } from '../api/like';
-import { toast } from './ui/Toast';
+import { toast } from './ui';
 
 interface LikeButtonProps {
   targetType: 'post' | 'reply';

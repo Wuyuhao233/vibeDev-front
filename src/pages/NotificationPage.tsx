@@ -8,12 +8,11 @@ import {
   type Notification,
 } from '../api/notification';
 import { useNotificationStore } from '../store/notificationStore';
-import { toast } from '../components/ui/Toast';
-import Pagination from '../components/ui/Pagination';
+import { toast } from '../components/ui';
+import { Pagination } from '../components/ui';
 import RelativeTime from '../components/ui/RelativeTime';
-import EmptyState from '../components/ui/EmptyState';
+import { Empty } from '../components/ui';
 
-const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const NOTIFICATION_ICONS: Record<Notification['type'], string> = {
   reply: '💬',
@@ -209,7 +208,7 @@ export default function NotificationPage() {
           <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <EmptyState
+        <Empty
           title="暂无通知"
           description={notifications.length === 0 ? '你还没有收到任何通知' : '没有符合条件的通知'}
         />

@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as authApi from '../../api/auth';
 import { EMAIL_PATTERN } from '../../utils/patterns';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import { Button, Input } from '../../components/ui';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -87,7 +86,7 @@ export default function ForgotPasswordPage() {
             autoComplete="email"
           />
 
-          <Button type="submit" loading={loading} size="lg" className="w-full">
+          <Button type="submit" disabled={loading} size="lg" className="w-full">
             {loading ? '发送中...' : '发送重置邮件'}
           </Button>
         </div>

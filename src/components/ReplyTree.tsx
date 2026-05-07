@@ -1,7 +1,5 @@
-import { type ReactNode } from 'react';
 import ReplyItem from './ReplyItem';
-import Pagination from './ui/Pagination';
-import EmptyState from './ui/EmptyState';
+import { Pagination, Empty } from './ui';
 import ErrorState from './ui/ErrorState';
 import type { Reply } from '../api/reply';
 
@@ -189,7 +187,7 @@ export default function ReplyTree({
 
   if (!loading && replies.length === 0) {
     return (
-      <EmptyState
+      <Empty
         icon={
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="text-gray-300">
             <path d="M32 12v26M20 26l12 12 12-12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />

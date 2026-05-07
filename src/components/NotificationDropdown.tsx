@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotificationStore } from '../store/notificationStore';
 import { getNotifications, markAsRead, type Notification } from '../api/notification';
-import { toast } from './ui/Toast';
+import { toast } from './ui';
 import RelativeTime from './ui/RelativeTime';
 
 const TYPE_CONFIG: Record<Notification['type'], { label: string; icon: string }> = {

@@ -1,7 +1,5 @@
 import { useState, useCallback } from 'react';
-import Modal from './ui/Modal';
-import Button from './ui/Button';
-import { toast } from './ui/Toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, toast } from './ui';
 import { submitReport, type ReportData } from '../api/report';
 
 const REPORT_TYPES: { value: ReportData['reason']; label: string; desc: string }[] = [
@@ -79,78 +77,73 @@ export default function ReportDialog({
     onClose();
   }, [onClose]);
 
-  const footer = (
-    <>
-      <Button variant="secondary" onClick={handleClose}>
-        取消
-      </Button>
-      <Button
-        variant="primary"
-        loading={submitting}
-        disabled={alreadyReported}
-        onClick={handleSubmit}
-      >
-        {alreadyReported ? '已举报' : '提交举报'}
-      </Button>
-    </>
-  );
-
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      title="举报"
-      size="sm"
-      footer={footer}
-    >
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">举报类型</label>
-          <div className="space-y-1.5">
-            {REPORT_TYPES.map((type) => (
-              <label
-                key={type.value}
-                className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors duration-150 ${
-                  reason === type.value
-                    ? 'border-primary-500 bg-primary-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="reportReason"
-                  value={type.value}
-                  checked={reason === type.value}
-                  onChange={() => setReason(type.value)}
-                  className="mt-0.5"
-                />
-                <div>
-                  <div className="text-sm font-medium text-gray-900">{type.label}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{type.desc}</div>
-                </div>
-              </label>
-            ))}
+    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
+      <DialogContent className="max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle>举报</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">举报类型</label>
+            <div className="space-y-1.5">
+              {REPORT_TYPES.map((type) => (
+                <label
+                  key={type.value}
+                  className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors duration-150 ${
+                    reason === type.value
+                      ? 'border-primary-500 bg-primary-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="reportReason"
+                    value={type.value}
+                    checked={reason === type.value}
+                    onChange={() => setReason(type.value)}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{type.label}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">{type.desc}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            详细描述
-            <span className="text-gray-400 font-normal ml-1">（可选）</span>
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="请提供更多信息..."
-            maxLength={500}
-            rows={4}
-            className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm outline-none resize-none transition-colors duration-150 focus:border-primary-500 focus:ring-2 focus:ring-primary-50"
-          />
-          <div className="text-right text-xs text-gray-400 mt-1">
-            {description.length}/500
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              详细描述
+              <span className="text-gray-400 font-normal ml-1">（可选）</span>
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="请提供更多信息..."
+              maxLength={500}
+              rows={4}
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm outline-none resize-none transition-colors duration-150 focus:border-primary-500 focus:ring-2 focus:ring-primary-50"
+            />
+            <div className="text-right text-xs text-gray-400 mt-1">
+              {description.length}/500
+            </div>
           </div>
         </div>
-      </div>
-    </Modal>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose}>
+            取消
+          </Button>
+          <Button
+            variant="default"
+            disabled={submitting || alreadyReported}
+            onClick={handleSubmit}
+          >
+            {alreadyReported ? '已举报' : '提交举报'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

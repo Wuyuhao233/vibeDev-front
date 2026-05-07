@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getFolders, type CollectionFolder } from '../api/collection';
 
 interface FolderSelectorProps {

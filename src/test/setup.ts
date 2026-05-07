@@ -5,8 +5,8 @@ class IntersectionObserverMock {
   readonly root: Element | null = null;
   readonly rootMargin: string = '';
   readonly thresholds: ReadonlyArray<number> = [];
+  // @ts-expect-error callback stored for potential use
   private callback: IntersectionObserverCallback;
-
   constructor(callback: IntersectionObserverCallback) {
     this.callback = callback;
   }

@@ -1,11 +1,11 @@
-import { type ReactNode, useState, useCallback } from 'react';
-import Avatar from './ui/Avatar';
+import { useState, useCallback } from 'react';
+import { Avatar } from './ui';
 import LevelBadge from './ui/LevelBadge';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import LikeButton from './LikeButton';
 import ReportDialog from './ReportDialog';
-import { toast } from './ui/Toast';
+import { toast } from './ui';
 import { formatRelativeTime } from '../utils/relativeTime';
 
 interface ReplyItemProps {

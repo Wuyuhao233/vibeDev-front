@@ -4,16 +4,16 @@ import { useAuthStore } from '../store/authStore';
 import * as userApi from '../api/user';
 import { ApiError } from '../utils/error';
 import { PASSWORD_PATTERN } from '../utils/patterns';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import Avatar from '../components/ui/Avatar';
-import Modal from '../components/ui/Modal';
-import ConfirmDialog from '../components/ui/ConfirmDialog';
-import EmptyState from '../components/ui/EmptyState';
-import Pagination from '../components/ui/Pagination';
-import Skeleton from '../components/ui/Skeleton';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { toast } from '../components/ui/Toast';
+import { Button } from '../components/ui';
+import { Input } from '../components/ui';
+import { Avatar } from '../components/ui';
+import { Dialog } from '../components/ui';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui';
+import { Empty } from '../components/ui';
+import { Pagination } from '../components/ui';
+import { Skeleton } from '../components/ui';
+import { Spinner } from '../components/ui';
+import { toast } from '../components/ui';
 import { formatRelativeTime } from '../utils/relativeTime';
 import * as notificationApi from '../api/notification';
 
@@ -161,7 +161,7 @@ function ProfileSection() {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-card p-6">
-        <Skeleton variant="profile" />
+        <Skeleton className="h-40 w-full rounded-md" />
       </div>
     );
   }
@@ -175,7 +175,7 @@ function ProfileSection() {
         <Avatar
           src={profile?.avatar}
           name={profile?.username || ''}
-          size={64}
+          className="size-8"
         />
         <label className="px-4 py-2 text-sm font-medium text-primary-500 border border-primary-500 rounded-md hover:bg-primary-50 cursor-pointer transition-colors duration-150">
           更换头像
@@ -197,23 +197,20 @@ function ProfileSection() {
             setNicknameError('');
           }}
           error={nicknameError}
-          charCount={{ current: nickname.length, max: 20 }}
         />
 
         <Input
           label="签名"
-          as="textarea"
+         
           value={signature}
           onChange={(e) => {
             setSignature(e.target.value);
             setSigError('');
           }}
           error={sigError}
-          charCount={{ current: signature.length, max: 200 }}
-          rows={3}
         />
 
-        <Button onClick={handleSaveProfile} loading={saving} className="self-start">
+        <Button onClick={handleSaveProfile} disabled={saving} className="self-start">
           保存修改
         </Button>
       </div>
@@ -401,7 +398,7 @@ function SecuritySection() {
         <p className="text-sm text-gray-500 mb-6">
           为保障账号安全，请使用新密码重新登录
         </p>
-        <Button variant="danger" onClick={handleReLogin}>
+        <Button variant="destructive" onClick={handleReLogin}>
           重新登录
         </Button>
       </div>
@@ -479,7 +476,7 @@ function SecuritySection() {
             disabled={savingPwd}
           />
 
-          <Button onClick={handleChangePassword} loading={savingPwd} className="self-start">
+          <Button onClick={handleChangePassword} disabled={savingPwd} className="self-start">
             保存修改
           </Button>
         </div>
@@ -520,24 +517,27 @@ function SecuritySection() {
             <p className="text-sm text-gray-500 mb-4">
               绑定 CAS 账号后，可使用 CAS 单点登录
             </p>
-            <Button variant="secondary" onClick={handleCasBind}>
+            <Button variant="outline" onClick={handleCasBind}>
               绑定 CAS 账号
             </Button>
           </div>
         )}
       </div>
 
-      <ConfirmDialog
-        open={unbindDialogOpen}
-        onClose={() => setUnbindDialogOpen(false)}
-        onConfirm={handleUnbindCas}
-        title="确认解绑 CAS"
-        description={
-          <p>解绑后你将无法使用 CAS 登录，仅能通过邮箱密码登录。<br />请确认你已设置过密码。</p>
-        }
-        confirmLabel="确认解绑"
-        loading={unbinding}
-      />
+      <AlertDialog open={unbindDialogOpen} onOpenChange={(o) => !o && setUnbindDialogOpen(false)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认解绑 CAS</AlertDialogTitle>
+            <AlertDialogDescription>
+              解绑后你将无法使用 CAS 登录，仅能通过邮箱密码登录。请确认你已设置过密码。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={unbinding}>取消</AlertDialogCancel>
+            <AlertDialogAction disabled={unbinding} onClick={handleUnbindCas}>确认解绑</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Login History */}
       <div className="bg-white rounded-lg shadow-card p-6">
@@ -546,9 +546,9 @@ function SecuritySection() {
         </h2>
 
         {historyLoading ? (
-          <Skeleton variant="table-row" rows={5} />
+          <Skeleton className="h-10 w-full"/>
         ) : loginHistory.length === 0 ? (
-          <EmptyState title="暂无登录记录" />
+          <Empty title="暂无登录记录" />
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -654,7 +654,7 @@ function DeactivateSection() {
         </button>
       </div>
 
-      <Modal open={showDialog} onClose={handleClose} size="sm" closeOnBackdrop={false}>
+      <Dialog open={showDialog} onOpenChange={(o) => !o && handleClose()}>
         {step === 1 && (
           <>
             <div className="flex items-start gap-3">
@@ -685,7 +685,7 @@ function DeactivateSection() {
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <Button variant="ghost" onClick={handleClose}>取消</Button>
-              <Button variant="danger" disabled={!understood} onClick={() => setStep(2)}>继续</Button>
+              <Button variant="destructive" disabled={!understood} onClick={() => setStep(2)}>继续</Button>
             </div>
           </>
         )}
@@ -715,7 +715,7 @@ function DeactivateSection() {
             <div className="flex justify-end gap-3 mt-6">
               <Button variant="ghost" onClick={() => setStep(1)}>上一步</Button>
               <Button
-                variant="danger"
+                variant="destructive"
                 disabled={email !== user?.email}
                 onClick={() => setStep(3)}
               >
@@ -748,9 +748,8 @@ function DeactivateSection() {
             <div className="flex justify-end gap-3 mt-6">
               <Button variant="ghost" onClick={() => setStep(2)}>上一步</Button>
               <Button
-                variant="danger"
-                disabled={!password}
-                loading={loading}
+                variant="destructive"
+                disabled={!password || loading}
                 onClick={handleDeactivate}
               >
                 确认注销账号
@@ -758,7 +757,7 @@ function DeactivateSection() {
             </div>
           </>
         )}
-      </Modal>
+      </Dialog>
     </>
   );
 }
@@ -852,7 +851,7 @@ function DataSection() {
               <option value="collections">仅收藏</option>
             </select>
           </div>
-          <Button onClick={handleExport} loading={loading}>
+          <Button onClick={handleExport} disabled={loading}>
             申请导出
           </Button>
         </div>
@@ -961,7 +960,7 @@ function NotificationSection() {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-card p-6">
-        <Skeleton variant="table-row" rows={7} />
+        <Skeleton className="h-10 w-full"/>
       </div>
     );
   }
@@ -994,7 +993,7 @@ function NotificationSection() {
                     <span className="inline-flex items-center gap-2">
                       {isBanned && (
                         <svg className="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="11" width="18" height="11" rx="2" />
+                          <rect x="3" y="11" rx="2" />
                           <path d="M7 11V7a5 5 0 0110 0v4" />
                         </svg>
                       )}
@@ -1030,7 +1029,7 @@ function NotificationSection() {
                         </span>
                       </label>
                       {updating === `${pref.eventType}-${ch.key}` && (
-                        <LoadingSpinner size="sm" className="ml-1 inline-block align-middle" />
+                        <Spinner className="ml-1 inline-block align-middle" />
                       )}
                     </td>
                   ))}
@@ -1042,7 +1041,7 @@ function NotificationSection() {
       </div>
 
       {preferences.length === 0 && (
-        <EmptyState title="暂无通知设置数据" />
+        <Empty title="暂无通知设置数据" />
       )}
     </div>
   );

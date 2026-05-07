@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import NotificationDropdown from './NotificationDropdown';
-import Avatar from './ui/Avatar';
+import { Avatar } from './ui';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -81,7 +81,7 @@ export default function Navbar() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 p-1 rounded-md hover:bg-gray-100 transition-colors duration-150"
                 >
-                  <Avatar name={user?.username || ''} size={32} />
+                  <Avatar name={user?.username || ''} size="sm" />
                   <span className="text-sm text-gray-700 max-w-[100px] truncate">{user?.username}</span>
                   <svg
                     width="12"

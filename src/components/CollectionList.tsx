@@ -1,6 +1,6 @@
 import type { CollectionFolder, CollectionItem } from '../api/collection';
 import FolderTabs from './FolderTabs';
-import EmptyState from './ui/EmptyState';
+import { Empty } from './ui';
 import ErrorState from './ui/ErrorState';
 
 interface CollectionListProps {
@@ -49,7 +49,7 @@ export default function CollectionList({
       ) : error ? (
         <ErrorState title="加载收藏失败" description={error} onRetry={onRetry} />
       ) : items.length === 0 ? (
-        <EmptyState
+        <Empty
           title="暂无收藏"
           description={selectedFolderId === null ? '遇到好内容记得收藏哦' : '该收藏夹为空'}
         />

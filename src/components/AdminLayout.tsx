@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import Avatar from './ui/Avatar';
+import { Avatar } from './ui';
 
 const adminNavItems = [
   { label: '仪表盘', path: '/admin' },
@@ -45,7 +45,7 @@ export default function AdminLayout() {
           ))}
         </nav>
         <div className="p-4 border-t border-gray-100 flex items-center gap-3">
-          <Avatar name={user?.username || ''} size={32} />
+          <Avatar name={user?.username || ''} size="sm" />
           <div className="flex-1 min-w-0">
             <p className="text-sm text-gray-700 truncate">{user?.username}</p>
           </div>

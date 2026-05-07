@@ -162,7 +162,7 @@ describe('PostPage', () => {
 
   it('shows appeal button for rejected post when user is author', async () => {
     const { useAuthStore } = await import('../store/authStore');
-    (useAuthStore as ReturnType<typeof vi.fn>).mockReturnValue({
+    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       user: { id: 1, username: 'testuser', level: 3 },
       isAuthenticated: true,
     });

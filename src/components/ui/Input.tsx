@@ -1,72 +1,20 @@
-import { type InputHTMLAttributes, type TextareaHTMLAttributes, useState, useId } from 'react';
+import * as React from "react"
+import { Input as InputPrimitive } from "@base-ui/react/input"
 
-interface BaseInputProps {
-  label?: string;
-  error?: string;
-  hint?: string;
-  charCount?: { current: number; max: number };
-}
+import { cn } from "@/lib/utils"
 
-type InputProps = BaseInputProps &
-  InputHTMLAttributes<HTMLInputElement> & { as?: 'input' };
-type TextareaProps = BaseInputProps &
-  TextareaHTMLAttributes<HTMLTextAreaElement> & { as: 'textarea' };
-
-type Props = InputProps | TextareaProps;
-
-export default function Input(props: Props) {
-  const {
-    label,
-    error,
-    hint,
-    charCount,
-    as,
-    className = '',
-    id: externalId,
-    ...rest
-  } = props;
-  const generatedId = useId();
-  const id = externalId || generatedId;
-  const [focused, setFocused] = useState(false);
-
-  const baseClass =
-    'w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 transition-colors duration-150 outline-none';
-  const stateClass = error
-    ? 'border-red-500 focus:ring-2 focus:ring-red-200'
-    : focused
-      ? 'border-primary-500 ring-2 ring-primary-50'
-      : 'border-gray-200 hover:border-gray-300';
-  const inputClass = `${baseClass} ${stateClass} ${className}`;
-
-  const Tag = as === 'textarea' ? 'textarea' : 'input';
-
+function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
-    <div className="flex flex-col gap-1">
-      {label && (
-        <label htmlFor={id} className="text-sm font-medium text-gray-900">
-          {label}
-        </label>
+    <InputPrimitive
+      type={type}
+      data-slot="input"
+      className={cn(
+        "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+        className
       )}
-      <Tag
-        id={id}
-        className={inputClass}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        {...(rest as any)}
-      />
-      <div className="flex items-center justify-between">
-        <div>
-          {error && <p className="text-xs text-red-500">{error}</p>}
-          {hint && !error && <p className="text-xs text-gray-400">{hint}</p>}
-        </div>
-        {charCount && (
-          <p
-            className={`text-xs ${charCount.current > charCount.max ? 'text-red-500' : 'text-gray-400'}`}
-          >
-            {charCount.current}/{charCount.max}
-          </p>
-        )}
-      </div>
-    </div>
-  );
+      {...props}
+    />
+  )
 }
+
+export { Input }

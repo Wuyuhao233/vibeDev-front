@@ -1,15 +1,14 @@
 import { Link } from 'react-router-dom';
-import EmptyState from '../components/ui/EmptyState';
-import Button from '../components/ui/Button';
+import { Empty, Button } from '../components/ui';
 
 export default function NotFoundPage() {
   return (
-    <EmptyState
+    <Empty
       title="页面不存在"
       description="您访问的页面不存在或已被移除"
       action={
         <Link to="/">
-          <Button variant="primary" size="sm">
+          <Button variant="default" size="sm">
             返回首页
           </Button>
         </Link>

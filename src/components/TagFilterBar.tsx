@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
-import { toast } from '../components/ui/Toast';
+import { toast } from '../components/ui';
 
 interface Tag {
   id: number;

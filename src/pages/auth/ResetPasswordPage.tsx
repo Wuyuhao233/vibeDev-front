@@ -3,9 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import * as authApi from '../../api/auth';
 import { ApiError } from '../../utils/error';
 import { PASSWORD_PATTERN } from '../../utils/patterns';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import { toast } from '../../components/ui/Toast';
+import { Button, Input, toast } from '../../components/ui';
 
 type PageState = 'form' | 'success';
 
@@ -170,7 +168,7 @@ export default function ResetPasswordPage() {
             autoComplete="new-password"
           />
 
-          <Button type="submit" loading={loading} size="lg" className="w-full mt-2">
+          <Button type="submit" disabled={loading} size="lg" className="w-full mt-2">
             {loading ? '重置中...' : '重置密码'}
           </Button>
         </div>

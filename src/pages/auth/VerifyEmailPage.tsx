@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import * as authApi from '../../api/auth';
 import { ApiError } from '../../utils/error';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
-import Button from '../../components/ui/Button';
+import { Spinner, Button } from '../../components/ui';
 
 type State = 'verifying' | 'success' | 'error';
 
@@ -61,7 +60,7 @@ export default function VerifyEmailPage() {
     return (
       <div className="max-w-md mx-auto mt-16 text-center">
         <div className="bg-white rounded-lg shadow-card p-8">
-          <LoadingSpinner size="lg" text="正在验证邮箱..." className="mb-4" />
+          <Spinner className="mb-4" />
         </div>
       </div>
     );
@@ -95,7 +94,7 @@ export default function VerifyEmailPage() {
         <p className="text-sm text-gray-500 mb-6">{errorMessage}</p>
         <div className="flex justify-center gap-3">
           <Link to="/register">
-            <Button variant="secondary">重新注册</Button>
+            <Button variant="outline">重新注册</Button>
           </Link>
           <Link to="/">
             <Button variant="ghost">返回首页</Button>

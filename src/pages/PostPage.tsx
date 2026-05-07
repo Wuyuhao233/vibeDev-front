@@ -5,18 +5,15 @@ import remarkGfm from 'remark-gfm';
 import { getPost, deletePost, recordPostView, pinPost, unpinPost, toggleEssence, type PostDetail } from '../api/post';
 import { getReplies, createReply, deleteReply, type Reply } from '../api/reply';
 import { useAuthStore } from '../store/authStore';
-import Avatar from '../components/ui/Avatar';
-import LevelBadge from '../components/ui/LevelBadge';
-import TagBadge from '../components/ui/TagBadge';
-import { EmptyState, ErrorState, ConfirmDialog, Button } from '../components/ui';
-import { toast } from '../components/ui/Toast';
+import { Avatar, LevelBadge, TagBadge, Empty, ErrorState, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui';
+import { toast } from '../components/ui';
 import PostDetailSkeleton from '../components/PostDetailSkeleton';
 import LikeButton from '../components/LikeButton';
 import CollectButton from '../components/CollectButton';
 import SharePanel from '../components/SharePanel';
 import ReportDialog from '../components/ReportDialog';
 import AppealDialog from '../components/AppealDialog';
-import type { ShareCardData } from '../components/ShareCard';
+// import type { ShareCardData } from '../components/ShareCard';
 import ReplyTree from '../components/ReplyTree';
 import QuickReply from '../components/QuickReply';
 import { formatRelativeTime } from '../utils/relativeTime';
@@ -44,13 +41,13 @@ export default function PostPage() {
 
   // UI state
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [_deleteLoading, setDeleteLoading] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
   const [pinLoading, setPinLoading] = useState(false);
   const [essenceLoading, setEssenceLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [appealOpen, setAppealOpen] = useState(false);
-  const [editing, setEditing] = useState(false);
+  const [_editing, setEditing] = useState(false);
   const [replyToId, setReplyToId] = useState<number | null>(null);
   const [replyToUsername, setReplyToUsername] = useState<string | null>(null);
   const [highlightedReplyId, setHighlightedReplyId] = useState<number | null>(null);
@@ -209,7 +206,7 @@ export default function PostPage() {
     [repliesPage, fetchReplies],
   );
 
-  const handleReplyEdit = useCallback((replyId: number) => {
+  const handleReplyEdit = useCallback((_replyId: number) => {
     // V1.1 will implement inline editing
     toast.info('编辑功能将在后续版本上线');
   }, []);
@@ -245,21 +242,21 @@ export default function PostPage() {
 
   // Error
   if (error) {
-    return <ErrorState title="加载失败" description={error} onRetry={fetchPost} />;
+    return <ErrorState description={error} onRetry={fetchPost} />;
   }
 
   // Not found
   if (notFound) {
     return (
-      <EmptyState
+      <Empty
         icon={
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
             <path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
         }
-        title="帖子不存在"
-        description="该帖子可能已被删除或链接无效"
+       
+       
         action={
           <Link
             to="/"
@@ -344,7 +341,7 @@ export default function PostPage() {
           <Avatar
             src={post.author.avatar || undefined}
             name={post.author.username}
-            size={48}
+            size="default"
           />
         </Link>
         <div>
@@ -611,16 +608,18 @@ export default function PostPage() {
       </div>
 
       {/* Delete confirm */}
-      <ConfirmDialog
-        open={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        onConfirm={handleDelete}
-        title="确认删除帖子？"
-        description="删除后该帖子将从版块列表中移除。其他人将无法看到该帖子。"
-        confirmLabel="确认删除"
-        cancelLabel="取消"
-        loading={deleteLoading}
-      />
+      <AlertDialog open={deleteOpen} onOpenChange={(o) => !o && setDeleteOpen(false)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>确定要删除这篇帖子吗？该操作不可撤销。</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Report dialog */}
       <ReportDialog

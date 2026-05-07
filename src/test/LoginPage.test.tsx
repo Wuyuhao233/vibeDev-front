@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import LoginPage from '../pages/auth/LoginPage';
-import { toast } from '../components/ui/Toast';
 
 const mockLoginApi = vi.fn();
 const mockCasLogin = vi.fn();
@@ -90,7 +89,7 @@ describe('LoginPage', () => {
   it('CAS button redirects on click', async () => {
     // Mock window.location as non-writable
     const originalLocation = window.location;
-    // @ts-expect-error: delete for mock
+    // delete for mock
     delete (window as any).location;
     (window as any).location = { href: '' };
 
