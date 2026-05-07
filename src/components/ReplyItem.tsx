@@ -4,6 +4,7 @@ import LevelBadge from './ui/LevelBadge';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import LikeButton from './LikeButton';
+import ReportDialog from './ReportDialog';
 import { toast } from './ui/Toast';
 import { formatRelativeTime } from '../utils/relativeTime';
 
@@ -60,6 +61,7 @@ export default function ReplyItem({
   const wasEdited = updatedAt && updatedAt !== createdAt;
   const level = Math.min(Math.max(author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6;
   const [shareCopied, setShareCopied] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const handleShare = useCallback(async () => {
     const url = `${window.location.origin}/post/${postId}#reply-${id}`;
@@ -75,8 +77,9 @@ export default function ReplyItem({
   }, [postId, id, onShare]);
 
   return (
-    <div className={`reply-item py-4 border-b border-gray-100 ${isDeleted ? 'opacity-60' : ''} ${className}`}>
-      <div className="flex gap-3">
+    <>
+      <div className={`reply-item py-4 border-b border-gray-100 ${isDeleted ? 'opacity-60' : ''} ${className}`}>
+        <div className="flex gap-3">
         <button
           onClick={() => window.location.hash = ''}
           className="flex-shrink-0"
@@ -147,6 +150,14 @@ export default function ReplyItem({
                 <span>{shareCopied ? '已复制' : '分享'}</span>
               </button>
 
+              {currentUserId && currentUserId !== author.id && (
+                <button
+                  onClick={() => setReportOpen(true)}
+                  className="text-sm text-gray-400 hover:text-red-500 transition-colors duration-150"
+                >
+                  举报
+                </button>
+              )}
               {canEdit && onEdit && (
                 <button
                   onClick={() => onEdit(id)}
@@ -167,6 +178,13 @@ export default function ReplyItem({
           )}
         </div>
       </div>
-    </div>
+      </div>
+      <ReportDialog
+        open={reportOpen}
+        targetType="reply"
+        targetId={id}
+        onClose={() => setReportOpen(false)}
+      />
+    </>
   );
 }

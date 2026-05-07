@@ -161,7 +161,7 @@ export default function NewPostPage() {
     if (title.length < 5) errs.title = '标题长度需在 5-100 字符之间';
     if (title.length > 100) errs.title = '标题长度需在 5-100 字符之间';
     if (!content.trim()) errs.content = '请输入帖子内容';
-    if (sensitiveHits.length > 0) errs.sensitive = '内容包含违规词汇，请修改后发布';
+    if (sensitiveHits.length > 0) errs.sensitive = '内容包含敏感词：';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }, [selectedBoardId, selectedTags, title, content, sensitiveHits]);
@@ -338,7 +338,7 @@ export default function NewPostPage() {
         <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-lg mb-4">
           <span className="text-red-500 font-medium text-sm">!</span>
           <span className="text-sm text-red-600">
-            内容包含违规词汇，请修改后发布
+            内容包含敏感词：
           </span>
           <div className="flex gap-1.5 ml-2">
             {sensitiveHits.map((word) => (

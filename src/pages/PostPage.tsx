@@ -14,6 +14,7 @@ import PostDetailSkeleton from '../components/PostDetailSkeleton';
 import LikeButton from '../components/LikeButton';
 import CollectButton from '../components/CollectButton';
 import SharePanel from '../components/SharePanel';
+import ReportDialog from '../components/ReportDialog';
 import type { ShareCardData } from '../components/ShareCard';
 import ReplyTree from '../components/ReplyTree';
 import QuickReply from '../components/QuickReply';
@@ -46,6 +47,7 @@ export default function PostPage() {
   const [pinOpen, setPinOpen] = useState(false);
   const [pinLoading, setPinLoading] = useState(false);
   const [essenceLoading, setEssenceLoading] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [replyToId, setReplyToId] = useState<number | null>(null);
   const [replyToUsername, setReplyToUsername] = useState<string | null>(null);
@@ -427,6 +429,16 @@ export default function PostPage() {
 
         <div className="flex-1" />
 
+        {/* Report button (non-author only) */}
+        {isAuthenticated && !isAuthor && (
+          <button
+            onClick={() => setReportOpen(true)}
+            className="text-sm text-gray-400 hover:text-red-500 transition-colors duration-150"
+          >
+            举报
+          </button>
+        )}
+
         {/* Stats */}
         <span className="text-sm text-gray-400">
           {post.viewCount} 次浏览 · {post.replyCount} 条回复
@@ -564,6 +576,14 @@ export default function PostPage() {
         confirmLabel="确认删除"
         cancelLabel="取消"
         loading={deleteLoading}
+      />
+
+      {/* Report dialog */}
+      <ReportDialog
+        open={reportOpen}
+        targetType="post"
+        targetId={post.id}
+        onClose={() => setReportOpen(false)}
       />
     </div>
   );
