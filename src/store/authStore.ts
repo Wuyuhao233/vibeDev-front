@@ -43,3 +43,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ accessToken, refreshToken });
   },
 }));
+
+// E2E helper: expose store to Playwright scripts
+if (typeof window !== 'undefined') {
+  (window as any).__authStore = useAuthStore;
+}
