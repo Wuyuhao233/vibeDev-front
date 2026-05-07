@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import AuthGuard from './components/AuthGuard';
+import AdminGuard from './components/AdminGuard';
 import MainLayout from './components/MainLayout';
 import AdminLayout from './components/AdminLayout';
 
@@ -28,6 +29,10 @@ import DashboardPage from './pages/admin/DashboardPage';
 import UsersPage from './pages/admin/UsersPage';
 import PostsPage from './pages/admin/PostsPage';
 import ReportsPage from './pages/admin/ReportsPage';
+import ReportDetailPage from './pages/admin/AdminReportDetail';
+import BoardsPage from './pages/admin/AdminBoards';
+import SensitiveWordsPage from './pages/admin/AdminSensitiveWords';
+import SettingsPageAdmin from './pages/admin/AdminSettings';
 
 export default function App() {
   return (
@@ -79,14 +84,20 @@ export default function App() {
           <Route
             element={
               <AuthGuard>
-                <AdminLayout />
+                <AdminGuard>
+                  <AdminLayout />
+                </AdminGuard>
               </AuthGuard>
             }
           >
             <Route path="/admin" element={<DashboardPage />} />
+            <Route path="/admin/boards" element={<BoardsPage />} />
             <Route path="/admin/users" element={<UsersPage />} />
             <Route path="/admin/posts" element={<PostsPage />} />
             <Route path="/admin/reports" element={<ReportsPage />} />
+            <Route path="/admin/reports/:id" element={<ReportDetailPage />} />
+            <Route path="/admin/sensitive-words" element={<SensitiveWordsPage />} />
+            <Route path="/admin/settings" element={<SettingsPageAdmin />} />
           </Route>
 
           {/* 404 */}

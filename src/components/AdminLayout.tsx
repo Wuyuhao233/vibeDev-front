@@ -2,11 +2,21 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Avatar } from './ui';
 
-const adminNavItems = [
-  { label: '仪表盘', path: '/admin' },
-  { label: '用户管理', path: '/admin/users' },
-  { label: '帖子管理', path: '/admin/posts' },
-  { label: '举报管理', path: '/admin/reports' },
+interface NavItem {
+  label: string;
+  path: string;
+  roles: ('admin' | 'moderator')[];
+}
+
+const adminNavItems: NavItem[] = [
+  { label: '仪表盘', path: '/admin', roles: ['admin', 'moderator'] },
+  { label: '版块管理', path: '/admin/boards', roles: ['admin'] },
+  { label: '用户管理', path: '/admin/users', roles: ['admin'] },
+  { label: '帖子管理', path: '/admin/posts', roles: ['admin'] },
+  { label: '审核队列', path: '/admin/moderation', roles: ['admin', 'moderator'] },
+  { label: '举报管理', path: '/admin/reports', roles: ['admin', 'moderator'] },
+  { label: '敏感词库', path: '/admin/sensitive-words', roles: ['admin'] },
+  { label: '系统设置', path: '/admin/settings', roles: ['admin'] },
 ];
 
 export default function AdminLayout() {
@@ -30,19 +40,21 @@ export default function AdminLayout() {
           <p className="text-xs text-gray-400 mt-1">管理后台</p>
         </div>
         <nav className="flex-1 p-3 space-y-1">
-          {adminNavItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`block px-3 py-2 rounded-md text-sm transition-colors duration-150 ${
-                location.pathname === item.path
-                  ? 'bg-primary-50 text-primary-500 font-medium'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {adminNavItems
+            .filter((item) => user && item.roles.includes(user.role as 'admin' | 'moderator'))
+            .map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`block px-3 py-2 rounded-md text-sm transition-colors duration-150 ${
+                  location.pathname.startsWith(item.path)
+                    ? 'bg-primary-50 text-primary-500 font-medium'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
         </nav>
         <div className="p-4 border-t border-gray-100 flex items-center gap-3">
           <Avatar name={user?.username || ''} size="sm" />

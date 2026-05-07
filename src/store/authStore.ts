@@ -2,12 +2,15 @@ import { create } from 'zustand';
 import { setTokens as setClientTokens, clearTokens } from '../api/client';
 import * as authApi from '../api/auth';
 
+export type UserRole = 'admin' | 'moderator' | 'user';
+
 interface User {
   id: number;
   username: string;
   email: string;
   avatar: string | null;
   level: number;
+  role: UserRole;
 }
 
 interface AuthState {
