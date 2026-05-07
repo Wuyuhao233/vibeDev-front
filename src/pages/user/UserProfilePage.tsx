@@ -19,6 +19,8 @@ import { Pagination } from '../../components/ui';
 import CollectionList from '../../components/CollectionList';
 import CollectionFolderManager from '../../components/CollectionFolderManager';
 import BatchMoveBar from '../../components/BatchMoveBar';
+import LevelProgress from '../../components/LevelProgress';
+import PointsHistory from '../../components/PointsHistory';
 import { toast } from '../../components/ui';
 import { formatRelativeTime } from '../../utils/relativeTime';
 
@@ -35,7 +37,7 @@ interface UserProfile {
   createdAt: string;
 }
 
-type TabKey = 'posts' | 'replies' | 'collections' | 'history';
+type TabKey = 'posts' | 'replies' | 'collections' | 'history' | 'points';
 
 interface TabItem {
   key: TabKey;
@@ -65,6 +67,7 @@ const TABS: TabItem[] = [
   { key: 'replies', label: '我的回复' },
   { key: 'collections', label: '我的收藏', requiresAuth: true },
   { key: 'history', label: '浏览历史', requiresAuth: true },
+  { key: 'points', label: '积分记录', requiresAuth: true },
 ];
 
 const PAGE_SIZE = 20;
@@ -298,6 +301,7 @@ export default function UserProfilePage() {
               <span>回复：{profile.replyCount ?? 0}</span>
               <span>注册于：{formatRelativeTime(profile.createdAt)}</span>
             </div>
+            <LevelProgress points={profile.points ?? 0} className="mt-4" />
           </div>
           {isOwner && (
             <Link
@@ -337,7 +341,9 @@ export default function UserProfilePage() {
         </div>
 
         <div className="p-6">
-          {activeTab === 'collections' && folders.length > 0 ? (
+          {activeTab === 'points' ? (
+            <PointsHistory username={username!} />
+          ) : activeTab === 'collections' && folders.length > 0 ? (
             <CollectionList
               folders={folders}
               selectedFolderId={selectedFolderId}

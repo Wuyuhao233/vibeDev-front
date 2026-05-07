@@ -13,6 +13,7 @@ import SearchPage from './pages/SearchPage';
 import NewPostPage from './pages/NewPostPage';
 import NotificationPage from './pages/NotificationPage';
 import SettingsPage from './pages/SettingsPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Auth pages
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="/post/:id" element={<PostPage />} />
             <Route path="/u/:username" element={<UserProfilePage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route
               path="/post/new"
               element={

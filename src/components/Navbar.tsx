@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import NotificationDropdown from './NotificationDropdown';
+import CheckInButton from './CheckInButton';
 import { Avatar } from './ui';
 
 export default function Navbar() {
@@ -67,6 +68,8 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <>
+              <CheckInButton />
+
               <button
                 onClick={() => navigate('/post/new')}
                 className="px-3 py-1.5 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
