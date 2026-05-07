@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import * as userApi from '../../api/user';
+import { getFolders, getFolderItems, type CollectionFolder, type CollectionItem } from '../../api/collection';
 import { ApiError } from '../../utils/error';
 import Avatar from '../../components/ui/Avatar';
 import LevelBadge from '../../components/ui/LevelBadge';
@@ -9,6 +10,8 @@ import Skeleton from '../../components/ui/Skeleton';
 import EmptyState from '../../components/ui/EmptyState';
 import ErrorState from '../../components/ui/ErrorState';
 import Pagination from '../../components/ui/Pagination';
+import CollectionList from '../../components/CollectionList';
+import CollectionFolderManager from '../../components/CollectionFolderManager';
 import { toast } from '../../components/ui/Toast';
 import { formatRelativeTime } from '../../utils/relativeTime';
 
@@ -74,6 +77,46 @@ export default function UserProfilePage() {
   const [total, setTotal] = useState(0);
   const [tabLoading, setTabLoading] = useState(false);
 
+  // Collection folder management
+  const [managerOpen, setManagerOpen] = useState(false);
+  const [folders, setFolders] = useState<CollectionFolder[]>([]);
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+  const [collectionItems, setCollectionItems] = useState<CollectionItem[]>([]);
+  const [collectionLoading, setCollectionLoading] = useState(false);
+  const [collectionError, setCollectionError] = useState<string | null>(null);
+
+  const fetchFolders = useCallback(async () => {
+    const data = await getFolders();
+    if (data.length > 0) {
+      setFolders(data);
+    }
+  }, []);
+
+  const fetchCollectionItems = useCallback(async () => {
+    setCollectionLoading(true);
+    setCollectionError(null);
+    try {
+      if (selectedFolderId === null) {
+        // Show all — use existing userApi.getCollections
+        const res = await userApi.getCollections(username!, page, PAGE_SIZE);
+        setItems(res.items);
+        setTotal(res.total);
+      } else {
+        const res = await getFolderItems(selectedFolderId, page - 1, PAGE_SIZE);
+        if (res) {
+          setCollectionItems(res.items);
+          setTotal(res.total);
+        } else {
+          setCollectionError('收藏夹功能暂未开放');
+        }
+      }
+    } catch {
+      setCollectionError('加载失败');
+    } finally {
+      setCollectionLoading(false);
+    }
+  }, [username, selectedFolderId, page]);
+
   const fetchProfile = useCallback(async () => {
     if (!username) return;
     setProfileLoading(true);
@@ -94,7 +137,8 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     fetchProfile();
-  }, [fetchProfile]);
+    if (isOwner) fetchFolders();
+  }, [fetchProfile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchTabData = useCallback(async () => {
     if (!username) return;
@@ -127,8 +171,12 @@ export default function UserProfilePage() {
   }, [username, activeTab, page]);
 
   useEffect(() => {
-    fetchTabData();
-  }, [fetchTabData]);
+    if (activeTab === 'collections' && folders.length > 0) {
+      fetchCollectionItems();
+    } else {
+      fetchTabData();
+    }
+  }, [fetchTabData, fetchCollectionItems, activeTab, folders]);
 
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
@@ -207,7 +255,7 @@ export default function UserProfilePage() {
 
       {/* Tabs */}
       <div className="bg-white rounded-lg shadow-card">
-        <div className="flex border-b border-gray-200">
+        <div className="flex items-center border-b border-gray-200">
           {visibleTabs.map((tab) => (
             <button
               key={tab.key}
@@ -221,10 +269,31 @@ export default function UserProfilePage() {
               {tab.label}
             </button>
           ))}
+          {isOwner && activeTab === 'collections' && (
+            <button
+              onClick={() => setManagerOpen(true)}
+              className="ml-auto mr-4 px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded hover:bg-gray-50 transition-colors duration-150"
+            >
+              管理收藏夹
+            </button>
+          )}
         </div>
 
         <div className="p-6">
-          {tabLoading ? (
+          {activeTab === 'collections' && folders.length > 0 ? (
+            <CollectionList
+              folders={folders}
+              selectedFolderId={selectedFolderId}
+              items={collectionItems}
+              loading={collectionLoading}
+              error={collectionError}
+              onFolderChange={(id) => {
+                setSelectedFolderId(id);
+                setPage(1);
+              }}
+              onRetry={fetchCollectionItems}
+            />
+          ) : tabLoading ? (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} variant="post-card" />
@@ -290,6 +359,14 @@ export default function UserProfilePage() {
           )}
         </div>
       </div>
+
+      <CollectionFolderManager
+        open={managerOpen}
+        onClose={() => {
+          setManagerOpen(false);
+          fetchFolders();
+        }}
+      />
     </div>
   );
 }

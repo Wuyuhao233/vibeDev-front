@@ -39,10 +39,12 @@ interface ReplyTreeNodeProps {
   reply: Reply;
   depth: number;
   childrenMap: Map<number, Reply[]>;
+  postId: number;
   currentUserId?: number | null;
   isModerator?: boolean;
   isAdmin?: boolean;
   onReply: (replyId: number) => void;
+  onShare?: (replyId: number) => void;
   onEdit: (replyId: number) => void;
   onDelete: (replyId: number) => void;
   highlightedReplyId: number | null;
@@ -52,10 +54,12 @@ function ReplyTreeNode({
   reply,
   depth,
   childrenMap,
+  postId,
   currentUserId,
   isModerator,
   isAdmin,
   onReply,
+  onShare,
   onEdit,
   onDelete,
   highlightedReplyId,
@@ -80,6 +84,7 @@ function ReplyTreeNode({
         <div style={{ paddingLeft: `${depth * 24}px` }}>
           <ReplyItem
             id={reply.id}
+            postId={postId}
             content={reply.content}
             author={reply.author}
             floorNumber={reply.floorNumber}
@@ -92,6 +97,7 @@ function ReplyTreeNode({
             isModerator={isModerator}
             isAdmin={isAdmin}
             onReply={() => onReply(reply.id)}
+            onShare={onShare}
             onEdit={onEdit}
             onDelete={onDelete}
           />
@@ -103,10 +109,12 @@ function ReplyTreeNode({
           reply={child}
           depth={depth + 1}
           childrenMap={childrenMap}
+          postId={postId}
           currentUserId={currentUserId}
           isModerator={isModerator}
           isAdmin={isAdmin}
           onReply={onReply}
+          onShare={onShare}
           onEdit={onEdit}
           onDelete={onDelete}
           highlightedReplyId={highlightedReplyId}
@@ -123,11 +131,13 @@ interface ReplyTreeProps {
   pageSize: number;
   loading: boolean;
   error: string | null;
+  postId: number;
   currentUserId?: number | null;
   isModerator?: boolean;
   isAdmin?: boolean;
   onPageChange: (page: number) => void;
   onReply: (replyId: number) => void;
+  onShare?: (replyId: number) => void;
   onEdit: (replyId: number) => void;
   onDelete: (replyId: number) => void;
   onRetry: () => void;
@@ -141,11 +151,13 @@ export default function ReplyTree({
   pageSize,
   loading,
   error,
+  postId,
   currentUserId,
   isModerator,
   isAdmin,
   onPageChange,
   onReply,
+  onShare,
   onEdit,
   onDelete,
   onRetry,
@@ -207,10 +219,12 @@ export default function ReplyTree({
             reply={reply}
             depth={0}
             childrenMap={childrenMap}
+            postId={postId}
             currentUserId={currentUserId}
             isModerator={isModerator}
             isAdmin={isAdmin}
             onReply={onReply}
+            onShare={onShare}
             onEdit={onEdit}
             onDelete={onDelete}
             highlightedReplyId={highlightedReplyId}

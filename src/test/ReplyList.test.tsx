@@ -23,6 +23,7 @@ const baseProps = {
   pageSize: 20,
   loading: false,
   error: null,
+  postId: 1,
   onPageChange: vi.fn(),
   onReply: vi.fn(),
   onEdit: vi.fn(),

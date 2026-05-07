@@ -12,11 +12,13 @@ interface ReplyListProps {
   pageSize: number;
   loading: boolean;
   error: string | null;
+  postId: number;
   currentUserId?: number | null;
   isModerator?: boolean;
   isAdmin?: boolean;
   onPageChange: (page: number) => void;
   onReply: (replyId: number) => void;
+  onShare?: (replyId: number) => void;
   onEdit: (replyId: number) => void;
   onDelete: (replyId: number) => void;
   onRetry: () => void;
@@ -29,11 +31,13 @@ export default function ReplyList({
   pageSize,
   loading,
   error,
+  postId,
   currentUserId,
   isModerator,
   isAdmin,
   onPageChange,
   onReply,
+  onShare,
   onEdit,
   onDelete,
   onRetry,
@@ -90,6 +94,7 @@ export default function ReplyList({
           <ReplyItem
             key={reply.id}
             id={reply.id}
+            postId={postId}
             content={reply.content}
             author={reply.author}
             floorNumber={reply.floorNumber}
@@ -102,6 +107,7 @@ export default function ReplyList({
             isModerator={isModerator}
             isAdmin={isAdmin}
             onReply={() => onReply(reply.id)}
+            onShare={onShare}
             onEdit={onEdit}
             onDelete={onDelete}
           />

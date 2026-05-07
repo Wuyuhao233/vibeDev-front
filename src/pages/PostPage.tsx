@@ -14,6 +14,7 @@ import PostDetailSkeleton from '../components/PostDetailSkeleton';
 import LikeButton from '../components/LikeButton';
 import CollectButton from '../components/CollectButton';
 import SharePanel from '../components/SharePanel';
+import type { ShareCardData } from '../components/ShareCard';
 import ReplyTree from '../components/ReplyTree';
 import QuickReply from '../components/QuickReply';
 import { formatRelativeTime } from '../utils/relativeTime';
@@ -390,7 +391,22 @@ export default function PostPage() {
               initialCollected={post.isCollected}
               initialCount={post.collectCount}
             />
-            <SharePanel url={postUrl} title={post.title} />
+            <SharePanel
+              url={postUrl}
+              title={post.title}
+              cardData={{
+                title: post.title,
+                authorName: post.author.username,
+                authorAvatar: post.author.avatar,
+                boardName: post.board.name,
+                excerpt: post.content
+                  ? post.content.replace(/[#*`>\-\[\]!()|~]/g, '').slice(0, 120)
+                  : '',
+                createdAt: post.createdAt,
+                replyCount: post.replyCount,
+                likeCount: post.likeCount,
+              }}
+            />
           </>
         ) : (
           <>
@@ -495,6 +511,7 @@ export default function PostPage() {
           pageSize={REPLY_PAGE_SIZE}
           loading={repliesLoading}
           error={repliesError}
+          postId={post.id}
           currentUserId={isAuthenticated ? user?.id : null}
           onPageChange={setRepliesPage}
           onReply={handleReplyToReply}
