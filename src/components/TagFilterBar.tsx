@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useAuthStore } from '../store/authStore';
+import { toast } from '../components/ui/Toast';
 
 interface Tag {
   id: number;
@@ -11,12 +13,15 @@ interface TagFilterBarProps {
   tags: Tag[];
   activeTagId: number | null;
   onSelect: (tagId: number | null) => void;
+  followedTagIds?: Set<number>;
+  onToggleFollow?: (tag: Tag) => void;
 }
 
 const MAX_VISIBLE = 8;
 
-export default function TagFilterBar({ tags, activeTagId, onSelect }: TagFilterBarProps) {
+export default function TagFilterBar({ tags, activeTagId, onSelect, followedTagIds, onToggleFollow }: TagFilterBarProps) {
   const [expanded, setExpanded] = useState(false);
+  const { isAuthenticated } = useAuthStore();
 
   const sorted = [{ id: 0, name: '全部', slug: '', sortOrder: -1 }, ...tags].sort(
     (a, b) => a.sortOrder - b.sortOrder
@@ -25,10 +30,21 @@ export default function TagFilterBar({ tags, activeTagId, onSelect }: TagFilterB
   const visible = expanded ? sorted : sorted.slice(0, MAX_VISIBLE);
   const hasMore = sorted.length > MAX_VISIBLE;
 
+  const isFollowed = (tagId: number) => followedTagIds?.has(tagId) ?? false;
+
+  const handleToggleFollow = (tag: Tag) => {
+    if (!isAuthenticated) {
+      toast.info('请先登录后关注标签');
+      return;
+    }
+    onToggleFollow?.(tag);
+  };
+
   return (
     <div className="tag-filter flex flex-wrap items-center gap-2 mb-4">
       {visible.map((tag) => {
         const isActive = tag.id === 0 ? activeTagId === null : activeTagId === tag.id;
+        const followed = tag.id !== 0 && isFollowed(tag.id);
         return (
           <button
             key={tag.id}
@@ -39,13 +55,35 @@ export default function TagFilterBar({ tags, activeTagId, onSelect }: TagFilterB
                 onSelect(tag.id);
               }
             }}
-            className={`tag-filter__item inline-flex items-center px-3 py-1 text-sm rounded-full transition-colors duration-150 ${
+            className={`tag-filter__item group inline-flex items-center gap-1 px-3 py-1 text-sm rounded-full transition-colors duration-150 ${
               isActive
                 ? 'tag-filter__item--active bg-primary-500 text-white'
                 : 'text-gray-500 bg-gray-100 hover:bg-gray-200'
             }`}
           >
             {tag.name}
+            {tag.id !== 0 && (
+              <span
+                className={`tag-filter__follow-toggle inline-flex items-center transition-opacity duration-150 ${
+                  followed ? '' : 'opacity-0 group-hover:opacity-100'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleFollow(tag);
+                }}
+                title={followed ? '取消关注' : '关注'}
+              >
+                {followed ? (
+                  <svg className="w-3.5 h-3.5 text-red-400 hover:text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5 hover:text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                )}
+              </span>
+            )}
           </button>
         );
       })}

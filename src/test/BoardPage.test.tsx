@@ -3,8 +3,11 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import BoardPage from '../pages/BoardPage';
 import * as boardApi from '../api/board';
+import * as tagApi from '../api/tag';
+import { useAuthStore } from '../store/authStore';
 
 vi.mock('../api/board');
+vi.mock('../api/tag');
 
 const mockBoard: boardApi.Board = {
   id: 1,
@@ -43,8 +46,10 @@ const mockPostsResult = {
 describe('BoardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthStore.setState({ isAuthenticated: false, user: null, accessToken: null, refreshToken: null });
     vi.mocked(boardApi.getBoard).mockResolvedValue(mockBoard);
     vi.mocked(boardApi.getBoardPosts).mockResolvedValue(mockPostsResult);
+    vi.mocked(tagApi.getFollowedTags).mockResolvedValue([]);
   });
 
   function renderBoard(route = '/board/general') {
@@ -71,11 +76,12 @@ describe('BoardPage', () => {
     });
   });
 
-  it('renders sort switcher', async () => {
+  it('renders sort switcher with trending option (V1.1)', async () => {
     renderBoard();
     await waitFor(() => {
       expect(screen.getByText('热门')).toBeInTheDocument();
       expect(screen.getByText('最新')).toBeInTheDocument();
+      expect(screen.getByText('热榜')).toBeInTheDocument();
     });
   });
 
@@ -85,7 +91,7 @@ describe('BoardPage', () => {
       expect(screen.getByText('全部')).toBeInTheDocument();
     });
     const reactButtons = screen.getAllByText('React');
-    expect(reactButtons.length).toBeGreaterThanOrEqual(2); // one in tag filter, one in post tags
+    expect(reactButtons.length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
   });
 
@@ -130,6 +136,21 @@ describe('BoardPage', () => {
         'general',
         expect.objectContaining({ sort: 'latest' })
       );
+    });
+  });
+
+  describe('V1.1 followed tags in BoardPage', () => {
+    it('fetches followed tags when authenticated', async () => {
+      useAuthStore.setState({ isAuthenticated: true, user: { id: 1, username: 'test', email: 'test@test.com', avatar: null, level: 1 }, accessToken: 'token', refreshToken: 'refresh' });
+      renderBoard();
+      await waitFor(() => {
+        expect(tagApi.getFollowedTags).toHaveBeenCalled();
+      });
+    });
+
+    it('does not fetch followed tags when not authenticated', () => {
+      renderBoard();
+      expect(tagApi.getFollowedTags).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { getBoard, getBoardPosts, type Board } from '../api/board';
+import { getFollowedTags, followTag, unfollowTag, type FollowedTag } from '../api/tag';
+import { useAuthStore } from '../store/authStore';
 import PostCard from '../components/PostCard';
 import SortSwitcher from '../components/SortSwitcher';
 import TagFilterBar from '../components/TagFilterBar';
@@ -25,6 +27,10 @@ export default function BoardPage() {
   const [postsLoading, setPostsLoading] = useState(true);
   const [postsError, setPostsError] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
+  const [followedTags, setFollowedTags] = useState<FollowedTag[]>([]);
+  const followedTagIds = new Set(followedTags.map((t) => t.id));
+
+  const { isAuthenticated } = useAuthStore();
 
   const tagParam = searchParams.get('tag');
   const sortParam = (searchParams.get('sort') || 'hot') as SortValue;
@@ -100,6 +106,39 @@ export default function BoardPage() {
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setFollowedTags([]);
+      return;
+    }
+    getFollowedTags()
+      .then(setFollowedTags)
+      .catch(() => { /* silently fail, tags just won't show as followed */ });
+  }, [isAuthenticated]);
+
+  const handleToggleFollow = async (tag: { id: number; name: string; slug: string }) => {
+    const isCurrentlyFollowed = followedTagIds.has(tag.id);
+    const prev = followedTags;
+
+    if (isCurrentlyFollowed) {
+      setFollowedTags((tags) => tags.filter((t) => t.id !== tag.id));
+      try {
+        await unfollowTag(tag.id);
+      } catch {
+        setFollowedTags(prev);
+        toast.error('取消关注失败，请重试');
+      }
+    } else {
+      setFollowedTags((tags) => [...tags, { id: tag.id, name: tag.name, slug: tag.slug }]);
+      try {
+        await followTag(tag.id);
+      } catch {
+        setFollowedTags(prev);
+        toast.error('关注失败，请重试');
+      }
+    }
+  };
 
   const handleSortChange = (sort: SortValue) => {
     updateParams({ sort: sort === 'hot' ? null : sort, page: null });
@@ -203,6 +242,8 @@ export default function BoardPage() {
           tags={board.tags.map((t) => ({ id: t.id, name: t.name, slug: t.slug, sortOrder: t.sortOrder }))}
           activeTagId={activeTagId}
           onSelect={handleTagChange}
+          followedTagIds={followedTagIds}
+          onToggleFollow={handleToggleFollow}
         />
       )}
 
@@ -211,7 +252,7 @@ export default function BoardPage() {
         <SortSwitcher
           value={sortParam}
           onChange={handleSortChange}
-          showTrending={false}
+          showTrending={true}
         />
       </div>
 

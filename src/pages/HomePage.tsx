@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { getHomeFeed, type FeedItem } from '../api/feed';
+import { getFollowedTags } from '../api/tag';
 import PostCard from '../components/PostCard';
 import { EmptyState, ErrorState } from '../components/ui';
 import { toast } from '../components/ui/Toast';
@@ -39,6 +40,7 @@ export default function HomePage() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [total, setTotal] = useState(0);
+  const [hasFollowedTags, setHasFollowedTags] = useState<boolean | null>(null);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const initialLoadRef = useRef(false);
@@ -49,15 +51,12 @@ export default function HomePage() {
   };
 
   const fetchPosts = useCallback(async (pageNum: number, append: boolean) => {
-    // V1.0: recommend is degraded to trending
-    const apiTab = activeTab === 'recommend' ? 'trending' : activeTab;
-
     try {
       if (!append) setLoading(true);
       setError(null);
 
       const result = await getHomeFeed({
-        tab: apiTab,
+        tab: activeTab,
         page: pageNum,
         limit: PAGE_SIZE,
       });
@@ -114,6 +113,17 @@ export default function HomePage() {
     }
   }, [activeTab, isAuthenticated, navigate]);
 
+  // Check followed tags when on following tab
+  useEffect(() => {
+    if (activeTab === 'following' && isAuthenticated) {
+      getFollowedTags()
+        .then((tags) => setHasFollowedTags(tags.length > 0))
+        .catch(() => setHasFollowedTags(false));
+    } else {
+      setHasFollowedTags(null);
+    }
+  }, [activeTab, isAuthenticated]);
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -148,6 +158,22 @@ export default function HomePage() {
 
     if (posts.length === 0) {
       if (activeTab === 'following') {
+        if (hasFollowedTags === false) {
+          return (
+            <EmptyState
+              title="你还没有关注的标签"
+              description="去版块页面关注感兴趣的标签吧"
+              action={
+                <Link
+                  to="/board/1"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                >
+                  去看看
+                </Link>
+              }
+            />
+          );
+        }
         return (
           <EmptyState
             title="关注标签下暂无帖子"
