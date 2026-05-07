@@ -14,7 +14,7 @@ import PostDetailSkeleton from '../components/PostDetailSkeleton';
 import LikeButton from '../components/LikeButton';
 import CollectButton from '../components/CollectButton';
 import SharePanel from '../components/SharePanel';
-import ReplyList from '../components/ReplyList';
+import ReplyTree from '../components/ReplyTree';
 import QuickReply from '../components/QuickReply';
 import { formatRelativeTime } from '../utils/relativeTime';
 
@@ -46,6 +46,9 @@ export default function PostPage() {
   const [pinLoading, setPinLoading] = useState(false);
   const [essenceLoading, setEssenceLoading] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [replyToId, setReplyToId] = useState<number | null>(null);
+  const [replyToUsername, setReplyToUsername] = useState<string | null>(null);
+  const [highlightedReplyId, setHighlightedReplyId] = useState<number | null>(null);
 
   // Fetch post
   const fetchPost = useCallback(async () => {
@@ -96,6 +99,32 @@ export default function PostPage() {
   useEffect(() => {
     fetchReplies(repliesPage);
   }, [fetchReplies, repliesPage]);
+
+  // Hash anchor: #reply-{reply_id} auto-scroll + 3s yellow highlight
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash.startsWith('#reply-')) {
+        const replyId = parseInt(hash.slice(7), 10);
+        if (!isNaN(replyId)) {
+          setHighlightedReplyId(replyId);
+          // Scroll after a tick to allow DOM to update
+          setTimeout(() => {
+            const el = document.getElementById(hash.slice(1));
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+          // Clear highlight after 3s
+          setTimeout(() => setHighlightedReplyId(null), 3000);
+        }
+      }
+    };
+
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [replies]);
 
   // Delete post
   const handleDelete = useCallback(async () => {
@@ -153,11 +182,13 @@ export default function PostPage() {
   // Reply actions
   const handleReplySubmit = useCallback(
     async (content: string) => {
-      await createReply(postId, { content });
+      await createReply(postId, { content, parentId: replyToId ?? undefined });
       toast.success('回复已发布');
+      setReplyToId(null);
+      setReplyToUsername(null);
       fetchReplies(repliesPage);
     },
-    [postId, repliesPage, fetchReplies],
+    [postId, replyToId, repliesPage, fetchReplies],
   );
 
   const handleReplyDelete = useCallback(
@@ -178,9 +209,22 @@ export default function PostPage() {
     toast.info('编辑功能将在后续版本上线');
   }, []);
 
-  const handleReplyToReply = useCallback((replyId: number) => {
-    // V1.1 will implement nested replies
-    toast.info('引用回复功能将在后续版本上线');
+  const handleReplyToReply = useCallback(
+    (replyId: number) => {
+      const reply = replies.find((r) => r.id === replyId);
+      setReplyToId(replyId);
+      setReplyToUsername(reply?.author.username ?? null);
+      // Scroll to quick reply
+      setTimeout(() => {
+        document.querySelector('.quick-reply')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    },
+    [replies],
+  );
+
+  const handleCancelReplyTo = useCallback(() => {
+    setReplyToId(null);
+    setReplyToUsername(null);
   }, []);
 
   // Permission checks
@@ -444,7 +488,7 @@ export default function PostPage() {
 
       {/* Replies section */}
       <div className="mt-8 pt-6 border-t border-gray-200">
-        <ReplyList
+        <ReplyTree
           replies={replies}
           total={repliesTotal}
           page={repliesPage}
@@ -457,11 +501,27 @@ export default function PostPage() {
           onEdit={handleReplyEdit}
           onDelete={handleReplyDelete}
           onRetry={() => fetchReplies(repliesPage)}
+          highlightedReplyId={highlightedReplyId}
         />
 
         {/* Quick reply */}
         {isAuthenticated ? (
-          <QuickReply onSubmit={handleReplySubmit} />
+          <div className="quick-reply-container">
+            {replyToId && replyToUsername && (
+              <div className="flex items-center gap-2 mt-4 px-3 py-2 bg-blue-50 border border-blue-200 rounded-md text-sm">
+                <span className="text-blue-700">
+                  正在回复 <span className="font-medium">@{replyToUsername}</span>
+                </span>
+                <button
+                  onClick={handleCancelReplyTo}
+                  className="ml-auto text-blue-500 hover:text-blue-700 text-xs"
+                >
+                  取消回复
+                </button>
+              </div>
+            )}
+            <QuickReply onSubmit={handleReplySubmit} />
+          </div>
         ) : (
           <div className="border-t border-gray-100 pt-4 mt-4">
             <div className="flex items-center justify-center gap-2 py-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
