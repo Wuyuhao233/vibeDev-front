@@ -24,6 +24,7 @@ export interface PostDetail {
   isEssence: boolean;
   auditStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
   auditReason?: string | null;
+  appealStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
   isDeleted?: boolean;
   version: number;
   createdAt: string;

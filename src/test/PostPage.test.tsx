@@ -159,4 +159,23 @@ describe('PostPage', () => {
       expect(mockRecordPostView).toHaveBeenCalledWith(1);
     });
   });
+
+  it('shows appeal button for rejected post when user is author', async () => {
+    const { useAuthStore } = await import('../store/authStore');
+    (useAuthStore as ReturnType<typeof vi.fn>).mockReturnValue({
+      user: { id: 1, username: 'testuser', level: 3 },
+      isAuthenticated: true,
+    });
+
+    mockGetPost.mockResolvedValue({
+      ...mockPostData,
+      auditStatus: 'REJECTED',
+      auditReason: '内容违规',
+    });
+
+    renderPostPage();
+    await waitFor(() => {
+      expect(screen.getByText('申诉')).toBeInTheDocument();
+    });
+  });
 });

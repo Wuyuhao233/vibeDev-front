@@ -15,6 +15,7 @@ import LikeButton from '../components/LikeButton';
 import CollectButton from '../components/CollectButton';
 import SharePanel from '../components/SharePanel';
 import ReportDialog from '../components/ReportDialog';
+import AppealDialog from '../components/AppealDialog';
 import type { ShareCardData } from '../components/ShareCard';
 import ReplyTree from '../components/ReplyTree';
 import QuickReply from '../components/QuickReply';
@@ -48,6 +49,7 @@ export default function PostPage() {
   const [pinLoading, setPinLoading] = useState(false);
   const [essenceLoading, setEssenceLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [appealOpen, setAppealOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [replyToId, setReplyToId] = useState<number | null>(null);
   const [replyToUsername, setReplyToUsername] = useState<string | null>(null);
@@ -305,7 +307,12 @@ export default function PostPage() {
             >
               修改重发
             </button>
-            <span className="text-xs text-gray-400">申诉功能即将上线</span>
+            <button
+              onClick={() => setAppealOpen(true)}
+              className="text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors duration-150"
+            >
+              申诉
+            </button>
           </div>
         </div>
       )}
@@ -621,6 +628,14 @@ export default function PostPage() {
         targetType="post"
         targetId={post.id}
         onClose={() => setReportOpen(false)}
+      />
+
+      {/* Appeal dialog */}
+      <AppealDialog
+        open={appealOpen}
+        postId={post.id}
+        initialStatus={post.appealStatus ?? null}
+        onClose={() => setAppealOpen(false)}
       />
     </div>
   );
