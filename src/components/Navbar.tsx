@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { useNotificationStore } from '../store/notificationStore';
+import NotificationDropdown from './NotificationDropdown';
 import Avatar from './ui/Avatar';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuthStore();
-  const unreadCount = useNotificationStore((s) => s.unreadCount);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -75,25 +74,7 @@ export default function Navbar() {
                 发布帖子
               </button>
 
-              <button
-                onClick={() => navigate('/notifications')}
-                className="relative p-1.5 text-gray-500 hover:text-primary-500 hover:bg-gray-100 rounded-md transition-colors duration-150"
-                aria-label="通知"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center px-1 font-medium">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
-              </button>
+              <NotificationDropdown />
 
               <div className="relative" ref={menuRef}>
                 <button

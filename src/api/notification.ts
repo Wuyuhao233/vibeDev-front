@@ -30,6 +30,10 @@ export async function getUnreadCount() {
   return res.data.data.count;
 }
 
+export async function deleteNotification(id: number) {
+  await client.delete(`/notifications/${id}`);
+}
+
 // ---- Notification Preferences ----
 
 export interface NotificationPreference {

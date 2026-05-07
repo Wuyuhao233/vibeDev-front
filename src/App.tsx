@@ -11,6 +11,7 @@ import PostPage from './pages/PostPage';
 import UserProfilePage from './pages/user/UserProfilePage';
 import SearchPage from './pages/SearchPage';
 import NewPostPage from './pages/NewPostPage';
+import NotificationPage from './pages/NotificationPage';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -51,6 +52,14 @@ export default function App() {
               element={
                 <AuthGuard>
                   <NewPostPage />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <AuthGuard>
+                  <NotificationPage />
                 </AuthGuard>
               }
             />
