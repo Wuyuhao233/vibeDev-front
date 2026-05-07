@@ -1,6 +1,4 @@
-import client from './client';
-
-export interface FeedItem {
+export interface PostCardData {
   id: number;
   title: string;
   content: string;
@@ -12,7 +10,7 @@ export interface FeedItem {
     avatar: string | null;
     level: number;
   };
-  board: { id: number; name: string; slug?: string };
+  board?: { id: number; name: string; slug?: string };
   tags: { id: number; name: string; slug: string }[];
   likeCount: number;
   replyCount: number;
@@ -22,16 +20,19 @@ export interface FeedItem {
   isEssence: boolean;
 }
 
-export interface FeedResult {
-  items: FeedItem[];
-  total: number;
+export interface BoardData {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string | null;
+  postCount: number;
+  sortOrder: number;
 }
 
-export async function getHomeFeed(params?: {
-  tab?: string;
-  page?: number;
-  limit?: number;
-}) {
-  const res = await client.get<{ data: FeedResult }>('/home/feed', { params });
-  return res.data.data;
+export interface TagData {
+  id: number;
+  name: string;
+  slug: string;
+  sortOrder: number;
 }
