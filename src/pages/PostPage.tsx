@@ -284,10 +284,29 @@ export default function PostPage() {
         </div>
       )}
 
-      {/* Audit status */}
+      {/* Audit status — PENDING */}
       {post.auditStatus === 'PENDING' && isAuthor && (
         <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-2 rounded-lg mb-4">
           你的帖子正在审核中，审核通过后将对所有人可见
+        </div>
+      )}
+
+      {/* Audit status — REJECTED */}
+      {post.auditStatus === 'REJECTED' && isAuthor && (
+        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-medium text-red-600 bg-red-100 px-1.5 py-px rounded-sm">已驳回</span>
+            <span className="text-sm text-red-700 font-medium">原因：{post.auditReason || '内容违规'}</span>
+          </div>
+          <div className="flex items-center gap-3 mt-2">
+            <button
+              onClick={() => navigate(`/post/edit/${post.id}`)}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-150"
+            >
+              修改重发
+            </button>
+            <span className="text-xs text-gray-400">申诉功能即将上线</span>
+          </div>
         </div>
       )}
 
@@ -353,10 +372,21 @@ export default function PostPage() {
             审核中
           </span>
         )}
+        {post.auditStatus === 'REJECTED' && (
+          <span className="inline-flex items-center rounded-sm px-1.5 py-px text-[11px] font-medium text-red-600 bg-red-50 flex-shrink-0">
+            已驳回
+          </span>
+        )}
       </div>
 
       {/* Content */}
-      <div className="prose max-w-none mb-6 prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-primary-500 prose-code:text-sm prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-lg prose-img:max-w-full prose-blockquote:border-l-primary-500 prose-blockquote:text-gray-500 prose-table:border prose-th:bg-gray-50 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2">
+      <div
+        className={`prose max-w-none mb-6 prose-headings:text-gray-900 prose-a:text-primary-500 prose-code:text-sm prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-lg prose-img:max-w-full prose-blockquote:border-l-primary-500 prose-blockquote:text-gray-500 prose-table:border prose-th:bg-gray-50 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 ${
+          post.auditStatus === 'REJECTED'
+            ? 'text-gray-400 line-through prose-p:text-gray-400'
+            : 'prose-p:text-gray-700 prose-p:leading-relaxed'
+        }`}
+      >
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
           {post.contentMarkdown || post.content}
         </ReactMarkdown>
@@ -533,8 +563,15 @@ export default function PostPage() {
           highlightedReplyId={highlightedReplyId}
         />
 
-        {/* Quick reply */}
-        {isAuthenticated ? (
+        {/* Quick reply — disabled for PENDING, hidden for REJECTED */}
+        {post.auditStatus === 'PENDING' && isAuthor ? (
+          <div className="border-t border-gray-100 pt-4 mt-4">
+            <p className="text-sm text-gray-400 text-center py-4 bg-gray-50 rounded-lg">
+              审核中的内容暂不支持回复
+            </p>
+          </div>
+        ) : post.auditStatus === 'REJECTED' ? null : (
+          isAuthenticated ? (
           <div className="quick-reply-container">
             {replyToId && replyToUsername && (
               <div className="flex items-center gap-2 mt-4 px-3 py-2 bg-blue-50 border border-blue-200 rounded-md text-sm">
@@ -563,7 +600,7 @@ export default function PostPage() {
               </Link>
             </div>
           </div>
-        )}
+        ))}
       </div>
 
       {/* Delete confirm */}

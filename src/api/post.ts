@@ -23,6 +23,7 @@ export interface PostDetail {
   isPinned: boolean;
   isEssence: boolean;
   auditStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
+  auditReason?: string | null;
   isDeleted?: boolean;
   version: number;
   createdAt: string;
