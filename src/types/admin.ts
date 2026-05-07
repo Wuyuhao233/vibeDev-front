@@ -116,3 +116,60 @@ export interface SettingListResponse {
   items: SettingItem[];
   total: number;
 }
+
+// Review queue (V1.1)
+export interface ReviewQueueItem {
+  id: string;
+  targetType: 'post' | 'reply';
+  targetId: string;
+  targetTitle: string;
+  contentExcerpt: string;
+  author: { id: string; username: string; avatarUrl: string | null };
+  boardName: string;
+  aiScore: number;
+  aiCategory: string;
+  aiDegraded: boolean;
+  status: 'pending' | 'approved' | 'rejected';
+  priority: number;
+  createdAt: string;
+}
+
+export interface ReviewQueueStats {
+  pendingCount: number;
+  todayApproved: number;
+  todayRejected: number;
+}
+
+export interface ReviewQueueListResponse {
+  items: ReviewQueueItem[];
+  stats: ReviewQueueStats;
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface ReviewStatsResponse {
+  queue: {
+    pendingCount: number;
+    appealCount: number;
+    todayApproved: number;
+    todayRejected: number;
+  };
+  reports: {
+    pendingCount: number;
+    todayResolved: number;
+  };
+  quality: {
+    passRate: number;
+    blockRate: number;
+    manualPassRate: number;
+    falsePositiveRate: number;
+    missRate: number;
+  };
+  cost: {
+    monthlyBudget: number;
+    monthlyCost: number;
+    dailyApiCalls: number;
+    isBudgetExceeded: boolean;
+  };
+}

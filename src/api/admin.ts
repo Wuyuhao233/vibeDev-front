@@ -167,3 +167,33 @@ export async function updateSetting(key: string, value: string) {
   const res = await client.put<{ data: any }>(`/admin/settings/${key}`, { value });
   return res.data.data;
 }
+
+// Review queue (V1.1)
+export async function getReviewQueue(params?: { status?: string; targetType?: string; page?: number; pageSize?: number }) {
+  const res = await client.get<{ data: import('../types/admin').ReviewQueueListResponse }>('/admin/review-queue', { params });
+  return res.data.data;
+}
+
+export async function approveReviewItem(id: string) {
+  await client.post(`/admin/review-queue/${id}/approve`);
+}
+
+export async function rejectReviewItem(id: string, reason: string) {
+  await client.post(`/admin/review-queue/${id}/reject`, { reason });
+}
+
+export async function getReviewStats() {
+  const res = await client.get<{ data: import('../types/admin').ReviewStatsResponse }>('/admin/review-stats');
+  return res.data.data;
+}
+
+// Moderator assignment (V1.1)
+export async function getModeratorList() {
+  const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/users', { params: { role: 'moderator', limit: '100' } });
+  return res.data.data;
+}
+
+export async function updateUserRole(userId: string, role: string) {
+  const res = await client.put<{ data: any }>(`/admin/users/${userId}/role`, { role });
+  return res.data.data;
+}
