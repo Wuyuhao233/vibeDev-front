@@ -2,7 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import * as userApi from '../../api/user';
-import { getFolders, getFolderItems, type CollectionFolder, type CollectionItem } from '../../api/collection';
+import {
+  getFolders,
+  getFolderItems,
+  moveItems,
+  type CollectionFolder,
+  type CollectionItem,
+} from '../../api/collection';
 import { ApiError } from '../../utils/error';
 import Avatar from '../../components/ui/Avatar';
 import LevelBadge from '../../components/ui/LevelBadge';
@@ -12,6 +18,7 @@ import ErrorState from '../../components/ui/ErrorState';
 import Pagination from '../../components/ui/Pagination';
 import CollectionList from '../../components/CollectionList';
 import CollectionFolderManager from '../../components/CollectionFolderManager';
+import BatchMoveBar from '../../components/BatchMoveBar';
 import { toast } from '../../components/ui/Toast';
 import { formatRelativeTime } from '../../utils/relativeTime';
 
@@ -85,6 +92,12 @@ export default function UserProfilePage() {
   const [collectionLoading, setCollectionLoading] = useState(false);
   const [collectionError, setCollectionError] = useState<string | null>(null);
 
+  // Batch move state
+  const [selectedPostIds, setSelectedPostIds] = useState<Set<number>>(new Set());
+  const [moving, setMoving] = useState(false);
+
+  const canManageFolders = isOwner && (profile?.level ?? 0) >= 3;
+
   const fetchFolders = useCallback(async () => {
     const data = await getFolders();
     if (data.length > 0) {
@@ -97,9 +110,15 @@ export default function UserProfilePage() {
     setCollectionError(null);
     try {
       if (selectedFolderId === null) {
-        // Show all — use existing userApi.getCollections
         const res = await userApi.getCollections(username!, page, PAGE_SIZE);
-        setItems(res.items);
+        // Map to CollectionItem shape for consistent rendering
+        const mapped: CollectionItem[] = res.items.map((item: any) => ({
+          postId: item.id ?? item.postId,
+          postTitle: item.title ?? item.postTitle ?? '',
+          boardName: item.boardName ?? '',
+          collectedAt: item.collectedAt ?? item.createdAt ?? '',
+        }));
+        setCollectionItems(mapped);
         setTotal(res.total);
       } else {
         const res = await getFolderItems(selectedFolderId, page - 1, PAGE_SIZE);
@@ -137,8 +156,11 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     fetchProfile();
+  }, [fetchProfile]);
+
+  useEffect(() => {
     if (isOwner) fetchFolders();
-  }, [fetchProfile]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOwner, fetchFolders]);
 
   const fetchTabData = useCallback(async () => {
     if (!username) return;
@@ -178,9 +200,44 @@ export default function UserProfilePage() {
     }
   }, [fetchTabData, fetchCollectionItems, activeTab, folders]);
 
+  const handleToggleSelect = (postId: number) => {
+    setSelectedPostIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(postId)) {
+        next.delete(postId);
+      } else {
+        next.add(postId);
+      }
+      return next;
+    });
+  };
+
+  const handleBatchMove = async (targetFolderId: number) => {
+    if (selectedPostIds.size === 0 || moving) return;
+    setMoving(true);
+    const postIds = Array.from(selectedPostIds);
+    const ok = await moveItems(postIds, targetFolderId);
+    setMoving(false);
+    if (ok) {
+      // Remove moved items from current view
+      setCollectionItems((prev) => prev.filter((item) => !selectedPostIds.has(item.postId)));
+      setSelectedPostIds(new Set());
+      toast.success(`已移动到收藏夹`);
+      // Refresh folders to update counts
+      fetchFolders();
+    } else {
+      toast.error('移动失败，请重试');
+    }
+  };
+
+  const handleCancelSelection = () => {
+    setSelectedPostIds(new Set());
+  };
+
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
     setPage(1);
+    setSelectedPostIds(new Set());
   };
 
   // Profile skeleton
@@ -290,8 +347,13 @@ export default function UserProfilePage() {
               onFolderChange={(id) => {
                 setSelectedFolderId(id);
                 setPage(1);
+                setSelectedPostIds(new Set());
               }}
               onRetry={fetchCollectionItems}
+              selectable={canManageFolders}
+              selectedIds={selectedPostIds}
+              onToggleSelect={handleToggleSelect}
+              onNewFolder={() => setManagerOpen(true)}
             />
           ) : tabLoading ? (
             <div className="flex flex-col gap-3">
@@ -367,6 +429,14 @@ export default function UserProfilePage() {
           fetchFolders();
         }}
       />
+
+      {selectedPostIds.size > 0 && (
+        <BatchMoveBar
+          selectedCount={selectedPostIds.size}
+          onMove={handleBatchMove}
+          onCancel={handleCancelSelection}
+        />
+      )}
     </div>
   );
 }
