@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { getSettings, updateSetting } from '../../api/admin';
+import { getSettings, updateSetting, recalculatePoints } from '../../api/admin';
 import type { SettingItem } from '../../types/admin';
 import {
   Button,
@@ -23,6 +23,20 @@ export default function AdminSettings() {
   const [editingSetting, setEditingSetting] = useState<SettingItem | null>(null);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
+  const [recalculating, setRecalculating] = useState(false);
+
+  const handleRecalculate = async () => {
+    if (!window.confirm('确认要重算全站用户积分吗？此操作将根据积分日志重新计算所有用户的积分和等级。')) return;
+    setRecalculating(true);
+    try {
+      const result = await recalculatePoints();
+      toast.success(`积分重算完成，更新了 ${result.updatedUsers} 个用户`);
+    } catch (err: any) {
+      toast.error(err?.message || '积分重算失败');
+    } finally {
+      setRecalculating(false);
+    }
+  };
 
   const fetchSettings = useCallback(async () => {
     setLoading(true);
@@ -103,6 +117,22 @@ export default function AdminSettings() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {settings.length > 0 && (
+        <div className="mt-6 bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">全站积分重算</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            根据积分日志重新计算所有用户的积分和等级。此操作不可撤销，建议在低峰期执行。
+          </p>
+          <Button
+            onClick={handleRecalculate}
+            disabled={recalculating}
+            variant="destructive"
+          >
+            {recalculating ? '重算中...' : '全站积分重算'}
+          </Button>
         </div>
       )}
 

@@ -148,6 +148,26 @@ export interface ReviewQueueListResponse {
   pageSize: number;
 }
 
+// Appeal (V1.2)
+export interface AppealItem {
+  id: string;
+  reportId: string;
+  appellantId: string;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected';
+  handlerId: string | null;
+  handlerNote: string | null;
+  createdAt: string;
+  processedAt: string | null;
+}
+
+export interface AppealListResponse {
+  items: AppealItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface ReviewStatsResponse {
   queue: {
     pendingCount: number;

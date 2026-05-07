@@ -187,6 +187,26 @@ export async function getReviewStats() {
   return res.data.data;
 }
 
+// Appeals (V1.2)
+export async function getAppeals(params?: { status?: string; page?: number; pageSize?: number }) {
+  const res = await client.get<{ data: import('../types/admin').AppealListResponse }>('/admin/appeals', { params });
+  return res.data.data;
+}
+
+export async function approveAppeal(id: string) {
+  await client.post(`/admin/appeals/${id}/approve`);
+}
+
+export async function rejectAppeal(id: string, data: { result: string; note?: string }) {
+  await client.post(`/admin/appeals/${id}/reject`, data);
+}
+
+// Points recalculation (V1.2)
+export async function recalculatePoints() {
+  const res = await client.post<{ data: { updatedUsers: number } }>('/admin/points/recalculate');
+  return res.data.data;
+}
+
 // Moderator assignment (V1.1)
 export async function getModeratorList() {
   const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/users', { params: { role: 'moderator', limit: '100' } });

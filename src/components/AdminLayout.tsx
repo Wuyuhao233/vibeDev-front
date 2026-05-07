@@ -19,6 +19,7 @@ const adminNavItems: NavItem[] = [
   { label: 'AI 审核', path: '/admin/review-queue', roles: ['admin', 'moderator'] },
   { label: '审核统计', path: '/admin/review-stats', roles: ['admin'] },
   { label: '版主分配', path: '/admin/moderator-assignment', roles: ['admin'] },
+  { label: '申诉复审', path: '/admin/appeals', roles: ['admin'] },
   { label: '系统设置', path: '/admin/settings', roles: ['admin'] },
 ];
 
