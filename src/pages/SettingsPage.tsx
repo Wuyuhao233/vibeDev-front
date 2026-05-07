@@ -279,6 +279,7 @@ function SecuritySection() {
   }, []);
 
   const fetchCasBinding = async () => {
+    setCasLoading(true);
     try {
       const data = await userApi.getCasBinding();
       setCasInfo(data);

@@ -4,8 +4,7 @@ import path from 'path';
 import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = path.join(__dirname, 'screenshots');
-fs.mkdirSync(OUT_DIR, { recursive: true });
+const OUT_DIR = __dirname;
 
 const BASE = 'http://localhost:5173';
 const PAGES = [
@@ -49,7 +48,7 @@ async function main() {
   }
 
   await browser.close();
-  console.log('\nAll screenshots saved to e2e/screenshots/');
+  console.log('\nAll screenshots saved to e2e/user/V1.0/');
 }
 
 main().catch((err) => {
