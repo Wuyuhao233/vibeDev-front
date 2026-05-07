@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import NotificationDropdown from './NotificationDropdown';
 import CheckInButton from './CheckInButton';
+import SearchInput from './SearchInput';
 import { Avatar } from './ui';
 
 export default function Navbar() {
@@ -12,10 +13,8 @@ export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const handleSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
+  const handleSearchSubmit = (query: string) => {
+    navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
   const handleLogout = async () => {
@@ -44,25 +43,13 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-4 flex-1 max-w-lg mx-8">
-          <div className="relative w-full">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
-              <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            <input
-              type="text"
-              placeholder="搜索帖子..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
-              className="w-full h-9 pl-9 pr-3 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-50 transition-all duration-150 placeholder:text-gray-400"
-            />
-          </div>
+        <div className="flex items-center flex-1 max-w-lg mx-8">
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onSubmit={handleSearchSubmit}
+            className="w-full"
+          />
         </div>
 
         <div className="flex items-center gap-3">

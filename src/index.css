@@ -212,3 +212,12 @@ body {
     @apply font-sans;
   }
 }
+
+/* Search keyword highlighting */
+.search-highlight mark,
+mark.search-highlight {
+  background: #FFF3CD;
+  color: #333;
+  border-radius: 2px;
+  padding: 0 1px;
+}

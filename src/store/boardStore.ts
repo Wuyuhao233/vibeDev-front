@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { type Board } from '../api/board';
+import type { Board } from '../api/board';
 
 interface BoardState {
   boards: Board[];

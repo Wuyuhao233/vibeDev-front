@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getReports, handleReport } from '../../api/admin';
-import { getBoards, Board } from '../../api/board';
+import { getBoards } from '../../api/board';
+import type { Board } from '../../api/board';
 import type { AdminReport } from '../../types/admin';
 import {
   Button,

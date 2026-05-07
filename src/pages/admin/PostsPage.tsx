@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { getAdminPosts, pinPost, unpinPost, markEssence, unmarkEssence, adminDeletePost, movePost } from '../../api/admin';
-import { getBoards, Board } from '../../api/board';
+import { getBoards } from '../../api/board';
+import type { Board } from '../../api/board';
 import type { AdminPost } from '../../types/admin';
 import {
   Button,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useLocation } from 'react-router-dom';
-import { getBoards, type Board } from '../api/board';
+import { getBoards } from '../api/board';
+import type { Board } from '../api/board';
 import { getFollowedTags, unfollowTag, type FollowedTag } from '../api/tag';
 import { useAuthStore } from '../store/authStore';
 import { toast } from '../components/ui';
