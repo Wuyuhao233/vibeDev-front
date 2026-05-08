@@ -2,19 +2,19 @@ import { useEffect } from 'react';
 import { useThemeStore } from '../store/themeStore';
 
 export default function ThemeInitializer() {
-  const setTheme = useThemeStore((s) => s.setTheme);
+  const setMode = useThemeStore((s) => s.setMode);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = () => {
-      const { theme } = useThemeStore.getState();
-      if (theme === 'system') {
-        setTheme('system');
+      const { mode } = useThemeStore.getState();
+      if (mode === 'system') {
+        setMode('system');
       }
     };
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
-  }, [setTheme]);
+  }, [setMode]);
 
   return null;
 }

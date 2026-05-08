@@ -1,26 +1,39 @@
 import { create } from 'zustand';
 
-export type Theme = 'light' | 'dark' | 'system';
-type ResolvedTheme = 'light' | 'dark';
+export type DesignSystem = 'github' | 'claude' | 'apple';
+export type ColorMode = 'light' | 'dark' | 'system';
 
-const STORAGE_KEY = 'vibeDev:theme';
+const DS_KEY = 'vibeDev:design-system';
+const MODE_KEY = 'vibeDev:mode';
 
-function getStoredTheme(): Theme {
+function getStoredDesignSystem(): DesignSystem {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(DS_KEY);
+    if (stored === 'github' || stored === 'claude' || stored === 'apple') return stored;
+  } catch { /* storage blocked */ }
+  return 'github';
+}
+
+function getStoredMode(): ColorMode {
+  try {
+    const stored = localStorage.getItem(MODE_KEY);
     if (stored === 'light' || stored === 'dark' || stored === 'system') return stored;
   } catch { /* storage blocked */ }
   return 'system';
 }
 
-function resolveTheme(theme: Theme): ResolvedTheme {
-  if (theme === 'system') {
+function resolveMode(mode: ColorMode): 'light' | 'dark' {
+  if (mode === 'system') {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
-  return theme;
+  return mode;
 }
 
-function applyTheme(resolved: ResolvedTheme) {
+function applyDesignSystem(ds: DesignSystem) {
+  document.documentElement.setAttribute('data-theme', ds);
+}
+
+function applyMode(resolved: 'light' | 'dark') {
   const el = document.documentElement;
   if (resolved === 'dark') {
     el.classList.add('dark');
@@ -30,26 +43,39 @@ function applyTheme(resolved: ResolvedTheme) {
 }
 
 interface ThemeState {
-  theme: Theme;
-  resolved: ResolvedTheme;
-  setTheme: (theme: Theme) => void;
+  designSystem: DesignSystem;
+  mode: ColorMode;
+  resolvedMode: 'light' | 'dark';
+  setDesignSystem: (ds: DesignSystem) => void;
+  setMode: (mode: ColorMode) => void;
 }
 
-export const useThemeStore = create<ThemeState>((set, get) => {
-  const initial = getStoredTheme();
-  const resolved = resolveTheme(initial);
-  applyTheme(resolved);
+export const useThemeStore = create<ThemeState>((set) => {
+  const designSystem = getStoredDesignSystem();
+  const mode = getStoredMode();
+  const resolvedMode = resolveMode(mode);
+
+  applyDesignSystem(designSystem);
+  applyMode(resolvedMode);
 
   return {
-    theme: initial,
-    resolved,
-    setTheme: (theme: Theme) => {
+    designSystem,
+    mode,
+    resolvedMode,
+    setDesignSystem: (ds: DesignSystem) => {
       try {
-        localStorage.setItem(STORAGE_KEY, theme);
+        localStorage.setItem(DS_KEY, ds);
       } catch { /* storage blocked */ }
-      const next = resolveTheme(theme);
-      applyTheme(next);
-      set({ theme, resolved: next });
+      applyDesignSystem(ds);
+      set({ designSystem: ds });
+    },
+    setMode: (mode: ColorMode) => {
+      try {
+        localStorage.setItem(MODE_KEY, mode);
+      } catch { /* storage blocked */ }
+      const next = resolveMode(mode);
+      applyMode(next);
+      set({ mode, resolvedMode: next });
     },
   };
 });
@@ -57,9 +83,9 @@ export const useThemeStore = create<ThemeState>((set, get) => {
 // Listen for system preference changes
 if (typeof window !== 'undefined') {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    const { theme, setTheme } = useThemeStore.getState();
-    if (theme === 'system') {
-      setTheme('system');
+    const { mode, setMode } = useThemeStore.getState();
+    if (mode === 'system') {
+      setMode('system');
     }
   });
 }
