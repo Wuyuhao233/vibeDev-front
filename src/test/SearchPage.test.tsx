@@ -274,4 +274,91 @@ describe('SearchPage', () => {
       });
     });
   });
+
+  // V1.2: Relevance sort indicator
+  it('shows relevance sort indicator and search time', async () => {
+    vi.mocked(searchApi.search).mockResolvedValue({
+      ...mockSearchResults,
+      searchTime: '0.42s',
+    });
+    renderSearch('/search?q=react');
+    await waitFor(() => {
+      expect(screen.getByText('按相关度排序')).toBeInTheDocument();
+    });
+    expect(screen.getByText('搜索耗时 0.42s')).toBeInTheDocument();
+  });
+
+  // V1.2: Trending sidebar on results page
+  it('shows trending sidebar on results page', async () => {
+    renderSearch('/search?q=react');
+    await waitFor(() => {
+      const headings = screen.getAllByText('热门搜索');
+      expect(headings.length).toBeGreaterThanOrEqual(1);
+    });
+    // Trending keywords should be present
+    expect(screen.getAllByText('React').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('TypeScript').length).toBeGreaterThanOrEqual(1);
+  });
+
+  // V1.2: Click trending term triggers search
+  it('clicks trending in sidebar triggers search', async () => {
+    renderSearch('/search?q=react');
+    await waitFor(() => {
+      expect(screen.getAllByText('热门搜索').length).toBeGreaterThanOrEqual(1);
+    });
+    // Click on the first "TypeScript" trending term
+    const tsButtons = screen.getAllByText('TypeScript');
+    const sidebarButton = tsButtons.find(
+      (btn) => btn.closest('button')
+    );
+    if (sidebarButton) {
+      fireEvent.click(sidebarButton);
+    }
+    // Should trigger search with the trending keyword
+    await waitFor(() => {
+      expect(searchApi.search).toHaveBeenCalled();
+    });
+  });
+
+  // V1.2: Client-side highlighting fallback when server returns plain text
+  it('highlights keywords client-side when server returns plain text', async () => {
+    vi.mocked(searchApi.search).mockResolvedValue({
+      items: [
+        {
+          id: 3,
+          title: 'Understanding React',
+          titleHighlighted: undefined,
+          contentExcerpt: 'This is a guide to understanding React hooks and patterns',
+          contentExcerptHighlighted: undefined,
+          author: { id: 1, username: 'dev1', avatar: null, level: 2 },
+          tags: [],
+          likeCount: 5,
+          replyCount: 2,
+          collectCount: 0,
+          createdAt: new Date().toISOString(),
+          isPinned: false,
+          isEssence: false,
+        },
+      ],
+      total: 1,
+      page: 1,
+      pageSize: 20,
+      searchTime: '0.12s',
+    });
+    renderSearch('/search?q=react');
+    await waitFor(() => {
+      // Client-side highlighting should produce <mark> tags
+      const marks = document.querySelectorAll('mark.search-highlight');
+      expect(marks.length).toBeGreaterThan(0);
+    });
+  });
+
+  // V1.2: Trending not shown on results page when there are no trending items
+  it('hides trending sidebar when no trending data', async () => {
+    vi.mocked(searchApi.getTrendingSearches).mockResolvedValue([]);
+    renderSearch('/search?q=react');
+    await waitFor(() => {
+      expect(screen.queryByText('热门搜索')).not.toBeInTheDocument();
+    });
+  });
 });

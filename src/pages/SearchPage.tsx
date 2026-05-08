@@ -19,8 +19,20 @@ const SCOPE_OPTIONS: { value: SearchScope; label: string }[] = [
 
 const COOLDOWN_SECONDS = 3;
 
-function highlightHtml(text: string): string {
-  return text;
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, (c) => map[c]);
+}
+
+function highlightHtml(text: string, keyword: string): string {
+  if (!keyword.trim()) return escapeHtml(text);
+  const escaped = escapeHtml(text);
+  const escapedKeyword = escapeHtml(keyword.trim());
+  const regex = new RegExp(
+    escapedKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+    'gi',
+  );
+  return escaped.replace(regex, (match) => `<mark class="search-highlight">${match}</mark>`);
 }
 
 function renderWithHighlights(html: string) {
@@ -37,6 +49,7 @@ export default function SearchPage() {
   const [inputValue, setInputValue] = useState(query);
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [total, setTotal] = useState(0);
+  const [searchTime, setSearchTime] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [boards, setBoards] = useState<Awaited<ReturnType<typeof getBoards>>>([]);
@@ -120,6 +133,7 @@ export default function SearchPage() {
       if (!q.trim()) {
         setResults([]);
         setTotal(0);
+        setSearchTime(undefined);
         return;
       }
       setLoading(true);
@@ -128,10 +142,12 @@ export default function SearchPage() {
         const data = await search({ q: q.trim(), scope: s, boardId: bId, page: p, pageSize: 20 });
         setResults(data.items);
         setTotal(data.total);
+        setSearchTime(data.searchTime);
       } catch (err: any) {
         setError(err?.message || '搜索失败，请稍后重试');
         setResults([]);
         setTotal(0);
+        setSearchTime(undefined);
       } finally {
         setLoading(false);
       }
@@ -357,15 +373,86 @@ export default function SearchPage() {
         {/* Results */}
         {!loading && !error && results.length > 0 && (
           <>
-            <div className="text-sm text-gray-500 mb-4">
-              共 {total} 条结果
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-sm text-gray-500">
+                共 {total} 条结果
+              </div>
+              <span className="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-100 rounded-sm px-2 py-0.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                  <path d="M3 4h2l1 8h10l2-14H7" stroke="currentColor" strokeWidth="2" fill="none" />
+                  <circle cx="8.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+                  <circle cx="18.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+                按相关度排序
+              </span>
+              {searchTime && (
+                <span className="text-xs text-gray-400">
+                  搜索耗时 {searchTime}
+                </span>
+              )}
             </div>
 
-            <div className="space-y-3">
-              {results.map((item) => (
-                <SearchResultCard key={item.id} item={item} />
-              ))}
+            <div className="flex gap-6">
+              {/* Results column */}
+              <div className="flex-1 min-w-0 space-y-3">
+                {results.map((item) => (
+                  <SearchResultCard key={item.id} item={item} query={query} />
+                ))}
+              </div>
+
+              {/* Trending sidebar */}
+              {trending.length > 0 && (
+                <div className="hidden lg:block w-56 flex-shrink-0">
+                  <div className="sticky top-20">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-3">热门搜索</h4>
+                    <div className="space-y-1">
+                      {trending.slice(0, 8).map((item, i) => (
+                        <button
+                          key={item.keyword}
+                          onClick={() => {
+                            setInputValue(item.keyword);
+                            handleSubmit(item.keyword);
+                          }}
+                          className="w-full text-left px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded transition-colors duration-150 flex items-center gap-2"
+                        >
+                          <span className={`flex-shrink-0 w-4 text-xs font-medium ${i < 3 ? 'text-primary-500' : 'text-gray-400'}`}>
+                            {i + 1}
+                          </span>
+                          <span className="truncate">{item.keyword}</span>
+                          {item.count !== undefined && (
+                            <span className="flex-shrink-0 text-xs text-gray-400 ml-auto">{formatCount(item.count)}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* Trending on mobile (below results) */}
+            {trending.length > 0 && (
+              <div className="lg:hidden mt-8 pt-6 border-t border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-900 mb-3">热门搜索</h4>
+                <div className="flex flex-wrap gap-2">
+                  {trending.map((item) => (
+                    <button
+                      key={item.keyword}
+                      onClick={() => {
+                        setInputValue(item.keyword);
+                        handleSubmit(item.keyword);
+                      }}
+                      className="inline-flex items-center px-3 py-1.5 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-150"
+                    >
+                      {item.keyword}
+                      {item.count !== undefined && (
+                        <span className="ml-1.5 text-xs text-gray-400">{formatCount(item.count)}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -425,13 +512,15 @@ export default function SearchPage() {
   );
 }
 
-function SearchResultCard({ item }: { item: SearchResultItem }) {
+function SearchResultCard({ item, query }: { item: SearchResultItem; query: string }) {
   const titleContent = item.titleHighlighted
     ? renderWithHighlights(item.titleHighlighted)
     : item.title;
   const excerptContent = item.contentExcerptHighlighted
     ? renderWithHighlights(item.contentExcerptHighlighted)
-    : item.contentExcerpt || '';
+    : item.contentExcerpt
+      ? renderWithHighlights(highlightHtml(item.contentExcerpt, query))
+      : null;
 
   return (
     <article
