@@ -122,12 +122,22 @@ export async function generateShareCard(id: string) {
   return res.data.data;
 }
 
+export interface SensitiveMatch {
+  word: string;
+  positions: number[];
+}
+
+export interface SensitiveCheckResult {
+  hasSensitive: boolean;
+  matches: SensitiveMatch[];
+}
+
 export async function getSensitiveWords() {
-  const res = await client.get<{ data: string[] }>('/sensitive-words');
+  const res = await client.get<{ data: string[] }>('/admin/sensitive-words');
   return res.data.data;
 }
 
-export async function checkSensitiveWords(text: string) {
-  const res = await client.post<{ data: { hits: string[] } }>('/sensitive-words/check', { text });
+export async function checkSensitiveWords(content: string) {
+  const res = await client.post<{ data: SensitiveCheckResult }>('/content/check-sensitive', { content });
   return res.data.data;
 }

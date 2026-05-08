@@ -2,18 +2,17 @@ import { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, toast } from './ui';
 import { submitReport, type ReportData } from '../api/report';
 
-const REPORT_TYPES: { value: ReportData['reason']; label: string; desc: string }[] = [
+const REPORT_TYPES: { value: ReportData['reasonType']; label: string; desc: string }[] = [
   { value: 'spam', label: '垃圾广告', desc: '商业广告、推广信息等' },
-  { value: 'sexual', label: '色情低俗', desc: '色情、低俗、擦边内容' },
-  { value: 'illegal', label: '违法违规', desc: '违反法律法规的内容' },
-  { value: 'harassment', label: '人身攻击', desc: '辱骂、诽谤、隐私泄露' },
+  { value: 'violation', label: '违法违规', desc: '违反法律法规的内容' },
+  { value: 'personal_attack', label: '人身攻击', desc: '辱骂、诽谤、隐私泄露' },
   { value: 'other', label: '其他', desc: '其他违规内容' },
 ];
 
 interface ReportDialogProps {
   open: boolean;
   targetType: ReportData['targetType'];
-  targetId: number;
+  targetId: string;
   onClose: () => void;
 }
 
@@ -26,7 +25,7 @@ export default function ReportDialog({
   targetId,
   onClose,
 }: ReportDialogProps) {
-  const [reason, setReason] = useState<ReportData['reason']>('spam');
+  const [reasonType, setReasonType] = useState<ReportData['reasonType']>('spam');
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -47,7 +46,7 @@ export default function ReportDialog({
       await submitReport({
         targetType,
         targetId,
-        reason,
+        reasonType,
         description: description.trim() || undefined,
       });
       lastReportedTarget = dupeKey;
@@ -67,10 +66,10 @@ export default function ReportDialog({
     } finally {
       setSubmitting(false);
     }
-  }, [targetType, targetId, reason, description, onClose, alreadyReported, dupeKey]);
+  }, [targetType, targetId, reasonType, description, onClose, alreadyReported, dupeKey]);
 
   const handleClose = useCallback(() => {
-    setReason('spam');
+    setReasonType('spam');
     setDescription('');
     setSubmitting(false);
     setSubmitted(false);
@@ -91,7 +90,7 @@ export default function ReportDialog({
                 <label
                   key={type.value}
                   className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors duration-150 ${
-                    reason === type.value
+                    reasonType === type.value
                       ? 'border-primary-500 bg-primary-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
@@ -100,8 +99,8 @@ export default function ReportDialog({
                     type="radio"
                     name="reportReason"
                     value={type.value}
-                    checked={reason === type.value}
-                    onChange={() => setReason(type.value)}
+                    checked={reasonType === type.value}
+                    onChange={() => setReasonType(type.value)}
                     className="mt-0.5"
                   />
                   <div>

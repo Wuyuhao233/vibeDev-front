@@ -18,7 +18,7 @@ export interface TrendItem {
 
 // User management
 export interface AdminUser {
-  id: number;
+  id: string;
   username: string;
   email: string;
   avatar: string | null;
@@ -37,10 +37,10 @@ export interface AdminUserListResponse {
 
 // Post management
 export interface AdminPost {
-  id: number;
+  id: string;
   title: string;
-  author: { id: number; username: string; avatar: string | null };
-  board: { id: number; name: string } | null;
+  author: { id: string; username: string; avatar: string | null };
+  board: { id: string; name: string } | null;
   status: 'published' | 'deleted' | 'hidden';
   isPinned: boolean;
   isEssence: boolean;
@@ -54,17 +54,19 @@ export interface AdminPostListResponse {
 
 // Report management
 export interface AdminReport {
-  id: number;
-  type: 'post' | 'reply';
-  targetId: number;
-  reason: string;
-  description: string;
-  reporter: { id: number; username: string };
-  targetContent: string;
-  status: 'pending' | 'handled';
-  boardId: number | null;
-  boardName: string | null;
+  id: string;
+  reporterId: string;
+  targetType: 'post' | 'reply';
+  targetId: string;
+  reasonType: string;
+  description: string | null;
+  status: string;
+  result: string | null;
+  resultDescription: string | null;
+  handlerId: string | null;
+  isMalicious: boolean;
   createdAt: string;
+  processedAt: string | null;
 }
 
 export interface AdminReportListResponse {
@@ -74,7 +76,7 @@ export interface AdminReportListResponse {
 
 // Board management
 export interface AdminBoard {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   description: string;
@@ -85,7 +87,7 @@ export interface AdminBoard {
 }
 
 export interface AdminTag {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   sortOrder: number;
@@ -93,10 +95,11 @@ export interface AdminTag {
 
 // Sensitive words
 export interface SensitiveWord {
-  id: number;
+  id: string;
   word: string;
-  category: string;
-  enabled: boolean;
+  matchType: string;
+  isActive: boolean;
+  createdBy: string;
   createdAt: string;
 }
 
@@ -151,14 +154,18 @@ export interface ReviewQueueListResponse {
 // Appeal (V1.2)
 export interface AppealItem {
   id: string;
-  reportId: string;
-  appellantId: string;
-  reason: string;
+  contentId: string;
+  contentTitle: string;
+  contentSummary: string;
+  appellantUsername: string;
+  violationCategory: string;
+  aiScore: number | null;
+  appealReason: string;
   status: 'pending' | 'approved' | 'rejected';
-  handlerId: string | null;
-  handlerNote: string | null;
+  reviewedBy: string | null;
+  reviewNote: string | null;
   createdAt: string;
-  processedAt: string | null;
+  reviewedAt: string | null;
 }
 
 export interface AppealListResponse {

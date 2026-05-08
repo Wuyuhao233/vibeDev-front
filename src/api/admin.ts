@@ -18,67 +18,67 @@ export async function getUsers(params?: { page?: number; pageSize?: number; keyw
   return res.data.data;
 }
 
-export async function getUserDetail(userId: number) {
+export async function getUserDetail(userId: string) {
   const res = await client.get<{ data: any }>(`/admin/users/${userId}`);
   return res.data.data;
 }
 
-export async function updateUser(userId: number, data: { role?: string; level?: number }) {
+export async function updateUser(userId: string, data: { role?: string; level?: number }) {
   const res = await client.put<{ data: any }>(`/admin/users/${userId}`, data);
   return res.data.data;
 }
 
-export async function banUser(userId: number, data: { reason?: string; duration?: number }) {
+export async function banUser(userId: string, data: { reason?: string; duration?: string }) {
   await client.post(`/admin/users/${userId}/ban`, data);
 }
 
-export async function unbanUser(userId: number) {
-  await client.post(`/admin/users/${userId}/unban`);
+export async function unbanUser(userId: string) {
+  await client.delete(`/admin/users/${userId}/ban`);
 }
 
 // Post management
-export async function getAdminPosts(params?: { page?: number; pageSize?: number; keyword?: string; boardId?: number; status?: string; startDate?: string; endDate?: string }) {
+export async function getAdminPosts(params?: { page?: number; pageSize?: number; keyword?: string; boardId?: string; status?: string; startDate?: string; endDate?: string }) {
   const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/posts', { params });
   return res.data.data;
 }
 
-export async function pinPost(postId: number) {
+export async function pinPost(postId: string) {
   await client.post(`/admin/posts/${postId}/pin`);
 }
 
-export async function unpinPost(postId: number) {
+export async function unpinPost(postId: string) {
   await client.post(`/admin/posts/${postId}/unpin`);
 }
 
-export async function markEssence(postId: number) {
+export async function markEssence(postId: string) {
   await client.post(`/admin/posts/${postId}/essence`);
 }
 
-export async function unmarkEssence(postId: number) {
+export async function unmarkEssence(postId: string) {
   await client.post(`/admin/posts/${postId}/unessence`);
 }
 
-export async function adminDeletePost(postId: number) {
+export async function adminDeletePost(postId: string) {
   await client.delete(`/admin/posts/${postId}`);
 }
 
-export async function movePost(postId: number, boardId: number) {
+export async function movePost(postId: string, boardId: string) {
   await client.post(`/admin/posts/${postId}/move`, { boardId });
 }
 
 // Report management
-export async function getReports(params?: { page?: number; pageSize?: number; status?: string; type?: string; boardId?: number }) {
+export async function getReports(params?: { page?: number; pageSize?: number; status?: string; targetType?: string; boardId?: string }) {
   const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/reports', { params });
   return res.data.data;
 }
 
-export async function getReportDetail(reportId: number) {
+export async function getReportDetail(reportId: string) {
   const res = await client.get<{ data: any }>(`/admin/reports/${reportId}`);
   return res.data.data;
 }
 
-export async function handleReport(reportId: number, data: { action: 'ignore' | 'warn' | 'delete_post' | 'ban'; note: string }) {
-  await client.post(`/admin/reports/${reportId}/handle`, data);
+export async function handleReport(reportId: string, data: { result: string; resultDescription?: string; banDuration?: string; banReason?: string }) {
+  await client.put(`/admin/reports/${reportId}/handle`, data);
 }
 
 // Board management
@@ -92,68 +92,66 @@ export async function createBoard(data: { name: string; slug: string; descriptio
   return res.data.data;
 }
 
-export async function updateBoard(boardId: number, data: { name?: string; description?: string; icon?: string; status?: string }) {
+export async function updateBoard(boardId: string, data: { name?: string; description?: string; icon?: string; status?: string }) {
   const res = await client.put<{ data: any }>(`/admin/boards/${boardId}`, data);
   return res.data.data;
 }
 
-export async function deleteBoard(boardId: number) {
+export async function deleteBoard(boardId: string) {
   await client.delete(`/admin/boards/${boardId}`);
 }
 
-export async function reorderBoards(boardIds: number[]) {
+export async function reorderBoards(boardIds: string[]) {
   await client.post('/admin/boards/reorder', { boardIds });
 }
 
 // Board tags
-export async function getBoardTags(boardId: number) {
+export async function getBoardTags(boardId: string) {
   const res = await client.get<{ data: any[] }>(`/admin/boards/${boardId}/tags`);
   return res.data.data;
 }
 
-export async function createBoardTag(boardId: number, data: { name: string; slug: string }) {
+export async function createBoardTag(boardId: string, data: { name: string; slug: string }) {
   const res = await client.post<{ data: any }>(`/admin/boards/${boardId}/tags`, data);
   return res.data.data;
 }
 
-export async function updateBoardTag(tagId: number, data: { name?: string; slug?: string; sortOrder?: number }) {
+export async function updateBoardTag(tagId: string, data: { name?: string; slug?: string; sortOrder?: number }) {
   const res = await client.put<{ data: any }>(`/admin/tags/${tagId}`, data);
   return res.data.data;
 }
 
-export async function deleteBoardTag(tagId: number) {
+export async function deleteBoardTag(tagId: string) {
   await client.delete(`/admin/tags/${tagId}`);
 }
 
 // Sensitive words
-export async function getSensitiveWords(params?: { page?: number; pageSize?: number; enabled?: boolean; category?: string }) {
+export async function getSensitiveWords(params?: { page?: number; limit?: number; search?: string }) {
   const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/sensitive-words', { params });
   return res.data.data;
 }
 
-export async function createSensitiveWord(data: { word: string; category: string }) {
+export async function createSensitiveWord(data: { word: string; matchType: string }) {
   const res = await client.post<{ data: any }>('/admin/sensitive-words', data);
   return res.data.data;
 }
 
-export async function updateSensitiveWord(wordId: number, data: { word?: string; category?: string }) {
+export async function updateSensitiveWord(wordId: string, data: { word?: string; matchType?: string }) {
   const res = await client.put<{ data: any }>(`/admin/sensitive-words/${wordId}`, data);
   return res.data.data;
 }
 
-export async function deleteSensitiveWord(wordId: number) {
+export async function deleteSensitiveWord(wordId: string) {
   await client.delete(`/admin/sensitive-words/${wordId}`);
 }
 
-export async function toggleSensitiveWord(wordId: number) {
-  const res = await client.post<{ data: any }>(`/admin/sensitive-words/${wordId}/toggle`);
+export async function toggleSensitiveWord(wordId: string) {
+  const res = await client.put<{ data: any }>(`/admin/sensitive-words/${wordId}/toggle`);
   return res.data.data;
 }
 
-export async function batchImportSensitiveWords(formData: FormData) {
-  const res = await client.post<{ data: { imported: number } }>('/admin/sensitive-words/batch', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+export async function batchImportSensitiveWords(words: { word: string; matchType: string }[]) {
+  const res = await client.post<{ data: { imported: number } }>('/admin/sensitive-words/batch-import', { words });
   return res.data.data;
 }
 

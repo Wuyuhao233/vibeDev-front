@@ -4,7 +4,7 @@ import { submitAppeal, type AppealResult } from '../api/report';
 
 interface AppealDialogProps {
   open: boolean;
-  postId: number;
+  reportId: string;
   initialStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
   onClose: () => void;
 }
@@ -17,7 +17,7 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
 
 export default function AppealDialog({
   open,
-  postId,
+  reportId,
   initialStatus,
   onClose,
 }: AppealDialogProps) {
@@ -33,7 +33,7 @@ export default function AppealDialog({
 
     setSubmitting(true);
     try {
-      const res = await submitAppeal(postId, { reason: trimmed });
+      const res = await submitAppeal(reportId, { reason: trimmed });
       setResult(res);
       toast.success('申诉已提交');
     } catch (err: any) {
@@ -41,7 +41,7 @@ export default function AppealDialog({
     } finally {
       setSubmitting(false);
     }
-  }, [postId, reason]);
+  }, [reportId, reason]);
 
   const handleClose = useCallback(() => {
     setReason('');

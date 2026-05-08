@@ -1,36 +1,14 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getBoards, type Board } from '../api/board';
-import { createPost, getSensitiveWords } from '../api/post';
+import { createPost, checkSensitiveWords } from '../api/post';
 import { useAuthStore } from '../store/authStore';
 import { Button, toast } from '../components/ui';
 import MarkdownSplitEditor from '../components/MarkdownSplitEditor';
 import TagSelector from '../components/TagSelector';
 import ImageUploader from '../components/ImageUploader';
 
-let sensitiveWordsCache: string[] | null = null;
-let sensitiveWordsCacheTime = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-async function loadSensitiveWords(): Promise<string[]> {
-  const now = Date.now();
-  if (sensitiveWordsCache && now - sensitiveWordsCacheTime < CACHE_TTL) {
-    return sensitiveWordsCache;
-  }
-  try {
-    const words = await getSensitiveWords();
-    sensitiveWordsCache = words;
-    sensitiveWordsCacheTime = now;
-    return words;
-  } catch {
-    // If API fails, use empty list (server will validate on submit)
-    return sensitiveWordsCache || [];
-  }
-}
-
-function checkSensitive(words: string[], text: string): string[] {
-  return words.filter((w) => text.includes(w));
-}
 
 export default function NewPostPage() {
   const navigate = useNavigate();
@@ -52,7 +30,6 @@ export default function NewPostPage() {
 
   // Validation
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [sensitiveWords, setSensitiveWords] = useState<string[]>([]);
   const [sensitiveHits, setSensitiveHits] = useState<string[]>([]);
   const [publishing, setPublishing] = useState(false);
 
@@ -74,24 +51,27 @@ export default function NewPostPage() {
       .finally(() => setBoardsLoading(false));
   }, [boardIdParam]);
 
-  // Load sensitive words
+  // Sensitive word detection via server API (300ms debounce)
   useEffect(() => {
-    loadSensitiveWords().then(setSensitiveWords);
-  }, []);
-
-  // Sensitive word detection (300ms debounce)
-  useEffect(() => {
-    if (sensitiveWords.length === 0) return;
+    if (!title && !content) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      const titleHits = checkSensitive(sensitiveWords, title);
-      const contentHits = checkSensitive(sensitiveWords, content);
-      setSensitiveHits([...new Set([...titleHits, ...contentHits])]);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const combined = [title, content].filter(Boolean).join('\n');
+        const result = await checkSensitiveWords(combined);
+        if (result.hasSensitive) {
+          setSensitiveHits([...new Set(result.matches.map((m) => m.word))]);
+        } else {
+          setSensitiveHits([]);
+        }
+      } catch {
+        // Server validation on submit as safety net
+      }
     }, 300);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [title, content, sensitiveWords]);
+  }, [title, content]);
 
   // Draft save
   useEffect(() => {
