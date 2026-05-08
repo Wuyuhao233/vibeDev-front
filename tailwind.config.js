@@ -105,8 +105,8 @@ export default {
       },
       keyframes: {
         shimmer: {
-          '0%, 100%': { backgroundColor: '#e5e7eb' },
-          '50%': { backgroundColor: '#f3f4f6' },
+          '0%, 100%': { backgroundColor: 'var(--color-skeleton)' },
+          '50%': { backgroundColor: 'var(--color-skeleton-shine)' },
         },
         spin: {
           from: { transform: 'rotate(0deg)' },

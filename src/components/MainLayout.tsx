@@ -15,7 +15,7 @@ export default function MainLayout() {
   }, [setBoards]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--color-bg-page)]">
       <Navbar />
       <div className="max-w-content mx-auto flex px-6 py-6 gap-6">
         <LeftSidebar />

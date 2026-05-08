@@ -120,6 +120,52 @@
   --z-toast: 50;
 }
 
+/* === GitHub dark mode overrides for app variables === */
+.dark {
+  --color-primary: #2da44e;
+  --color-primary-hover: #2c974b;
+  --color-primary-light: #0d3320;
+  --color-primary-dark: #3fb950;
+
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #8b949e;
+  --color-text-tertiary: #656d76;
+  --color-text-inverse: #0d1117;
+
+  --color-success: #3fb950;
+  --color-success-light: #0d3320;
+  --color-error: #f85149;
+  --color-error-light: #3d1517;
+  --color-warning: #d2991d;
+  --color-warning-light: #332314;
+  --color-warning-text: #e6b450;
+  --color-info: #58a6ff;
+  --color-info-light: #0c2d6b;
+
+  --color-surface: #161b22;
+  --color-bg-page: #0d1117;
+  --color-bg-hover: #1c2128;
+  --color-bg-active: #0c2d6b;
+  --color-border: #30363d;
+  --color-border-light: #21262d;
+
+  --color-like: #f85149;
+  --color-like-inactive: #484f58;
+  --color-collect: #d2991d;
+  --color-collect-inactive: #484f58;
+  --color-essence: #d2991d;
+  --color-pinned: #58a6ff;
+
+  --color-skeleton: #21262d;
+  --color-skeleton-shine: #30363d;
+
+  --gradient-brand: linear-gradient(135deg, #2da44e, #0969da);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.30);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.40);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.50);
+  --shadow-xl: 0 8px 24px rgba(0,0,0,0.60);
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);

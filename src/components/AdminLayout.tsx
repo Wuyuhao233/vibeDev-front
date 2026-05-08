@@ -34,14 +34,14 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-[var(--color-bg-page)] flex">
       {/* Sidebar */}
-      <aside className="w-sidebar flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-100">
-          <Link to="/" className="text-lg font-bold text-gray-900">
+      <aside className="w-sidebar flex-shrink-0 bg-card border-r border-border flex flex-col">
+        <div className="p-4 border-b border-border">
+          <Link to="/" className="text-lg font-bold text-foreground">
             vibeDev
           </Link>
-          <p className="text-xs text-gray-400 mt-1">管理后台</p>
+          <p className="text-xs text-muted-foreground mt-1">管理后台</p>
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {adminNavItems
@@ -52,22 +52,22 @@ export default function AdminLayout() {
                 to={item.path}
                 className={`block px-3 py-2 rounded-md text-sm transition-colors duration-150 ${
                   location.pathname.startsWith(item.path)
-                    ? 'bg-primary-50 text-primary-500 font-medium'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-[var(--color-bg-active)] text-primary font-medium'
+                    : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
                 {item.label}
               </Link>
             ))}
         </nav>
-        <div className="p-4 border-t border-gray-100 flex items-center gap-3">
+        <div className="p-4 border-t border-border flex items-center gap-3">
           <Avatar name={user?.username || ''} size="sm" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-gray-700 truncate">{user?.username}</p>
+            <p className="text-sm text-foreground truncate">{user?.username}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="text-xs text-gray-400 hover:text-gray-600"
+            className="text-xs text-muted-foreground hover:text-foreground"
           >
             退出
           </button>
@@ -76,8 +76,8 @@ export default function AdminLayout() {
 
       {/* Main */}
       <div className="flex-1 min-w-0">
-        <header className="sticky top-0 z-20 h-14 bg-white border-b border-gray-200 flex items-center px-6">
-          <Link to="/" className="text-sm text-gray-500 hover:text-primary-500">
+        <header className="sticky top-0 z-20 h-14 bg-card border-b border-border flex items-center px-6">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-primary">
             ← 返回前台
           </Link>
         </header>

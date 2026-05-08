@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import ThemeInitializer from './components/ThemeInitializer';
 import AuthGuard from './components/AuthGuard';
 import AdminGuard from './components/AdminGuard';
 import MainLayout from './components/MainLayout';
@@ -41,6 +42,7 @@ import AppealQueuePage from './pages/admin/AppealQueuePage';
 export default function App() {
   return (
     <BrowserRouter>
+      <ThemeInitializer />
       <Toaster position="top-center" richColors />
       <Routes>
           {/* Public routes */}

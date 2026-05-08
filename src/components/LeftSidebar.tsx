@@ -121,7 +121,7 @@ export default function LeftSidebar() {
 
   return (
     <aside className="board-sidebar w-sidebar flex-shrink-0 pr-6">
-      <h3 className="board-sidebar__header text-sm font-semibold text-gray-900 mb-3">
+      <h3 className="board-sidebar__header text-sm font-semibold text-foreground mb-3">
         版块导航
       </h3>
 
@@ -129,7 +129,7 @@ export default function LeftSidebar() {
       {loading && (
         <div className="board-sidebar__skeleton flex flex-col gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="board-nav-item--skeleton h-6 w-full animate-shimmer rounded-md bg-gray-200" />
+            <div key={i} className="board-nav-item--skeleton h-6 w-full animate-shimmer rounded-md bg-[var(--color-skeleton)]" />
           ))}
         </div>
       )}
@@ -137,9 +137,9 @@ export default function LeftSidebar() {
       {/* Error */}
       {error && !loading && (
         <div className="board-sidebar__error py-4 text-center">
-          <p className="text-sm text-gray-500 mb-2">版块列表加载失败</p>
+          <p className="text-sm text-muted-foreground mb-2">版块列表加载失败</p>
           <button
-            className="board-sidebar__retry-btn text-sm text-primary-500 hover:text-primary-600 transition-colors duration-150"
+            className="board-sidebar__retry-btn text-sm text-primary hover:text-primary/80 transition-colors duration-150"
             onClick={() => { setLoading(true); setError(false); }}
           >
             重新加载
@@ -156,20 +156,20 @@ export default function LeftSidebar() {
                 to={`/board/${board.slug}`}
                 className={`board-nav-item flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors duration-150 ${
                   isActive(board)
-                    ? 'board-nav-item--active bg-primary-50 text-primary-500 border-l-[3px] border-primary-500 font-medium'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'board-nav-item--active bg-[var(--color-bg-active)] text-primary border-l-[3px] border-primary font-medium'
+                    : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
                 {board.icon ? (
                   <img src={board.icon} alt="" className="board-nav-item__icon w-5 h-5 rounded object-cover" />
                 ) : (
-                  <span className="board-nav-item__icon w-5 h-5 rounded bg-gray-200 flex items-center justify-center text-[10px] text-gray-400">
+                  <span className="board-nav-item__icon w-5 h-5 rounded bg-[var(--color-skeleton)] flex items-center justify-center text-[10px] text-muted-foreground">
                     {board.name.charAt(0)}
                   </span>
                 )}
                 <span className="board-nav-item__name truncate flex-1">{board.name}</span>
                 {board.postCount > 0 && (
-                  <span className="board-nav-item__count text-xs text-gray-400">{board.postCount}</span>
+                  <span className="board-nav-item__count text-xs text-muted-foreground">{board.postCount}</span>
                 )}
               </Link>
             </li>
@@ -178,13 +178,13 @@ export default function LeftSidebar() {
       )}
 
       {/* Divider */}
-      <div className="board-sidebar__divider border-t border-gray-100 my-4" />
+      <div className="board-sidebar__divider border-t border-border my-4" />
 
       {/* My Follows */}
       {isAuthenticated && (
         <div className="board-sidebar__followed">
           <button
-            className="board-sidebar__followed-header flex items-center gap-1 text-sm font-semibold text-gray-900 mb-2 w-full text-left"
+            className="board-sidebar__followed-header flex items-center gap-1 text-sm font-semibold text-foreground mb-2 w-full text-left"
             onClick={toggleCollapsed}
           >
             <span>我的关注</span>
@@ -204,19 +204,19 @@ export default function LeftSidebar() {
               {tagsLoading && (
                 <div className="flex flex-col gap-2">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="h-5 w-full animate-shimmer rounded bg-gray-200" />
+                    <div key={i} className="h-5 w-full animate-shimmer rounded bg-[var(--color-skeleton)]" />
                   ))}
                 </div>
               )}
 
               {tagsError && !tagsLoading && (
-                <p className="board-sidebar__followed-error text-sm text-gray-400">
+                <p className="board-sidebar__followed-error text-sm text-muted-foreground">
                   加载失败
                 </p>
               )}
 
               {!tagsLoading && !tagsError && followedTags.length === 0 && (
-                <p className="board-sidebar__followed-empty text-sm text-gray-400">
+                <p className="board-sidebar__followed-empty text-sm text-muted-foreground">
                   你还没有关注的标签，去版块页面关注感兴趣的标签吧
                 </p>
               )}
@@ -227,12 +227,12 @@ export default function LeftSidebar() {
                     <li key={tag.id} className="followed-tag group flex items-center justify-between">
                       <Link
                         to={`/board/general?tag=${tag.slug}`}
-                        className="followed-tag__name text-sm text-gray-600 hover:text-primary-500 transition-colors duration-150 truncate flex-1"
+                        className="followed-tag__name text-sm text-muted-foreground hover:text-primary transition-colors duration-150 truncate flex-1"
                       >
                         {tag.name}
                       </Link>
                       <button
-                        className="followed-tag__unfollow opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all duration-150 ml-1 flex-shrink-0"
+                        className="followed-tag__unfollow opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all duration-150 ml-1 flex-shrink-0"
                         onClick={(e) => {
                           e.preventDefault();
                           handleUnfollow(tag);
@@ -254,11 +254,11 @@ export default function LeftSidebar() {
 
       {!isAuthenticated && (
         <div className="board-sidebar__followed">
-          <h4 className="board-sidebar__followed-header text-sm font-semibold text-gray-900 mb-2">
+          <h4 className="board-sidebar__followed-header text-sm font-semibold text-foreground mb-2">
             我的关注
           </h4>
           <div className="board-sidebar__followed-list">
-            <p className="board-sidebar__followed-empty text-sm text-gray-400">
+            <p className="board-sidebar__followed-empty text-sm text-muted-foreground">
               关注感兴趣的标签
             </p>
           </div>
