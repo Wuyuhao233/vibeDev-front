@@ -114,7 +114,7 @@ export default function LeftSidebar() {
 
   const isActive = (board: Board) => {
     if (location.pathname.startsWith('/board/')) {
-      return params.id === board.slug;
+      return params.id === board.id;
     }
     return false;
   };
@@ -153,7 +153,7 @@ export default function LeftSidebar() {
           {boards.map((board) => (
             <li key={board.id}>
               <Link
-                to={`/board/${board.slug}`}
+                to={`/board/${board.id}`}
                 className={`board-nav-item flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors duration-150 ${
                   isActive(board)
                     ? 'board-nav-item--active bg-[var(--color-bg-active)] text-primary border-l-[3px] border-primary font-medium'
@@ -226,7 +226,7 @@ export default function LeftSidebar() {
                   {followedTags.map((tag) => (
                     <li key={tag.id} className="followed-tag group flex items-center justify-between">
                       <Link
-                        to={`/board/general?tag=${tag.slug}`}
+                        to={`/board/general?tag=${tag.id}`}
                         className="followed-tag__name text-sm text-muted-foreground hover:text-primary transition-colors duration-150 truncate flex-1"
                       >
                         {tag.name}

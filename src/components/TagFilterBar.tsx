@@ -3,17 +3,16 @@ import { useAuthStore } from '../store/authStore';
 import { toast } from '../components/ui';
 
 interface Tag {
-  id: number;
+  id: string;
   name: string;
-  slug: string;
   sortOrder: number;
 }
 
 interface TagFilterBarProps {
   tags: Tag[];
-  activeTagId: number | null;
-  onSelect: (tagId: number | null) => void;
-  followedTagIds?: Set<number>;
+  activeTagId: string | null;
+  onSelect: (tagId: string | null) => void;
+  followedTagIds?: Set<string>;
   onToggleFollow?: (tag: Tag) => void;
 }
 
@@ -23,14 +22,14 @@ export default function TagFilterBar({ tags, activeTagId, onSelect, followedTagI
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuthStore();
 
-  const sorted = [{ id: 0, name: '全部', slug: '', sortOrder: -1 }, ...tags].sort(
+  const sorted = [{ id: '', name: '全部', sortOrder: -1 }, ...tags].sort(
     (a, b) => a.sortOrder - b.sortOrder
   );
 
   const visible = expanded ? sorted : sorted.slice(0, MAX_VISIBLE);
   const hasMore = sorted.length > MAX_VISIBLE;
 
-  const isFollowed = (tagId: number) => followedTagIds?.has(tagId) ?? false;
+  const isFollowed = (tagId: string) => followedTagIds?.has(tagId) ?? false;
 
   const handleToggleFollow = (tag: Tag) => {
     if (!isAuthenticated) {
@@ -43,13 +42,13 @@ export default function TagFilterBar({ tags, activeTagId, onSelect, followedTagI
   return (
     <div className="tag-filter flex flex-wrap items-center gap-2 mb-4">
       {visible.map((tag) => {
-        const isActive = tag.id === 0 ? activeTagId === null : activeTagId === tag.id;
-        const followed = tag.id !== 0 && isFollowed(tag.id);
+        const isActive = tag.id === '' ? activeTagId === null : activeTagId === tag.id;
+        const followed = tag.id !== '' && isFollowed(tag.id);
         return (
           <button
             key={tag.id}
             onClick={() => {
-              if (tag.id === 0) {
+              if (tag.id === '') {
                 onSelect(null);
               } else if (tag.id !== activeTagId) {
                 onSelect(tag.id);
@@ -62,7 +61,7 @@ export default function TagFilterBar({ tags, activeTagId, onSelect, followedTagI
             }`}
           >
             {tag.name}
-            {tag.id !== 0 && (
+            {tag.id !== '' && (
               <span
                 className={`tag-filter__follow-toggle inline-flex items-center transition-opacity duration-150 ${
                   followed ? '' : 'opacity-0 group-hover:opacity-100'

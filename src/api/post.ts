@@ -1,55 +1,58 @@
 import client from './client';
 
 export interface PostDetail {
-  id: number;
+  id: string;
   title: string;
-  content: string;
-  contentMarkdown?: string;
-  coverImageUrl?: string | null;
+  contentMarkdown: string;
+  contentHtml: string;
+  authorId: string;
+  boardId: string;
+  boardName: string;
+  tags: { id: string; name: string; boardId: string; sortOrder: number; postCount: number }[];
+  coverImageUrl: string | null;
   author: {
-    id: number;
+    id: string;
     username: string;
-    avatar: string | null;
+    nickname: string;
+    avatarUrl: string | null;
     level: number;
+    role: string;
   };
-  board: { id: number; name: string; slug?: string };
-  tags: { id: number; name: string; slug: string }[];
+  isCollectedByCurrentUser: boolean;
+  isLikedByCurrentUser: boolean;
   likeCount: number;
   replyCount: number;
   collectCount: number;
-  viewCount: number;
-  isLiked: boolean;
-  isCollected: boolean;
+  shareCount: number;
   isPinned: boolean;
+  pinType: string;
   isEssence: boolean;
-  auditStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
-  auditReason?: string | null;
-  appealStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
-  isDeleted?: boolean;
+  auditStatus: string;
+  isDeleted: boolean;
   version: number;
   createdAt: string;
   updatedAt: string;
-  lastEditedAt?: string | null;
+  lastEditedAt: string | null;
 }
 
 export interface CreatePostData {
-  boardId: number;
+  boardId: string;
+  tagIds: string[];
   title: string;
   content: string;
-  tags?: number[];
   coverImageUrl?: string;
-  idempotencyKey?: string;
+  idempotencyKey: string;
 }
 
 export interface UpdatePostData {
   title?: string;
   content?: string;
-  tags?: number[];
+  tagIds?: string[];
   coverImageUrl?: string;
   version: number;
 }
 
-export async function getPost(id: number) {
+export async function getPost(id: string) {
   const res = await client.get<{ data: PostDetail }>(`/posts/${id}`);
   return res.data.data;
 }
@@ -59,16 +62,16 @@ export async function createPost(data: CreatePostData) {
   return res.data.data;
 }
 
-export async function updatePost(id: number, data: UpdatePostData) {
+export async function updatePost(id: string, data: UpdatePostData) {
   const res = await client.put<{ data: PostDetail }>(`/posts/${id}`, data);
   return res.data.data;
 }
 
-export async function deletePost(id: number) {
+export async function deletePost(id: string) {
   await client.delete(`/posts/${id}`);
 }
 
-export async function recordPostView(id: number) {
+export async function recordPostView(id: string) {
   try {
     await client.post(`/posts/${id}/view`);
   } catch {
@@ -76,17 +79,46 @@ export async function recordPostView(id: number) {
   }
 }
 
-export async function pinPost(id: number, pinType: 'board' | 'global') {
-  const res = await client.post<{ data: { success: boolean } }>(`/posts/${id}/pin`, { pinType });
+export async function collectPost(id: string, folderId?: string) {
+  const res = await client.post<{ data: { collected: boolean; newCount: number } }>(
+    `/posts/${id}/collect`,
+    folderId ? { folderId } : {},
+  );
   return res.data.data;
 }
 
-export async function unpinPost(id: number) {
+export async function uncollectPost(id: string) {
+  const res = await client.delete<{ data: { collected: boolean; newCount: number } }>(
+    `/posts/${id}/collect`,
+  );
+  return res.data.data;
+}
+
+export async function pinPost(id: string, pinType: 'board' | 'global') {
+  const res = await client.post<{ data: { isPinned: boolean; pinType: string } }>(`/posts/${id}/pin`, { pinType });
+  return res.data.data;
+}
+
+export async function unpinPost(id: string) {
   await client.delete(`/posts/${id}/pin`);
 }
 
-export async function toggleEssence(id: number) {
-  const res = await client.post<{ data: { success: boolean; isEssence: boolean } }>(`/posts/${id}/essence`);
+export async function toggleEssence(id: string) {
+  const res = await client.post<{ data: { isEssence: boolean } }>(`/posts/${id}/essence`);
+  return res.data.data;
+}
+
+export async function unEssence(id: string) {
+  await client.delete(`/posts/${id}/essence`);
+}
+
+export async function getShareCard(id: string) {
+  const res = await client.get<{ data: { title: string; description: string; coverUrl: string | null; authorName: string; url: string } }>(`/posts/${id}/share-card`);
+  return res.data.data;
+}
+
+export async function generateShareCard(id: string) {
+  const res = await client.post<{ data: { imageUrl: string; width: number; height: number } }>(`/posts/${id}/share-card/generate`);
   return res.data.data;
 }
 

@@ -36,7 +36,7 @@ export default function BoardPage() {
   const sortParam = (searchParams.get('sort') || 'hot') as SortValue;
   const pageParam = parseInt(searchParams.get('page') || '1', 10);
 
-  const activeTagId = tagParam ? parseInt(tagParam, 10) : null;
+  const activeTagId = tagParam || null;
 
   const updateParams = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(searchParams);
@@ -117,7 +117,7 @@ export default function BoardPage() {
       .catch(() => { /* silently fail, tags just won't show as followed */ });
   }, [isAuthenticated]);
 
-  const handleToggleFollow = async (tag: { id: number; name: string; slug: string }) => {
+  const handleToggleFollow = async (tag: { id: string; name: string }) => {
     const isCurrentlyFollowed = followedTagIds.has(tag.id);
     const prev = followedTags;
 
@@ -130,7 +130,7 @@ export default function BoardPage() {
         toast.error('取消关注失败，请重试');
       }
     } else {
-      setFollowedTags((tags) => [...tags, { id: tag.id, name: tag.name, slug: tag.slug }]);
+      setFollowedTags((tags) => [...tags, { id: tag.id, name: tag.name }]);
       try {
         await followTag(tag.id);
       } catch {
@@ -144,8 +144,8 @@ export default function BoardPage() {
     updateParams({ sort: sort === 'hot' ? null : sort, page: null });
   };
 
-  const handleTagChange = (tagId: number | null) => {
-    updateParams({ tag: tagId ? String(tagId) : null, page: null });
+  const handleTagChange = (tagId: string | null) => {
+    updateParams({ tag: tagId || null, page: null });
   };
 
   const handlePageChange = (page: number) => {
@@ -239,7 +239,7 @@ export default function BoardPage() {
       {/* Tag Filter Bar */}
       {board?.tags && board.tags.length > 0 && (
         <TagFilterBar
-          tags={board.tags.map((t) => ({ id: t.id, name: t.name, slug: t.slug, sortOrder: t.sortOrder }))}
+          tags={board.tags.map((t) => ({ id: t.id, name: t.name, sortOrder: t.sortOrder }))}
           activeTagId={activeTagId}
           onSelect={handleTagChange}
           followedTagIds={followedTagIds}

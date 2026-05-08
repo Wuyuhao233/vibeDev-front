@@ -9,40 +9,42 @@ import { toast } from './ui';
 import { formatRelativeTime } from '../utils/relativeTime';
 
 interface ReplyItemProps {
-  id: number;
-  postId: number;
-  content: string;
+  id: string;
+  postId: string;
+  contentMarkdown: string;
   author: {
-    id: number;
+    id: string;
     username: string;
-    avatar: string | null;
+    nickname: string;
+    avatarUrl: string | null;
     level: number;
+    role: string;
   };
-  floorNumber: number;
+  depth: number;
   likeCount: number;
-  isLiked: boolean;
+  isLikedByCurrentUser: boolean;
   isDeleted?: boolean;
   createdAt: string;
   updatedAt?: string;
-  currentUserId?: number | null;
+  currentUserId?: string | null;
   isModerator?: boolean;
   isAdmin?: boolean;
   onLikeChange?: (count: number, liked: boolean) => void;
   onReply?: () => void;
-  onShare?: (replyId: number) => void;
-  onEdit?: (replyId: number) => void;
-  onDelete?: (replyId: number) => void;
+  onShare?: (replyId: string) => void;
+  onEdit?: (replyId: string) => void;
+  onDelete?: (replyId: string) => void;
   className?: string;
 }
 
 export default function ReplyItem({
   id,
   postId,
-  content,
+  contentMarkdown,
   author,
-  floorNumber,
+  depth,
   likeCount,
-  isLiked,
+  isLikedByCurrentUser,
   isDeleted,
   createdAt,
   updatedAt,
@@ -86,7 +88,7 @@ export default function ReplyItem({
           tabIndex={-1}
         >
           <Avatar
-            src={author.avatar || undefined}
+            src={author.avatarUrl || undefined}
             name={author.username}
             size={40}
             className="reply-item__avatar"
@@ -98,7 +100,7 @@ export default function ReplyItem({
           <div className="flex items-center gap-2 mb-1.5">
             <span className="text-sm font-medium text-gray-900">{author.username}</span>
             <LevelBadge level={level} />
-            <span className="text-xs text-gray-400">#{floorNumber}</span>
+            <span className="text-xs text-gray-400">L{depth}</span>
             <span className="text-xs text-gray-400">
               {formatRelativeTime(createdAt)}
             </span>
@@ -113,7 +115,7 @@ export default function ReplyItem({
           ) : (
             <div className="prose prose-sm max-w-none prose-p:text-gray-700 prose-a:text-primary-500 prose-code:text-sm prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-blockquote:border-l-primary-500">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {content}
+                {contentMarkdown}
               </ReactMarkdown>
             </div>
           )}
@@ -124,7 +126,7 @@ export default function ReplyItem({
               <LikeButton
                 targetType="reply"
                 targetId={id}
-                initialLiked={isLiked}
+                initialLiked={isLikedByCurrentUser}
                 initialCount={likeCount}
                 onCountChange={onLikeChange}
               />

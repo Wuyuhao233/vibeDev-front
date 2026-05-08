@@ -1,13 +1,12 @@
 import client from './client';
 
 export interface FollowedTag {
-  id: number;
+  id: string;
   name: string;
-  slug: string;
 }
 
 export async function getFollowedTags() {
-  const res = await client.get<{ data: FollowedTag[] }>('/user/followed-tags');
+  const res = await client.get<{ data: FollowedTag[] }>('/tags/followed');
   return res.data.data;
 }
 

@@ -173,7 +173,7 @@ function ProfileSection() {
       {/* Avatar */}
       <div className="flex items-center gap-4 mb-8">
         <Avatar
-          src={profile?.avatar}
+          src={profile?.avatarUrl}
           name={profile?.username || ''}
           className="size-8"
         />

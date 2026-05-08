@@ -40,8 +40,8 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
 
   const handleTagClick = (e: React.MouseEvent, tag: PostCardData['tags'][0]) => {
     e.stopPropagation();
-    if (post.board) {
-      navigate(`/board/${post.board.id}?tag=${tag.id}`);
+    if (post.boardId) {
+      navigate(`/board/${post.boardId}?tag=${tag.id}`);
     }
   };
 
@@ -110,7 +110,7 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
               onKeyDown={(e) => { if (e.key === 'Enter') handleAuthorClick(e as any); }}
             >
               <Avatar
-                src={post.author.avatar || undefined}
+                src={post.author.avatarUrl || undefined}
                 name={post.author.username}
                 size={28}
                 className="post-card__author-avatar"
@@ -123,9 +123,9 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
 
             <RelativeTime date={post.createdAt} className="text-xs text-gray-400" />
 
-            {showBoard && post.board && (
+            {showBoard && post.boardName && (
               <span className="post-card__board text-xs text-gray-400">
-                {post.board.name}
+                {post.boardName}
               </span>
             )}
 

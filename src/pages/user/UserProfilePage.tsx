@@ -283,7 +283,7 @@ export default function UserProfilePage() {
       <div className="bg-white rounded-lg shadow-card p-6 mb-6">
         <div className="flex items-start gap-6">
           <Avatar
-            src={profile.avatar || undefined}
+            src={profile.avatarUrl || undefined}
             name={profile.username}
             size="lg"
           />

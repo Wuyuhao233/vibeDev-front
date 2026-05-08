@@ -12,12 +12,12 @@ const DEPTH_COLORS = [
   'border-l-cyan-400',
 ];
 
-function buildTree(replies: Reply[]): { roots: Reply[]; childrenMap: Map<number, Reply[]> } {
-  const childrenMap = new Map<number, Reply[]>();
+function buildTree(replies: Reply[]): { roots: Reply[]; childrenMap: Map<string, Reply[]> } {
+  const childrenMap = new Map<string, Reply[]>();
   const roots: Reply[] = [];
 
   for (const reply of replies) {
-    const parentId = reply.parentId;
+    const parentId = reply.parentReplyId;
     if (parentId === null) {
       roots.push(reply);
     } else {
@@ -36,16 +36,16 @@ function buildTree(replies: Reply[]): { roots: Reply[]; childrenMap: Map<number,
 interface ReplyTreeNodeProps {
   reply: Reply;
   depth: number;
-  childrenMap: Map<number, Reply[]>;
-  postId: number;
-  currentUserId?: number | null;
+  childrenMap: Map<string, Reply[]>;
+  postId: string;
+  currentUserId?: string | null;
   isModerator?: boolean;
   isAdmin?: boolean;
-  onReply: (replyId: number) => void;
-  onShare?: (replyId: number) => void;
-  onEdit: (replyId: number) => void;
-  onDelete: (replyId: number) => void;
-  highlightedReplyId: number | null;
+  onReply: (replyId: string) => void;
+  onShare?: (replyId: string) => void;
+  onEdit: (replyId: string) => void;
+  onDelete: (replyId: string) => void;
+  highlightedReplyId: string | null;
 }
 
 function ReplyTreeNode({
@@ -83,11 +83,11 @@ function ReplyTreeNode({
           <ReplyItem
             id={reply.id}
             postId={postId}
-            content={reply.content}
+            contentMarkdown={reply.contentMarkdown}
             author={reply.author}
-            floorNumber={reply.floorNumber}
+            depth={reply.depth}
             likeCount={reply.likeCount}
-            isLiked={reply.isLiked}
+            isLikedByCurrentUser={reply.isLikedByCurrentUser}
             isDeleted={reply.isDeleted}
             createdAt={reply.createdAt}
             updatedAt={reply.updatedAt}
@@ -129,17 +129,17 @@ interface ReplyTreeProps {
   pageSize: number;
   loading: boolean;
   error: string | null;
-  postId: number;
-  currentUserId?: number | null;
+  postId: string;
+  currentUserId?: string | null;
   isModerator?: boolean;
   isAdmin?: boolean;
   onPageChange: (page: number) => void;
-  onReply: (replyId: number) => void;
-  onShare?: (replyId: number) => void;
-  onEdit: (replyId: number) => void;
-  onDelete: (replyId: number) => void;
+  onReply: (replyId: string) => void;
+  onShare?: (replyId: string) => void;
+  onEdit: (replyId: string) => void;
+  onDelete: (replyId: string) => void;
   onRetry: () => void;
-  highlightedReplyId?: number | null;
+  highlightedReplyId?: string | null;
 }
 
 export default function ReplyTree({

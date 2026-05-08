@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
-import { addFavorite, removeFavorite } from '../api/favorite';
+import { collectPost, uncollectPost } from '../api/post';
 import { addToFolder } from '../api/collection';
 import { toast } from './ui';
 import FolderSelector from './FolderSelector';
 
 interface CollectButtonProps {
-  postId: number;
+  postId: string;
   initialCollected: boolean;
   initialCount: number;
   onCountChange?: (count: number, collected: boolean) => void;
@@ -36,7 +36,7 @@ export default function CollectButton({
       onCountChange?.(prevCount - 1, false);
 
       try {
-        await removeFavorite(postId);
+        await uncollectPost(postId);
       } catch (err: any) {
         setCollected(true);
         setCount(prevCount);
@@ -52,7 +52,7 @@ export default function CollectButton({
   }, [loading, collected, count, postId, onCountChange]);
 
   const handleFolderSelect = useCallback(
-    async (folderId: number, folderName: string) => {
+    async (folderId: string, folderName: string) => {
       setFolderSelectorOpen(false);
       setLoading(true);
       const prevCount = count;
@@ -61,13 +61,13 @@ export default function CollectButton({
       onCountChange?.(prevCount + 1, true);
 
       try {
-        if (folderId === 0) {
-          // Default favorites
-          await addFavorite(postId);
+        if (!folderId) {
+          // Default favorites (no folder)
+          await collectPost(postId);
         } else {
-          await addToFolder(folderId, postId);
+          await collectPost(postId, folderId);
         }
-        toast.success(folderId === 0 ? '已收藏' : `已收藏到「${folderName}」`);
+        toast.success(!folderId ? '已收藏' : `已收藏到「${folderName}」`);
       } catch (err: any) {
         setCollected(false);
         setCount(prevCount);

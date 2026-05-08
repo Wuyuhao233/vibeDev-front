@@ -1,17 +1,18 @@
 export interface PostCardData {
-  id: number;
+  id: string;
   title: string;
-  content: string;
+  content?: string;
   contentSummary?: string;
   coverImageUrl?: string | null;
   author: {
-    id: number;
     username: string;
-    avatar: string | null;
+    nickname?: string;
+    avatarUrl: string | null;
     level: number;
   };
-  board?: { id: number; name: string; slug?: string };
-  tags: { id: number; name: string; slug: string }[];
+  boardId?: string;
+  boardName?: string;
+  tags: { id: string; name: string }[];
   likeCount: number;
   replyCount: number;
   collectCount: number;
@@ -21,9 +22,8 @@ export interface PostCardData {
 }
 
 export interface BoardData {
-  id: number;
+  id: string;
   name: string;
-  slug: string;
   description: string;
   icon: string | null;
   postCount: number;
@@ -31,8 +31,7 @@ export interface BoardData {
 }
 
 export interface TagData {
-  id: number;
+  id: string;
   name: string;
-  slug: string;
   sortOrder: number;
 }

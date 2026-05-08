@@ -2,19 +2,18 @@ import client from './client';
 import type { FeedResult } from './feed';
 
 export interface Board {
-  id: number;
+  id: string;
   name: string;
-  slug: string;
   description: string;
   icon: string | null;
   postCount: number;
   sortOrder: number;
-  tags?: { id: number; name: string; slug: string; sortOrder: number }[];
+  tags?: { id: string; name: string; sortOrder: number }[];
 }
 
 export async function getBoards() {
-  const res = await client.get<{ data: Board[] }>('/boards');
-  return res.data.data;
+  const res = await client.get<{ data: { boards: Board[] } }>('/boards');
+  return res.data.data.boards;
 }
 
 export async function getBoard(idOrSlug: number | string) {

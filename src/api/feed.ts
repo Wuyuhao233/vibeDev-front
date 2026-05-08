@@ -1,19 +1,20 @@
 import client from './client';
 
 export interface FeedItem {
-  id: number;
+  id: string;
   title: string;
-  content: string;
+  content?: string;
   contentSummary?: string;
   coverImageUrl?: string | null;
   author: {
-    id: number;
     username: string;
-    avatar: string | null;
+    nickname?: string;
+    avatarUrl: string | null;
     level: number;
   };
-  board: { id: number; name: string; slug?: string };
-  tags: { id: number; name: string; slug: string }[];
+  boardId?: string;
+  boardName?: string;
+  tags: { id: string; name: string }[];
   likeCount: number;
   replyCount: number;
   collectCount: number;
@@ -32,6 +33,6 @@ export async function getHomeFeed(params?: {
   page?: number;
   limit?: number;
 }) {
-  const res = await client.get<{ data: FeedResult }>('/home/feed', { params });
+  const res = await client.get<{ data: FeedResult }>('/posts', { params });
   return res.data.data;
 }

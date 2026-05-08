@@ -23,7 +23,7 @@ const REPLY_PAGE_SIZE = 20;
 export default function PostPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const postId = parseInt(id || '0', 10);
+  const postId = id || '';
   const { user, isAuthenticated } = useAuthStore();
 
   // Post state
@@ -48,9 +48,9 @@ export default function PostPage() {
   const [reportOpen, setReportOpen] = useState(false);
   const [appealOpen, setAppealOpen] = useState(false);
   const [_editing, setEditing] = useState(false);
-  const [replyToId, setReplyToId] = useState<number | null>(null);
+  const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyToUsername, setReplyToUsername] = useState<string | null>(null);
-  const [highlightedReplyId, setHighlightedReplyId] = useState<number | null>(null);
+  const [highlightedReplyId, setHighlightedReplyId] = useState<string | null>(null);
 
   // Fetch post
   const fetchPost = useCallback(async () => {
@@ -84,7 +84,7 @@ export default function PostPage() {
     setRepliesError(null);
 
     try {
-      const result = await getReplies(postId, { page, pageSize: REPLY_PAGE_SIZE });
+      const result = await getReplies(postId, { page, limit: REPLY_PAGE_SIZE });
       setReplies(result.items);
       setRepliesTotal(result.total);
     } catch (err: any) {
@@ -107,8 +107,8 @@ export default function PostPage() {
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash.startsWith('#reply-')) {
-        const replyId = parseInt(hash.slice(7), 10);
-        if (!isNaN(replyId)) {
+        const replyId = hash.slice(7);
+        if (replyId) {
           setHighlightedReplyId(replyId);
           // Scroll after a tick to allow DOM to update
           setTimeout(() => {
@@ -134,7 +134,7 @@ export default function PostPage() {
     try {
       await deletePost(postId);
       toast.success('帖子已删除');
-      navigate(post?.board?.slug ? `/board/${post.board.slug}` : '/', { replace: true });
+      navigate(post?.boardId ? `/board/${post.boardId}` : '/', { replace: true });
     } catch (err: any) {
       toast.error(err?.message || '删除失败');
     } finally {
@@ -184,7 +184,7 @@ export default function PostPage() {
   // Reply actions
   const handleReplySubmit = useCallback(
     async (content: string) => {
-      await createReply(postId, { content, parentId: replyToId ?? undefined });
+      await createReply(postId, { content, parentReplyId: replyToId ?? undefined, idempotencyKey: `reply-${Date.now()}-${Math.random().toString(36).slice(2, 9)}` });
       toast.success('回复已发布');
       setReplyToId(null);
       setReplyToUsername(null);
@@ -194,7 +194,7 @@ export default function PostPage() {
   );
 
   const handleReplyDelete = useCallback(
-    async (replyId: number) => {
+    async (replyId: string) => {
       try {
         await deleteReply(replyId);
         toast.success('回复已删除');
@@ -206,13 +206,13 @@ export default function PostPage() {
     [repliesPage, fetchReplies],
   );
 
-  const handleReplyEdit = useCallback((_replyId: number) => {
+  const handleReplyEdit = useCallback((_replyId: string) => {
     // V1.1 will implement inline editing
     toast.info('编辑功能将在后续版本上线');
   }, []);
 
   const handleReplyToReply = useCallback(
-    (replyId: number) => {
+    (replyId: string) => {
       const reply = replies.find((r) => r.id === replyId);
       setReplyToId(replyId);
       setReplyToUsername(reply?.author.username ?? null);
@@ -316,9 +316,9 @@ export default function PostPage() {
 
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-        {post.board && (
-          <Link to={`/board/${post.board.slug || post.board.id}`} className="hover:text-primary-500">
-            {post.board.name}
+        {post.boardName && (
+          <Link to={`/board/${post.boardId}`} className="hover:text-primary-500">
+            {post.boardName}
           </Link>
         )}
         {post.tags.length > 0 && (
@@ -339,7 +339,7 @@ export default function PostPage() {
       <div className="flex items-center gap-3 mb-4">
         <Link to={`/u/${post.author.username}`}>
           <Avatar
-            src={post.author.avatar || undefined}
+            src={post.author.avatarUrl || undefined}
             name={post.author.username}
             size="default"
           />
@@ -392,7 +392,7 @@ export default function PostPage() {
         }`}
       >
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {post.contentMarkdown || post.content}
+          {post.contentMarkdown}
         </ReactMarkdown>
       </div>
 
@@ -403,7 +403,7 @@ export default function PostPage() {
           {post.tags.map((tag) => (
             <Link
               key={tag.id}
-              to={`/board/${post.board?.slug || post.board?.id}?tag=${tag.id}`}
+              to={`/board/${post.boardId}?tag=${tag.id}`}
               className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors duration-150"
             >
               {tag.name}
@@ -419,12 +419,12 @@ export default function PostPage() {
             <LikeButton
               targetType="post"
               targetId={post.id}
-              initialLiked={post.isLiked}
+              initialLiked={post.isLikedByCurrentUser}
               initialCount={post.likeCount}
             />
             <CollectButton
               postId={post.id}
-              initialCollected={post.isCollected}
+              initialCollected={post.isCollectedByCurrentUser}
               initialCount={post.collectCount}
             />
             <SharePanel
@@ -433,10 +433,10 @@ export default function PostPage() {
               cardData={{
                 title: post.title,
                 authorName: post.author.username,
-                authorAvatar: post.author.avatar,
-                boardName: post.board.name,
-                excerpt: post.content
-                  ? post.content.replace(/[#*`>\-\[\]!()|~]/g, '').slice(0, 120)
+                authorAvatar: post.author.avatarUrl,
+                boardName: post.boardName,
+                excerpt: post.contentMarkdown
+                  ? post.contentMarkdown.replace(/[#*`>\-\[\]!()|~]/g, '').slice(0, 120)
                   : '',
                 createdAt: post.createdAt,
                 replyCount: post.replyCount,
@@ -475,7 +475,7 @@ export default function PostPage() {
 
         {/* Stats */}
         <span className="text-sm text-gray-400">
-          {post.viewCount} 次浏览 · {post.replyCount} 条回复
+          {post.shareCount} 次分享 · {post.replyCount} 条回复
         </span>
       </div>
 

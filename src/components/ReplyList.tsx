@@ -10,15 +10,15 @@ interface ReplyListProps {
   pageSize: number;
   loading: boolean;
   error: string | null;
-  postId: number;
-  currentUserId?: number | null;
+  postId: string;
+  currentUserId?: string | null;
   isModerator?: boolean;
   isAdmin?: boolean;
   onPageChange: (page: number) => void;
-  onReply: (replyId: number) => void;
-  onShare?: (replyId: number) => void;
-  onEdit: (replyId: number) => void;
-  onDelete: (replyId: number) => void;
+  onReply: (replyId: string) => void;
+  onShare?: (replyId: string) => void;
+  onEdit: (replyId: string) => void;
+  onDelete: (replyId: string) => void;
   onRetry: () => void;
 }
 
@@ -93,11 +93,11 @@ export default function ReplyList({
             key={reply.id}
             id={reply.id}
             postId={postId}
-            content={reply.content}
+            contentMarkdown={reply.contentMarkdown}
             author={reply.author}
-            floorNumber={reply.floorNumber}
+            depth={reply.depth}
             likeCount={reply.likeCount}
-            isLiked={reply.isLiked}
+            isLikedByCurrentUser={reply.isLikedByCurrentUser}
             isDeleted={reply.isDeleted}
             createdAt={reply.createdAt}
             updatedAt={reply.updatedAt}
