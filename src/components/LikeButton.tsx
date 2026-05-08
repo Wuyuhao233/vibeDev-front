@@ -4,7 +4,7 @@ import { toast } from './ui';
 
 interface LikeButtonProps {
   targetType: 'post' | 'reply';
-  targetId: number;
+  targetId: string;
   initialLiked: boolean;
   initialCount: number;
   onCountChange?: (count: number, liked: boolean) => void;

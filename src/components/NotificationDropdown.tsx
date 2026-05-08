@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotificationStore } from '../store/notificationStore';
-import { getNotifications, markAsRead, type Notification } from '../api/notification';
+import { getNotifications, markAsRead, getNotificationCategory, getNotificationPath, type Notification } from '../api/notification';
 import { toast } from './ui';
 import RelativeTime from './ui/RelativeTime';
 
-const TYPE_CONFIG: Record<Notification['type'], { label: string; icon: string }> = {
+const TYPE_CONFIG: Record<string, { label: string; icon: string }> = {
   reply: { label: '帖子回复', icon: '💬' },
   like: { label: '被点赞', icon: '❤️' },
   collect: { label: '被收藏', icon: '⭐' },
@@ -13,21 +13,13 @@ const TYPE_CONFIG: Record<Notification['type'], { label: string; icon: string }>
   mention: { label: '@提及', icon: '📣' },
 };
 
-const NOTIFICATION_ICONS: Record<Notification['type'], string> = {
+const NOTIFICATION_ICONS: Record<string, string> = {
   reply: '💬',
   like: '❤️',
   collect: '⭐',
   system: '📢',
   mention: '📣',
 };
-
-function getTargetPath(type: Notification['type'], targetId: number | null): string | null {
-  if (!targetId) return null;
-  if (type === 'reply' || type === 'like' || type === 'collect' || type === 'mention') {
-    return `/post/${targetId}`;
-  }
-  return null;
-}
 
 export default function NotificationDropdown() {
   const navigate = useNavigate();
@@ -44,7 +36,7 @@ export default function NotificationDropdown() {
   useEffect(() => {
     if (!open) return;
     setLoading(true);
-    getNotifications({ page: 1, pageSize: 10 })
+    getNotifications({ page: 1, limit: 10 })
       .then((data) => {
         setNotifications(data.items);
         setUnreadCount(data.unreadCount);
@@ -76,7 +68,7 @@ export default function NotificationDropdown() {
           toast.error('标记已读失败');
         }
       }
-      const path = getTargetPath(notification.type, notification.targetId);
+      const path = getNotificationPath(notification);
       setOpen(false);
       if (path) navigate(path);
     },
@@ -88,9 +80,10 @@ export default function NotificationDropdown() {
     navigate('/notifications');
   }, [navigate]);
 
-  // Group notifications by type
+  // Group notifications by category
   const grouped = notifications.reduce<Record<string, Notification[]>>((acc, n) => {
-    (acc[n.type] ||= []).push(n);
+    const cat = getNotificationCategory(n.eventType);
+    (acc[cat] ||= []).push(n);
     return acc;
   }, {});
 
@@ -136,10 +129,10 @@ export default function NotificationDropdown() {
             ) : notifications.length === 0 ? (
               <div className="py-8 text-center text-sm text-gray-400">暂无通知</div>
             ) : (
-              Object.entries(grouped).map(([type, items]) => (
-                <div key={type}>
+              Object.entries(grouped).map(([cat, items]) => (
+                <div key={cat}>
                   <div className="px-4 py-2 text-xs text-gray-400 bg-gray-50 font-medium">
-                    {TYPE_CONFIG[type as Notification['type']]?.label || type}
+                    {TYPE_CONFIG[cat]?.label || cat}
                   </div>
                   {items.map((n) => (
                     <button
@@ -150,11 +143,11 @@ export default function NotificationDropdown() {
                       }`}
                     >
                       <span className="text-base flex-shrink-0 mt-0.5">
-                        {NOTIFICATION_ICONS[n.type]}
+                        {NOTIFICATION_ICONS[getNotificationCategory(n.eventType)]}
                       </span>
                       <div className="flex-1 min-w-0">
                         <p className={`text-sm ${!n.isRead ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
-                          {n.message}
+                          {n.body}
                         </p>
                         <RelativeTime date={n.createdAt} className="text-xs text-gray-400" />
                       </div>

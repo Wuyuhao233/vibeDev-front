@@ -5,6 +5,8 @@ import {
   markAsRead,
   markAllAsRead,
   deleteNotification,
+  getNotificationCategory,
+  getNotificationPath,
   type Notification,
 } from '../api/notification';
 import { useNotificationStore } from '../store/notificationStore';
@@ -14,7 +16,7 @@ import RelativeTime from '../components/ui/RelativeTime';
 import { Empty } from '../components/ui';
 
 
-const NOTIFICATION_ICONS: Record<Notification['type'], string> = {
+const NOTIFICATION_ICONS: Record<string, string> = {
   reply: '💬',
   like: '❤️',
   collect: '⭐',
@@ -22,21 +24,13 @@ const NOTIFICATION_ICONS: Record<Notification['type'], string> = {
   mention: '📣',
 };
 
-const TABS: { key: Notification['type'] | 'all'; label: string }[] = [
+const TABS: { key: string; label: string }[] = [
   { key: 'all', label: '全部' },
   { key: 'reply', label: '帖子回复' },
   { key: 'like', label: '被点赞' },
   { key: 'collect', label: '被收藏' },
   { key: 'system', label: '系统通知' },
 ];
-
-function getTargetPath(type: Notification['type'], targetId: number | null): string | null {
-  if (!targetId) return null;
-  if (type === 'reply' || type === 'like' || type === 'collect' || type === 'mention') {
-    return `/post/${targetId}`;
-  }
-  return null;
-}
 
 export default function NotificationPage() {
   const navigate = useNavigate();
@@ -45,7 +39,7 @@ export default function NotificationPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [typeFilter, setTypeFilter] = useState<Notification['type'] | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
   const [readFilter, setReadFilter] = useState<'all' | 'unread' | 'read'>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +52,7 @@ export default function NotificationPage() {
     try {
       const data = await getNotifications({
         page,
-        pageSize,
+        limit: pageSize,
       });
       if (!mountedRef.current) return;
       setNotifications(data.items);
@@ -78,16 +72,16 @@ export default function NotificationPage() {
     return () => { mountedRef.current = false; };
   }, [fetchNotifications]);
 
-  // Client-side filtering (backend may not support all filter params)
+  // Client-side filtering by notification category and read status
   const filtered = notifications.filter((n) => {
-    if (typeFilter !== 'all' && n.type !== typeFilter) return false;
+    if (typeFilter !== 'all' && getNotificationCategory(n.eventType) !== typeFilter) return false;
     if (readFilter === 'unread' && n.isRead) return false;
     if (readFilter === 'read' && !n.isRead) return false;
     return true;
   });
 
   const handleMarkRead = useCallback(
-    async (id: number) => {
+    async (id: string) => {
       try {
         await markAsRead(id);
         setNotifications((prev) =>
@@ -101,7 +95,7 @@ export default function NotificationPage() {
     [decrement],
   );
 
-  const handleDelete = useCallback(async (id: number) => {
+  const handleDelete = useCallback(async (id: string) => {
     try {
       await deleteNotification(id);
       const wasUnread = notifications.find((n) => n.id === id)?.isRead === false;
@@ -132,7 +126,7 @@ export default function NotificationPage() {
       if (!notification.isRead) {
         await handleMarkRead(notification.id);
       }
-      const path = getTargetPath(notification.type, notification.targetId);
+      const path = getNotificationPath(notification);
       if (path) navigate(path);
     },
     [handleMarkRead, navigate],
@@ -226,11 +220,11 @@ export default function NotificationPage() {
                 className="flex items-start gap-4 flex-1 text-left min-w-0"
               >
                 <span className="text-lg flex-shrink-0 mt-0.5">
-                  {NOTIFICATION_ICONS[n.type]}
+                  {NOTIFICATION_ICONS[getNotificationCategory(n.eventType)]}
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm ${!n.isRead ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
-                    {n.message}
+                    {n.body}
                   </p>
                   <RelativeTime date={n.createdAt} className="text-xs text-gray-400 mt-0.5" />
                 </div>

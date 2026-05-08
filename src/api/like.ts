@@ -1,15 +1,20 @@
 import client from './client';
 
-export async function getLikes(params?: { page?: number; pageSize?: number }) {
-  const res = await client.get<{ data: { items: any[]; total: number } }>('/likes', { params });
+export interface LikeToggleResponse {
+  liked: boolean;
+  newCount: number;
+}
+
+export async function addLike(targetType: 'post' | 'reply', targetId: string) {
+  const res = await client.post<{ data: LikeToggleResponse }>(
+    `/${targetType}s/${targetId}/like`,
+  );
   return res.data.data;
 }
 
-export async function addLike(targetType: 'post' | 'reply', targetId: number) {
-  const res = await client.post<{ data: { success: boolean } }>(`/likes`, { targetType, targetId });
+export async function removeLike(targetType: 'post' | 'reply', targetId: string) {
+  const res = await client.delete<{ data: LikeToggleResponse }>(
+    `/${targetType}s/${targetId}/like`,
+  );
   return res.data.data;
-}
-
-export async function removeLike(targetType: 'post' | 'reply', targetId: number) {
-  await client.delete(`/likes/${targetType}/${targetId}`);
 }
