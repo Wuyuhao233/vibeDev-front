@@ -7,7 +7,7 @@ import LevelBadge from '../components/ui/LevelBadge';
 import RelativeTime from '../components/ui/RelativeTime';
 import { formatCount } from '../utils/formatCount';
 import { search, getSearchSuggestions, getTrendingSearches } from '../api/search';
-import type { SearchScope, SearchResultItem, SearchSuggestItem } from '../api/search';
+import type { SearchScope, SearchResultItem } from '../api/search';
 import { getBoards } from '../api/board';
 
 const SCOPE_OPTIONS: { value: SearchScope; label: string }[] = [
@@ -43,7 +43,7 @@ export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const scope = (searchParams.get('scope') as SearchScope) || 'all';
-  const boardId = parseInt(searchParams.get('boardId') || '0') || undefined;
+  const boardId = searchParams.get('boardId') || undefined;
   const page = parseInt(searchParams.get('page') || '1') || 1;
 
   const [inputValue, setInputValue] = useState(query);
@@ -54,7 +54,7 @@ export default function SearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [boards, setBoards] = useState<Awaited<ReturnType<typeof getBoards>>>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [trending, setTrending] = useState<SearchSuggestItem[]>([]);
+  const [trending, setTrending] = useState<string[]>([]);
   const [cooldown, setCooldown] = useState(0);
   const [boardDropdownOpen, setBoardDropdownOpen] = useState(false);
   const boardDropdownRef = useRef<HTMLDivElement>(null);
@@ -98,7 +98,7 @@ export default function SearchPage() {
     }
     const timer = setTimeout(() => {
       getSearchSuggestions(inputValue.trim())
-        .then((items) => setSuggestions(items.map((i) => i.keyword)))
+        .then(setSuggestions)
         .catch(() => setSuggestions([]));
     }, 300);
     return () => clearTimeout(timer);
@@ -139,7 +139,7 @@ export default function SearchPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await search({ q: q.trim(), scope: s, boardId: bId, page: p, pageSize: 20 });
+        const data = await search({ q: q.trim(), scope: s, boardId: bId, page: p, limit: 20 });
         setResults(data.items);
         setTotal(data.total);
         setSearchTime(data.searchTime);
@@ -217,19 +217,16 @@ export default function SearchPage() {
             <div className="mt-12">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">热门搜索</h3>
               <div className="flex flex-wrap gap-2">
-                {trending.map((item) => (
+                {trending.map((keyword) => (
                   <button
-                    key={item.keyword}
+                    key={keyword}
                     onClick={() => {
-                      setInputValue(item.keyword);
-                      handleSubmit(item.keyword);
+                      setInputValue(keyword);
+                      handleSubmit(keyword);
                     }}
                     className="inline-flex items-center px-3 py-1.5 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-150"
                   >
-                    {item.keyword}
-                    {item.count !== undefined && (
-                      <span className="ml-1.5 text-xs text-gray-400">{formatCount(item.count)}</span>
-                    )}
+                    {keyword}
                   </button>
                 ))}
               </div>
@@ -406,22 +403,19 @@ export default function SearchPage() {
                   <div className="sticky top-20">
                     <h4 className="text-sm font-semibold text-gray-900 mb-3">热门搜索</h4>
                     <div className="space-y-1">
-                      {trending.slice(0, 8).map((item, i) => (
+                      {trending.slice(0, 8).map((keyword, i) => (
                         <button
-                          key={item.keyword}
+                          key={keyword}
                           onClick={() => {
-                            setInputValue(item.keyword);
-                            handleSubmit(item.keyword);
+                            setInputValue(keyword);
+                            handleSubmit(keyword);
                           }}
                           className="w-full text-left px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded transition-colors duration-150 flex items-center gap-2"
                         >
                           <span className={`flex-shrink-0 w-4 text-xs font-medium ${i < 3 ? 'text-primary-500' : 'text-gray-400'}`}>
                             {i + 1}
                           </span>
-                          <span className="truncate">{item.keyword}</span>
-                          {item.count !== undefined && (
-                            <span className="flex-shrink-0 text-xs text-gray-400 ml-auto">{formatCount(item.count)}</span>
-                          )}
+                          <span className="truncate">{keyword}</span>
                         </button>
                       ))}
                     </div>
@@ -435,19 +429,16 @@ export default function SearchPage() {
               <div className="lg:hidden mt-8 pt-6 border-t border-gray-200">
                 <h4 className="text-sm font-semibold text-gray-900 mb-3">热门搜索</h4>
                 <div className="flex flex-wrap gap-2">
-                  {trending.map((item) => (
+                  {trending.map((keyword) => (
                     <button
-                      key={item.keyword}
+                      key={keyword}
                       onClick={() => {
-                        setInputValue(item.keyword);
-                        handleSubmit(item.keyword);
+                        setInputValue(keyword);
+                        handleSubmit(keyword);
                       }}
                       className="inline-flex items-center px-3 py-1.5 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-150"
                     >
-                      {item.keyword}
-                      {item.count !== undefined && (
-                        <span className="ml-1.5 text-xs text-gray-400">{formatCount(item.count)}</span>
-                      )}
+                      {keyword}
                     </button>
                   ))}
                 </div>
@@ -519,7 +510,9 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
   const excerptContent = item.contentExcerptHighlighted
     ? renderWithHighlights(item.contentExcerptHighlighted)
     : item.contentExcerpt
-      ? renderWithHighlights(highlightHtml(item.contentExcerpt, query))
+      ? (item.contentExcerpt.includes('<mark>')
+          ? renderWithHighlights(item.contentExcerpt)
+          : renderWithHighlights(highlightHtml(item.contentExcerpt, query)))
       : null;
 
   return (
@@ -543,7 +536,7 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
                 置顶
               </span>
             )}
-            {item.isEssence && (
+            {item.isEssenced && (
               <span className="inline-flex items-center rounded-sm px-1.5 py-px text-[11px] font-medium text-essence bg-amber-50 flex-shrink-0">
                 精
               </span>
@@ -585,8 +578,8 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
               <LevelBadge level={Math.min(Math.max(item.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6} />
             </div>
             <RelativeTime date={item.createdAt} className="text-xs text-gray-400" />
-            {item.board && (
-              <span className="text-xs text-gray-400">{item.board.name}</span>
+            {item.boardName && (
+              <span className="text-xs text-gray-400">{item.boardName}</span>
             )}
             <div className="flex items-center gap-3 ml-auto">
               <span className="inline-flex items-center gap-1 text-xs text-gray-400">
@@ -605,7 +598,7 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-gray-400">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" fill="none" />
                 </svg>
-                {formatCount(item.collectCount)}
+                {formatCount(item.bookmarkCount)}
               </span>
             </div>
           </div>

@@ -11,36 +11,38 @@ vi.mock('../api/board');
 const mockSearchResults: searchApi.SearchResponse = {
   items: [
     {
-      id: 1,
+      id: '1',
       title: 'React 18 Best Practices',
       titleHighlighted: 'React 18 <mark>Best</mark> Practices',
       contentExcerpt: 'A guide to React 18 <mark>best</mark> practices...',
       contentExcerptHighlighted: 'A guide to React 18 <mark>best</mark> practices...',
-      author: { id: 1, username: 'dev1', avatar: null, level: 3 },
-      board: { id: 1, name: 'Tech', slug: 'tech' },
-      tags: [{ id: 1, name: 'React', slug: 'react' }],
+      author: { id: '1', username: 'dev1', avatarUrl: null, level: 3 },
+      boardName: 'Tech',
+      boardId: '1',
+      tags: [{ id: '1', name: 'React' }],
       likeCount: 10,
       replyCount: 5,
-      collectCount: 2,
+      bookmarkCount: 2,
       createdAt: new Date(Date.now() - 3600000).toISOString(),
       isPinned: false,
-      isEssence: false,
+      isEssenced: false,
     },
     {
-      id: 2,
+      id: '2',
       title: 'TypeScript Tips',
       titleHighlighted: 'TypeScript <mark>Tips</mark>',
       contentExcerpt: 'Useful TypeScript tips for developers...',
       contentExcerptHighlighted: 'Useful TypeScript tips for developers...',
-      author: { id: 2, username: 'dev2', avatar: null, level: 2 },
-      board: { id: 1, name: 'Tech', slug: 'tech' },
-      tags: [{ id: 2, name: 'TypeScript', slug: 'ts' }],
+      author: { id: '2', username: 'dev2', avatarUrl: null, level: 2 },
+      boardName: 'Tech',
+      boardId: '1',
+      tags: [{ id: '2', name: 'TypeScript' }],
       likeCount: 8,
       replyCount: 3,
-      collectCount: 1,
+      bookmarkCount: 1,
       createdAt: new Date(Date.now() - 7200000).toISOString(),
       isPinned: true,
-      isEssence: false,
+      isEssenced: false,
     },
   ],
   total: 42,
@@ -49,14 +51,11 @@ const mockSearchResults: searchApi.SearchResponse = {
 };
 
 const mockBoards: boardApi.Board[] = [
-  { id: 1, name: 'Tech', slug: 'tech', description: 'Tech board', icon: null, postCount: 100, sortOrder: 1 },
-  { id: 2, name: 'Life', slug: 'life', description: 'Life board', icon: null, postCount: 50, sortOrder: 2 },
+  { id: '1', name: 'Tech', description: 'Tech board', icon: null, postCount: 100, sortOrder: 1 },
+  { id: '2', name: 'Life', description: 'Life board', icon: null, postCount: 50, sortOrder: 2 },
 ];
 
-const mockTrending: searchApi.SearchSuggestItem[] = [
-  { keyword: 'React', count: 120 },
-  { keyword: 'TypeScript', count: 80 },
-];
+const mockTrending: string[] = ['React', 'TypeScript'];
 
 describe('SearchPage', () => {
   beforeEach(() => {
@@ -116,7 +115,7 @@ describe('SearchPage', () => {
         scope: 'all',
         boardId: undefined,
         page: 1,
-        pageSize: 20,
+        limit: 20,
       });
     });
   });
@@ -257,7 +256,7 @@ describe('SearchPage', () => {
         scope: 'title_only',
         boardId: undefined,
         page: 1,
-        pageSize: 20,
+        limit: 20,
       });
     });
   });
@@ -268,9 +267,9 @@ describe('SearchPage', () => {
       expect(searchApi.search).toHaveBeenCalledWith({
         q: 'react',
         scope: 'board',
-        boardId: 1,
+        boardId: '1',
         page: 1,
-        pageSize: 20,
+        limit: 20,
       });
     });
   });
@@ -325,19 +324,19 @@ describe('SearchPage', () => {
     vi.mocked(searchApi.search).mockResolvedValue({
       items: [
         {
-          id: 3,
+          id: '3',
           title: 'Understanding React',
           titleHighlighted: undefined,
           contentExcerpt: 'This is a guide to understanding React hooks and patterns',
           contentExcerptHighlighted: undefined,
-          author: { id: 1, username: 'dev1', avatar: null, level: 2 },
+          author: { id: '1', username: 'dev1', avatarUrl: null, level: 2 },
           tags: [],
           likeCount: 5,
           replyCount: 2,
-          collectCount: 0,
+          bookmarkCount: 0,
           createdAt: new Date().toISOString(),
           isPinned: false,
-          isEssence: false,
+          isEssenced: false,
         },
       ],
       total: 1,
