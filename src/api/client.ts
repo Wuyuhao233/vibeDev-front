@@ -1,8 +1,30 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { ApiError } from '../utils/error';
 
+// camelCase ↔ snake_case key transformation
+function toSnakeCase(key: string): string {
+  return key.replace(/([A-Z])/g, '_$1').toLowerCase();
+}
+
+function toCamelCase(key: string): string {
+  return key.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
+}
+
+function transformKeys(obj: unknown, transform: (key: string) => string): unknown {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) return obj.map((v) => transformKeys(v, transform));
+  if (typeof obj === 'object' && !(obj instanceof FormData) && !(obj instanceof File) && !(obj instanceof Blob)) {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      result[transform(key)] = transformKeys(value, transform);
+    }
+    return result;
+  }
+  return obj;
+}
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -25,17 +47,28 @@ export function onTokenExpired(cb: () => void) {
   onRefresh = cb;
 }
 
-// Request interceptor: inject Authorization
+// Request interceptor: convert camelCase → snake_case + inject Authorization
 client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (config.data && !(config.data instanceof FormData) && !(config.data instanceof File) && !(config.data instanceof Blob)) {
+    config.data = transformKeys(config.data, toSnakeCase);
+  }
+  if (config.params) {
+    config.params = transformKeys(config.params, toSnakeCase);
+  }
   if (accessToken && config.headers) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
   return config;
 });
 
-// Response interceptor: handle errors
+// Response interceptor: snake_case → camelCase + handle errors
 client.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data) {
+      response.data = transformKeys(response.data, toCamelCase);
+    }
+    return response;
+  },
   async (error: AxiosError<{ errorCode?: string; message?: string }>) => {
     if (!error.response) {
       const msg = '网络连接失败，请检查网络';
@@ -49,8 +82,8 @@ client.interceptors.response.use(
     // Auto-refresh token on 401
     if (error.response.status === 401 && refreshToken) {
       try {
-        const res = await axios.post('/api/auth/refresh', { refreshToken });
-        const { accessToken: newAccess, refreshToken: newRefresh } = res.data.data;
+        const res = await axios.post('/api/v1/auth/refresh-token', { refresh_token: refreshToken });
+        const { access_token: newAccess, refresh_token: newRefresh } = res.data.data;
         setTokens(newAccess, newRefresh);
         // Retry original request
         const config = error.config!;

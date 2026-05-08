@@ -1,8 +1,9 @@
 import client from './client';
 
 export interface LoginRequest {
-  username: string;
+  usernameOrEmail: string;
   password: string;
+  rememberMe: boolean;
 }
 
 export interface RegisterRequest {
@@ -14,12 +15,14 @@ export interface RegisterRequest {
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
+  expiresIn: number;
   user: {
-    id: number;
+    id: string;
     username: string;
-    email: string;
-    avatar: string | null;
+    nickname: string;
+    avatarUrl: string;
     level: number;
+    role: string;
   };
 }
 
@@ -29,17 +32,16 @@ export async function login(data: LoginRequest) {
 }
 
 export async function register(data: RegisterRequest) {
-  const res = await client.post<{ data: AuthResponse }>('/auth/register', data);
-  return res.data.data;
+  await client.post('/auth/register', data);
 }
 
 export async function refresh(refreshToken: string) {
-  const res = await client.post<{ data: AuthResponse }>('/auth/refresh', { refreshToken });
+  const res = await client.post<{ data: AuthResponse }>('/auth/refresh-token', { refreshToken });
   return res.data.data;
 }
 
-export async function logout() {
-  await client.post('/auth/logout');
+export async function logout(refreshToken?: string) {
+  await client.post('/auth/logout', refreshToken ? { refreshToken } : undefined);
 }
 
 export async function verifyEmail(token: string) {

@@ -5,10 +5,10 @@ import * as authApi from '../api/auth';
 export type UserRole = 'admin' | 'moderator' | 'user';
 
 interface User {
-  id: number;
+  id: string;
   username: string;
-  email: string;
-  avatar: string | null;
+  nickname: string;
+  avatarUrl: string;
   level: number;
   role: UserRole;
 }
@@ -34,7 +34,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   logout: async () => {
     try {
-      await authApi.logout();
+      const rt = useAuthStore.getState().refreshToken;
+      if (rt) await authApi.logout(rt);
     } catch {
       // Ignore logout API errors
     }

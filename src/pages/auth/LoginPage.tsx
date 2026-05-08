@@ -108,7 +108,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await authApi.login({ username: username.trim(), password });
+      const res = await authApi.login({ usernameOrEmail: username.trim(), password, rememberMe });
       login(res.user, res.accessToken, res.refreshToken);
       toast.success('登录成功');
       navigate(redirect, { replace: true });

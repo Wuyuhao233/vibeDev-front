@@ -123,7 +123,7 @@ function ProfileSection() {
       const { url } = await userApi.uploadAvatar(file);
       await userApi.updateProfile({ avatar: url, bio: undefined } as any);
       if (profile) setProfile({ ...profile, avatar: url });
-      if (user) login({ ...user, avatar: url }, useAuthStore.getState().accessToken!, useAuthStore.getState().refreshToken!);
+      if (user) login({ ...user, avatarUrl: url }, useAuthStore.getState().accessToken!, useAuthStore.getState().refreshToken!);
       toast.success('头像更新成功');
     } catch {
       toast.error('上传失败，请稍后重试');
@@ -276,15 +276,8 @@ function SecuritySection() {
   }, []);
 
   const fetchCasBinding = async () => {
-    setCasLoading(true);
-    try {
-      const data = await userApi.getCasBinding();
-      setCasInfo(data);
-    } catch {
-      // Silently fail
-    } finally {
-      setCasLoading(false);
-    }
+    // Backend has no GET CAS binding status endpoint yet
+    setCasLoading(false);
   };
 
   const handleCasBind = () => {
@@ -620,7 +613,7 @@ function DeactivateSection() {
   const handleDeactivate = async () => {
     setLoading(true);
     try {
-      await userApi.deactivateAccount(password);
+      await userApi.deactivateAccount(user!.username, password);
       setShowDialog(false);
       // Show result and logout
       await logout();
@@ -716,7 +709,7 @@ function DeactivateSection() {
               <Button variant="ghost" onClick={() => setStep(1)}>上一步</Button>
               <Button
                 variant="destructive"
-                disabled={email !== user?.email}
+                disabled={!email.trim()}
                 onClick={() => setStep(3)}
               >
                 确认注销
@@ -775,7 +768,7 @@ function DataSection() {
   const handleExport = async () => {
     setLoading(true);
     try {
-      const res = await userApi.exportData(scope);
+      const res = await userApi.exportData(user!.username, scope);
       if (res.status === 'processing') {
         setTaskId(res.taskId);
         setStatus('processing');
@@ -797,7 +790,7 @@ function DataSection() {
     pollRef.current = setInterval(async () => {
       count++;
       try {
-        const res = await userApi.getExportStatus(id);
+        const res = await userApi.getExportStatus(user!.username, id);
         if (res.status === 'ready') {
           clearInterval(pollRef.current);
           setFileInfo(res);

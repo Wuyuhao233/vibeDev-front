@@ -113,7 +113,7 @@ export default function UserProfilePage() {
     setCollectionError(null);
     try {
       if (selectedFolderId === null) {
-        const res = await userApi.getCollections(username!, page, PAGE_SIZE);
+        const res = await userApi.getFavorites(username!, page, PAGE_SIZE);
         // Map to CollectionItem shape for consistent rendering
         const mapped: CollectionItem[] = res.items.map((item: any) => ({
           postId: item.id ?? item.postId,
@@ -178,10 +178,10 @@ export default function UserProfilePage() {
           res = await userApi.getUserReplies(username, page, PAGE_SIZE);
           break;
         case 'collections':
-          res = await userApi.getCollections(username, page, PAGE_SIZE);
+          res = await userApi.getFavorites(username, page, PAGE_SIZE);
           break;
         case 'history':
-          res = await userApi.getBrowseHistory(page, PAGE_SIZE);
+          res = await userApi.getBrowseHistory(username!, page, PAGE_SIZE);
           break;
         default:
           res = { items: [], total: 0 };
