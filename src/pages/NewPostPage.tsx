@@ -195,25 +195,35 @@ export default function NewPostPage() {
   }
 
   return (
-    <div className="new-post-editor flex flex-col h-full">
-      {/* Title input */}
-      <div className="px-8 pt-6 pb-3">
-        <div className="relative max-w-[960px] mx-auto">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="输入文章标题..."
-            maxLength={100}
-            className={`w-full text-3xl font-bold border-none outline-none bg-transparent text-gray-900 placeholder-gray-300 py-2 ${
-              errors.title ? 'text-red-500' : ''
-            }`}
-          />
-          <span className={`absolute right-0 bottom-3 text-sm ${titleCountColor}`}>
-            {title.length}/100
-          </span>
+    <div className="new-post-editor flex flex-col">
+      {/* Title row: title + publish button */}
+      <div className="flex-shrink-0 px-8 pt-6 pb-3">
+        <div className="max-w-[960px] mx-auto flex items-start gap-4">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="输入文章标题..."
+              maxLength={100}
+              className={`w-full text-3xl font-bold border-none outline-none bg-transparent text-gray-900 placeholder-gray-300 py-2 ${
+                errors.title ? 'text-red-500' : ''
+              }`}
+            />
+            <span className={`absolute right-0 -bottom-1 text-sm ${titleCountColor}`}>
+              {title.length}/100
+            </span>
+            {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+          </div>
+          <Button
+            size="lg"
+            disabled={publishing || sensitiveHits.length > 0}
+            onClick={() => setShowPublishDialog(true)}
+            className="flex-shrink-0 mt-2"
+          >
+            {sensitiveHits.length > 0 ? '内容包含违规词汇' : '发布'}
+          </Button>
         </div>
-        {errors.title && <p className="mt-1 text-xs text-red-500 max-w-[960px] mx-auto">{errors.title}</p>}
       </div>
 
       {/* Editor */}
@@ -229,7 +239,7 @@ export default function NewPostPage() {
 
       {/* Sensitive word warning */}
       {sensitiveHits.length > 0 && (
-        <div className="px-8">
+        <div className="px-8 pb-3">
           <div className="max-w-[960px] mx-auto flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
             <span className="text-red-500 font-medium text-sm">!</span>
             <span className="text-sm text-red-600">内容包含敏感词：</span>
@@ -241,18 +251,6 @@ export default function NewPostPage() {
           </div>
         </div>
       )}
-
-      {/* Sticky bottom bar */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-100 px-8 py-3 flex items-center justify-between">
-        <span className="text-sm text-gray-400">{content.length} 字</span>
-        <Button
-          size="lg"
-          disabled={publishing || sensitiveHits.length > 0}
-          onClick={() => setShowPublishDialog(true)}
-        >
-          {sensitiveHits.length > 0 ? '内容包含违规词汇' : '发布'}
-        </Button>
-      </div>
 
       {/* Publish dialog */}
       <Dialog open={showPublishDialog} onOpenChange={(v) => !v && setShowPublishDialog(false)}>

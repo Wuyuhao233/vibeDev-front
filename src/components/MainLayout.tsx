@@ -18,9 +18,9 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-page)]">
-      <Navbar />
+      {!isEditorRoute && <Navbar />}
       {isEditorRoute ? (
-        <main className="min-h-[calc(100vh-3.5rem)]">
+        <main className="h-screen">
           <Outlet />
         </main>
       ) : (
