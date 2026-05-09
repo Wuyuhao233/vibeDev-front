@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { getBoards } from '../api/board';
 import { createPost, checkSensitiveWords } from '../api/post';
 import { useAuthStore } from '../store/authStore';
@@ -21,7 +21,27 @@ export default function NewPostPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const boardIdParam = searchParams.get('board');
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuthStore();
+
+  // User menu
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleLogout = async () => {
+    setShowUserMenu(false);
+    await logout();
+    navigate('/');
+  };
 
   // Board data
   const storeBoards = useBoardStore((s) => s.boards);
@@ -217,7 +237,6 @@ export default function NewPostPage() {
             {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
           </div>
           <div className="flex items-center gap-3 flex-shrink-0 mt-2">
-            <Avatar name={user?.username || ''} src={user?.avatarUrl || undefined} size="sm" />
             <Button
               size="lg"
               disabled={publishing || sensitiveHits.length > 0}
@@ -225,6 +244,57 @@ export default function NewPostPage() {
             >
               {sensitiveHits.length > 0 ? '内容包含违规词汇' : '发布'}
             </Button>
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 p-1 rounded-md hover:bg-muted transition-colors duration-150"
+              >
+                <Avatar name={user?.username || ''} src={user?.avatarUrl || undefined} size="sm" />
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className={`text-muted-foreground transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`}
+                >
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+              {showUserMenu && (
+                <div className="absolute right-0 top-full mt-1 w-40 bg-card rounded-lg shadow-modal border border-border py-1 z-dropdown">
+                  <Link
+                    to={`/u/${user?.username}`}
+                    onClick={() => setShowUserMenu(false)}
+                    className="block px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors duration-150"
+                  >
+                    个人中心
+                  </Link>
+                  <Link
+                    to="/settings"
+                    onClick={() => setShowUserMenu(false)}
+                    className="block px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors duration-150"
+                  >
+                    设置
+                  </Link>
+                  {(user?.role === 'admin' || user?.role === 'moderator') && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setShowUserMenu(false)}
+                      className="block px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors duration-150"
+                    >
+                      管理后台
+                    </Link>
+                  )}
+                  <hr className="border-border my-1" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-muted transition-colors duration-150"
+                  >
+                    退出登录
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

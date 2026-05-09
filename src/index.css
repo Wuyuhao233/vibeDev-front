@@ -557,6 +557,10 @@ mark.search-highlight {
   display: flex;
   flex-direction: column;
 }
+.new-post-editor .bytemd-container,
+.new-post-editor .bytemd-container > * {
+  height: 100%;
+}
 .new-post-editor .bytemd {
   height: 100% !important;
 }
