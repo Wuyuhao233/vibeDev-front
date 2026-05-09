@@ -1,4 +1,5 @@
 import 'bytemd/dist/index.css';
+import 'github-markdown-css/github-markdown.css';
 import { Editor } from '@bytemd/react';
 import gfm from '@bytemd/plugin-gfm';
 import highlight from '@bytemd/plugin-highlight';

@@ -542,6 +542,28 @@ body {
   --radius: 11px;
 }
 
+/* === ByteMD Markdown Preview (prevent Tailwind preflight from stripping list markers) === */
+.markdown-body ol {
+  list-style: decimal;
+}
+.markdown-body ul {
+  list-style: disc;
+}
+.markdown-body ol ol,
+.markdown-body ul ol {
+  list-style: lower-alpha;
+}
+.markdown-body ol ul,
+.markdown-body ul ul {
+  list-style: circle;
+}
+.markdown-body h1 { font-size: 2em; }
+.markdown-body h2 { font-size: 1.5em; }
+.markdown-body h3 { font-size: 1.25em; }
+.markdown-body h4 { font-size: 1em; }
+.markdown-body h5 { font-size: 0.875em; }
+.markdown-body h6 { font-size: 0.85em; }
+
 /* Search keyword highlighting */
 .search-highlight mark,
 mark.search-highlight {
