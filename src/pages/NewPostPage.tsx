@@ -19,10 +19,10 @@ export default function NewPostPage() {
   // Form state
   const [boards, setBoards] = useState<Board[]>([]);
   const [_boardsLoading, setBoardsLoading] = useState(true);
-  const [selectedBoardId, setSelectedBoardId] = useState<number | null>(
-    boardIdParam ? parseInt(boardIdParam, 10) : null,
+  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(
+    boardIdParam || null,
   );
-  const [selectedTags, setSelectedTags] = useState<number[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
@@ -42,7 +42,7 @@ export default function NewPostPage() {
         setBoards(data);
         if (boardIdParam) {
           const matched = data.find(
-            (b) => b.id === parseInt(boardIdParam, 10) || b.slug === boardIdParam,
+            (b) => b.id === boardIdParam,
           );
           if (matched) setSelectedBoardId(matched.id);
         }
@@ -160,7 +160,7 @@ export default function NewPostPage() {
         boardId: selectedBoardId!,
         title: title.trim(),
         content: content.trim(),
-        tags: selectedTags,
+        tagIds: selectedTags,
         coverImageUrl: coverImageUrl || undefined,
         idempotencyKey,
       });
@@ -205,7 +205,7 @@ export default function NewPostPage() {
         <select
           value={selectedBoardId || ''}
           onChange={(e) => {
-            setSelectedBoardId(e.target.value ? parseInt(e.target.value, 10) : null);
+            setSelectedBoardId(e.target.value || null);
             setSelectedTags([]);
           }}
           className={`w-full max-w-xs border rounded-md px-3 py-2 text-sm bg-white outline-none transition-colors duration-150 ${

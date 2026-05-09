@@ -212,3 +212,7 @@ export async function assignModerator(userId: string, boardIds: string[]) {
 export async function removeModerator(userId: string, note?: string) {
   await client.delete('/admin/assign-moderator', { data: { user_id: userId, note } });
 }
+
+export async function updateUserRole(userId: string, role: string) {
+  await client.put(`/admin/users/${userId}/role`, { role });
+}

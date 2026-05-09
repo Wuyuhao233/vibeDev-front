@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 
 interface TagSelectorProps {
-  tags: { id: number; name: string }[];
-  selected: number[];
-  onChange: (selected: number[]) => void;
+  tags: { id: string; name: string }[];
+  selected: string[];
+  onChange: (selected: string[]) => void;
   max?: number;
   min?: number;
   error?: string;
@@ -38,7 +38,7 @@ export default function TagSelector({
   }, []);
 
   const handleSelect = useCallback(
-    (id: number) => {
+    (id: string) => {
       if (atMax || selected.includes(id)) return;
       onChange([...selected, id]);
       setSearch('');
@@ -47,7 +47,7 @@ export default function TagSelector({
   );
 
   const handleRemove = useCallback(
-    (id: number) => {
+    (id: string) => {
       onChange(selected.filter((s) => s !== id));
     },
     [selected, onChange],
