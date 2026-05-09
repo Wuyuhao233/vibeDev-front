@@ -14,13 +14,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  Avatar,
 } from '../components/ui';
 
 export default function NewPostPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const boardIdParam = searchParams.get('board');
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   // Board data
   const storeBoards = useBoardStore((s) => s.boards);
@@ -215,14 +216,16 @@ export default function NewPostPage() {
             </span>
             {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
           </div>
-          <Button
-            size="lg"
-            disabled={publishing || sensitiveHits.length > 0}
-            onClick={() => setShowPublishDialog(true)}
-            className="flex-shrink-0 mt-2"
-          >
-            {sensitiveHits.length > 0 ? '内容包含违规词汇' : '发布'}
-          </Button>
+          <div className="flex items-center gap-3 flex-shrink-0 mt-2">
+            <Avatar name={user?.username || ''} src={user?.avatarUrl || undefined} size="sm" />
+            <Button
+              size="lg"
+              disabled={publishing || sensitiveHits.length > 0}
+              onClick={() => setShowPublishDialog(true)}
+            >
+              {sensitiveHits.length > 0 ? '内容包含违规词汇' : '发布'}
+            </Button>
+          </div>
         </div>
       </div>
 
