@@ -3,18 +3,13 @@ import type { DashboardStats } from '../types/admin';
 
 // Dashboard stats
 export async function getDashboardStats() {
-  const res = await client.get<{ data: DashboardStats }>('/admin/stats');
-  return res.data.data;
-}
-
-export async function getTrendData(params?: { days?: number }) {
-  const res = await client.get<{ data: any[] }>('/admin/stats/trend', { params });
+  const res = await client.get<{ data: DashboardStats }>('/admin/dashboard');
   return res.data.data;
 }
 
 // User management
-export async function getUsers(params?: { page?: number; pageSize?: number; keyword?: string; role?: string; status?: string }) {
-  const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/users', { params });
+export async function getUsers(params?: { page?: number; limit?: number; search?: string; role?: string; status?: string }) {
+  const res = await client.get<{ data: { items: any[]; total: number; page: number; pageSize: number } }>('/admin/users', { params });
   return res.data.data;
 }
 
@@ -28,7 +23,7 @@ export async function updateUser(userId: string, data: { role?: string; level?: 
   return res.data.data;
 }
 
-export async function banUser(userId: string, data: { reason?: string; duration?: string }) {
+export async function banUser(userId: string, data: { reason?: string; duration?: string; boardId?: string }) {
   await client.post(`/admin/users/${userId}/ban`, data);
 }
 
@@ -37,17 +32,17 @@ export async function unbanUser(userId: string) {
 }
 
 // Post management
-export async function getAdminPosts(params?: { page?: number; pageSize?: number; keyword?: string; boardId?: string; status?: string; startDate?: string; endDate?: string }) {
-  const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/posts', { params });
+export async function getAdminPosts(params?: { page?: number; limit?: number; search?: string; boardId?: string; status?: string }) {
+  const res = await client.get<{ data: { items: any[]; total: number; page: number; pageSize: number } }>('/admin/posts', { params });
   return res.data.data;
 }
 
 export async function pinPost(postId: string) {
-  await client.post(`/admin/posts/${postId}/pin`);
+  await client.post(`/admin/posts/${postId}/pin`, { pin_type: 'board' });
 }
 
 export async function unpinPost(postId: string) {
-  await client.post(`/admin/posts/${postId}/unpin`);
+  await client.post(`/admin/posts/${postId}/pin`, { pin_type: 'board' });
 }
 
 export async function markEssence(postId: string) {
@@ -55,7 +50,7 @@ export async function markEssence(postId: string) {
 }
 
 export async function unmarkEssence(postId: string) {
-  await client.post(`/admin/posts/${postId}/unessence`);
+  await client.post(`/admin/posts/${postId}/essence`);
 }
 
 export async function adminDeletePost(postId: string) {
@@ -63,7 +58,7 @@ export async function adminDeletePost(postId: string) {
 }
 
 export async function movePost(postId: string, boardId: string) {
-  await client.post(`/admin/posts/${postId}/move`, { boardId });
+  await client.put(`/admin/posts/${postId}/move`, { target_board_id: boardId });
 }
 
 // Report management
@@ -87,12 +82,12 @@ export async function getAdminBoards() {
   return res.data.data;
 }
 
-export async function createBoard(data: { name: string; slug: string; description?: string; icon?: string }) {
+export async function createBoard(data: { name: string; icon?: string; description?: string; tags?: string[] }) {
   const res = await client.post<{ data: any }>('/admin/boards', data);
   return res.data.data;
 }
 
-export async function updateBoard(boardId: string, data: { name?: string; description?: string; icon?: string; status?: string }) {
+export async function updateBoard(boardId: string, data: { name?: string; description?: string; icon?: string; sortOrder?: number }) {
   const res = await client.put<{ data: any }>(`/admin/boards/${boardId}`, data);
   return res.data.data;
 }
@@ -101,8 +96,8 @@ export async function deleteBoard(boardId: string) {
   await client.delete(`/admin/boards/${boardId}`);
 }
 
-export async function reorderBoards(boardIds: string[]) {
-  await client.post('/admin/boards/reorder', { boardIds });
+export async function reorderBoards(items: { id: string; sortOrder: number }[]) {
+  await client.put('/admin/boards/sort', { items });
 }
 
 // Board tags
@@ -111,12 +106,12 @@ export async function getBoardTags(boardId: string) {
   return res.data.data;
 }
 
-export async function createBoardTag(boardId: string, data: { name: string; slug: string }) {
+export async function createBoardTag(boardId: string, data: { name: string }) {
   const res = await client.post<{ data: any }>(`/admin/boards/${boardId}/tags`, data);
   return res.data.data;
 }
 
-export async function updateBoardTag(tagId: string, data: { name?: string; slug?: string; sortOrder?: number }) {
+export async function updateBoardTag(tagId: string, data: { name?: string; sortOrder?: number }) {
   const res = await client.put<{ data: any }>(`/admin/tags/${tagId}`, data);
   return res.data.data;
 }
@@ -157,13 +152,12 @@ export async function batchImportSensitiveWords(words: { word: string; matchType
 
 // System settings
 export async function getSettings() {
-  const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/settings');
+  const res = await client.get<{ data: { settings: Record<string, string> } }>('/admin/settings');
   return res.data.data;
 }
 
-export async function updateSetting(key: string, value: string) {
-  const res = await client.put<{ data: any }>(`/admin/settings/${key}`, { value });
-  return res.data.data;
+export async function updateSetting(key: string, configValue: string) {
+  await client.put(`/admin/settings/${key}`, { config_value: configValue });
 }
 
 // Review queue (V1.1)
@@ -207,11 +201,14 @@ export async function recalculatePoints() {
 
 // Moderator assignment (V1.1)
 export async function getModeratorList() {
-  const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/users', { params: { role: 'moderator', limit: '100' } });
+  const res = await client.get<{ data: { items: any[]; total: number } }>('/admin/users', { params: { role: 'moderator', limit: 100 } });
   return res.data.data;
 }
 
-export async function updateUserRole(userId: string, role: string) {
-  const res = await client.put<{ data: any }>(`/admin/users/${userId}/role`, { role });
-  return res.data.data;
+export async function assignModerator(userId: string, boardIds: string[]) {
+  await client.put('/admin/assign-moderator', { user_id: userId, board_ids: boardIds });
+}
+
+export async function removeModerator(userId: string, note?: string) {
+  await client.delete('/admin/assign-moderator', { data: { user_id: userId, note } });
 }

@@ -33,7 +33,7 @@ export default function AdminBoards() {
   // Board form modal
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBoard, setEditingBoard] = useState<AdminBoard | null>(null);
-  const [boardForm, setBoardForm] = useState({ name: '', slug: '', description: '', icon: '' });
+  const [boardForm, setBoardForm] = useState({ name: '', description: '', icon: '' });
   const [saving, setSaving] = useState(false);
 
   // Delete confirmation
@@ -67,7 +67,7 @@ export default function AdminBoards() {
   // Board CRUD handlers
   function openCreateModal() {
     setEditingBoard(null);
-    setBoardForm({ name: '', slug: '', description: '', icon: '' });
+    setBoardForm({ name: '', description: '', icon: '' });
     setModalOpen(true);
   }
 
@@ -75,7 +75,6 @@ export default function AdminBoards() {
     setEditingBoard(board);
     setBoardForm({
       name: board.name,
-      slug: board.slug,
       description: board.description || '',
       icon: board.icon || '',
     });
@@ -83,8 +82,8 @@ export default function AdminBoards() {
   }
 
   async function handleSaveBoard() {
-    if (!boardForm.name || !boardForm.slug) {
-      toast.error('版块名称和别名为必填项');
+    if (!boardForm.name) {
+      toast.error('版块名称为必填项');
       return;
     }
     setSaving(true);
@@ -93,7 +92,7 @@ export default function AdminBoards() {
         await updateBoard(editingBoard.id, boardForm);
         toast.success('版块已更新');
       } else {
-        await createBoard(boardForm);
+        await createBoard({ name: boardForm.name, icon: boardForm.icon, description: boardForm.description });
         toast.success('版块已创建');
       }
       setModalOpen(false);
@@ -135,7 +134,8 @@ export default function AdminBoards() {
   async function handleDragEnd() {
     setDragIdx(null);
     try {
-      await reorderBoards(boards.map((b) => b.id));
+      const items = boards.map((b, i) => ({ id: b.id, sortOrder: i + 1 }));
+      await reorderBoards(items);
       toast.success('排序已保存');
     } catch {
       toast.error('保存排序失败');
@@ -157,10 +157,10 @@ export default function AdminBoards() {
     }
   }
 
-  async function handleCreateTag(name: string, slug: string) {
+  async function handleCreateTag(name: string) {
     if (!tagBoard) return;
     try {
-      await createBoardTag(tagBoard.id, { name, slug });
+      await createBoardTag(tagBoard.id, { name });
       const data = await getBoardTags(tagBoard.id);
       setTags(data || []);
       toast.success('标签已创建');
@@ -169,7 +169,7 @@ export default function AdminBoards() {
     }
   }
 
-  async function handleDeleteTag(tagId: number) {
+  async function handleDeleteTag(tagId: string) {
     try {
       await deleteBoardTag(tagId);
       setTags((prev) => prev.filter((t) => t.id !== tagId));
@@ -208,7 +208,7 @@ export default function AdminBoards() {
               <tr>
                 <th className="w-8 px-4 py-3" />
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">名称</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">别名</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">描述</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">帖子数</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">排序</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">状态</th>
@@ -232,7 +232,9 @@ export default function AdminBoards() {
                     {board.icon && <span className="mr-2">{board.icon}</span>}
                     {board.name}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{board.slug}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate">
+                    {board.description || '-'}
+                  </td>
                   <td className="px-4 py-3 text-sm text-gray-500">{board.postCount}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{board.sortOrder}</td>
                   <td className="px-4 py-3">
@@ -286,14 +288,6 @@ export default function AdminBoards() {
                 value={boardForm.name}
                 onChange={(e) => setBoardForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="版块名称"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">别名 (slug)</label>
-              <Input
-                value={boardForm.slug}
-                onChange={(e) => setBoardForm((f) => ({ ...f, slug: e.target.value }))}
-                placeholder="board-slug"
               />
             </div>
             <div>
@@ -371,19 +365,17 @@ function BoardTagModal({
   tags: AdminTag[];
   loading: boolean;
   onClose: () => void;
-  onCreate: (name: string, slug: string) => void;
-  onDelete: (tagId: number) => void;
+  onCreate: (name: string) => void;
+  onDelete: (tagId: string) => void;
 }) {
   const [newName, setNewName] = useState('');
-  const [newSlug, setNewSlug] = useState('');
   const [adding, setAdding] = useState(false);
 
   function handleAdd() {
-    if (!newName || !newSlug) return;
+    if (!newName) return;
     setAdding(true);
-    onCreate(newName, newSlug);
+    onCreate(newName);
     setNewName('');
-    setNewSlug('');
     setAdding(false);
   }
 
@@ -394,41 +386,29 @@ function BoardTagModal({
           <DialogTitle>管理标签 - {board.name}</DialogTitle>
         </DialogHeader>
         <div className="py-4 space-y-4">
-          {/* Add new tag */}
           <div className="flex gap-2">
             <Input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="标签名称"
               className="flex-1"
+              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             />
-            <Input
-              value={newSlug}
-              onChange={(e) => setNewSlug(e.target.value)}
-              placeholder="slug"
-              className="w-32"
-            />
-            <Button onClick={handleAdd} disabled={adding} size="sm">
+            <Button onClick={handleAdd} disabled={adding || !newName}>
               添加
             </Button>
           </div>
-
-          {/* Tag list */}
           {loading ? (
-            <div className="flex items-center justify-center py-8">
+            <div className="flex justify-center py-8">
               <Spinner size="sm" />
-              <span className="ml-2 text-sm text-gray-500">加载中...</span>
             </div>
           ) : tags.length === 0 ? (
-            <p className="text-center text-gray-400 py-4 text-sm">暂无标签</p>
+            <p className="text-center text-gray-400 text-sm py-4">暂无标签</p>
           ) : (
             <div className="space-y-1">
               {tags.map((tag) => (
-                <div key={tag.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
-                  <span className="text-sm text-gray-700">
-                    {tag.name}{' '}
-                    <span className="text-gray-400 text-xs">/{tag.slug}/</span>
-                  </span>
+                <div key={tag.id} className="flex items-center justify-between py-2 px-3 rounded hover:bg-gray-50">
+                  <span className="text-sm text-gray-900">{tag.name}</span>
                   <button
                     onClick={() => onDelete(tag.id)}
                     className="text-xs text-red-500 hover:text-red-600"
@@ -440,11 +420,6 @@ function BoardTagModal({
             </div>
           )}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            关闭
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -1,19 +1,19 @@
 // Admin dashboard
 export interface DashboardStats {
-  todayNewUsers: number;
-  todayNewPosts: number;
-  todayNewReplies: number;
-  totalUsers: number;
-  totalPosts: number;
-  totalReplies: number;
+  todayPosts: number;
+  todayUsers: number;
+  pendingAudits: number;
   pendingReports: number;
+  onlineUsers: number;
+  totalPosts: number;
+  totalUsers: number;
+  totalReplies: number;
+  postsTrend: TrendItem[];
 }
 
 export interface TrendItem {
   date: string;
-  users: number;
-  posts: number;
-  replies: number;
+  count: number;
 }
 
 // User management
@@ -21,13 +21,17 @@ export interface AdminUser {
   id: string;
   username: string;
   email: string;
-  avatar: string | null;
+  avatarUrl: string | null;
   role: 'admin' | 'moderator' | 'user';
   level: number;
   points: number;
-  status: 'active' | 'banned' | 'muted';
-  bannedUntil: string | null;
+  isBanned: boolean;
+  isActivated: boolean;
+  postCount: number;
+  replyCount: number;
   createdAt: string;
+  lastLoginAt: string | null;
+  bannedUntil: string | null;
 }
 
 export interface AdminUserListResponse {
@@ -39,12 +43,20 @@ export interface AdminUserListResponse {
 export interface AdminPost {
   id: string;
   title: string;
-  author: { id: string; username: string; avatar: string | null };
-  board: { id: string; name: string } | null;
-  status: 'published' | 'deleted' | 'hidden';
+  authorId: string;
+  boardId: string;
+  isDeleted: boolean;
+  deletedBy: string | null;
+  auditStatus: string;
   isPinned: boolean;
+  pinType: string;
   isEssence: boolean;
+  likeCount: number;
+  replyCount: number;
+  collectCount: number;
+  heatScore: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface AdminPostListResponse {
@@ -78,19 +90,19 @@ export interface AdminReportListResponse {
 export interface AdminBoard {
   id: string;
   name: string;
-  slug: string;
-  description: string;
   icon: string | null;
+  description: string;
   postCount: number;
   sortOrder: number;
   status: 'active' | 'archived';
+  tags?: AdminTag[];
 }
 
 export interface AdminTag {
   id: string;
   name: string;
-  slug: string;
   sortOrder: number;
+  postCount: number;
 }
 
 // Sensitive words

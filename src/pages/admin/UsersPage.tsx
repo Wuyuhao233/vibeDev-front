@@ -41,14 +41,14 @@ export default function UsersPage() {
   // Ban modal
   const [banTarget, setBanTarget] = useState<AdminUser | null>(null);
   const [banReason, setBanReason] = useState('');
-  const [banDuration, setBanDuration] = useState(24);
+  const [banDuration, setBanDuration] = useState('1d');
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const params: Record<string, string | number> = { page, pageSize: PAGE_SIZE };
-      if (keyword) params.keyword = keyword;
+      const params: Record<string, string | number> = { page, limit: PAGE_SIZE };
+      if (keyword) params.search = keyword;
       if (roleFilter) params.role = roleFilter;
       if (statusFilter) params.status = statusFilter;
       const data = await getUsers(params);
@@ -104,7 +104,7 @@ export default function UsersPage() {
       toast.success(`已禁言用户 ${banTarget.username}`);
       setBanTarget(null);
       setBanReason('');
-      setBanDuration(24);
+      setBanDuration('1d');
       fetchUsers();
     } catch (err: any) {
       toast.error(err?.message || '操作失败');
@@ -122,11 +122,12 @@ export default function UsersPage() {
   }
 
   const roleLabels: Record<string, string> = { admin: '管理员', moderator: '版主', user: '用户' };
-  const statusLabels: Record<string, { text: string; cls: string }> = {
-    active: { text: '正常', cls: 'bg-emerald-50 text-emerald-500' },
-    banned: { text: '封禁', cls: 'bg-red-50 text-red-500' },
-    muted: { text: '禁言', cls: 'bg-amber-50 text-amber-600' },
-  };
+
+  function userStatus(u: AdminUser) {
+    if (u.isBanned) return { text: '封禁', cls: 'bg-red-50 text-red-500' };
+    if (!u.isActivated) return { text: '未激活', cls: 'bg-gray-100 text-gray-400' };
+    return { text: '正常', cls: 'bg-emerald-50 text-emerald-500' };
+  }
 
   return (
     <div>
@@ -162,7 +163,6 @@ export default function UsersPage() {
           <option value="">全部状态</option>
           <option value="active">正常</option>
           <option value="banned">封禁</option>
-          <option value="muted">禁言</option>
         </select>
       </div>
 
@@ -192,12 +192,12 @@ export default function UsersPage() {
               </thead>
               <tbody>
                 {users.map((u) => {
-                  const st = statusLabels[u.status] || statusLabels.active;
+                  const st = userStatus(u);
                   return (
                     <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <Avatar name={u.username} size="xs" />
+                          <Avatar name={u.username} src={u.avatarUrl || undefined} size="xs" />
                           <span className="text-sm text-gray-900">{u.username}</span>
                         </div>
                       </td>
@@ -217,7 +217,7 @@ export default function UsersPage() {
                         >
                           编辑
                         </button>
-                        {u.status === 'banned' || u.status === 'muted' ? (
+                        {u.isBanned ? (
                           <button
                             onClick={() => handleUnbanUser(u)}
                             className="text-xs text-emerald-500 hover:text-emerald-600 mr-3"
@@ -294,18 +294,17 @@ export default function UsersPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">禁言时长（小时）</label>
+              <label className="block text-sm text-gray-700 mb-1">禁言时长</label>
               <select
                 value={banDuration}
-                onChange={(e) => setBanDuration(Number(e.target.value))}
+                onChange={(e) => setBanDuration(e.target.value)}
                 className="h-9 w-full px-3 border border-gray-200 rounded-md text-sm bg-white"
               >
-                <option value={1}>1 小时</option>
-                <option value={24}>24 小时</option>
-                <option value={72}>3 天</option>
-                <option value={168}>7 天</option>
-                <option value={720}>30 天</option>
-                <option value={-1}>永久</option>
+                <option value="1h">1 小时</option>
+                <option value="1d">1 天</option>
+                <option value="3d">3 天</option>
+                <option value="7d">7 天</option>
+                <option value="permanent">永久</option>
               </select>
             </div>
             <div>

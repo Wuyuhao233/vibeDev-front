@@ -103,13 +103,15 @@ export default function Navbar() {
                     >
                       设置
                     </Link>
-                    <Link
-                      to="/admin"
-                      onClick={() => setShowUserMenu(false)}
-                      className="block px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors duration-150"
-                    >
-                      管理后台
-                    </Link>
+                    {(user?.role === 'admin' || user?.role === 'moderator') && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setShowUserMenu(false)}
+                        className="block px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors duration-150"
+                      >
+                        管理后台
+                      </Link>
+                    )}
                     <hr className="border-border my-1" />
                     <button
                       onClick={handleLogout}

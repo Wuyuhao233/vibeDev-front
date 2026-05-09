@@ -29,10 +29,8 @@ export default function PostsPage() {
 
   const [keyword, setKeyword] = useState('');
   const [searchInput, setSearchInput] = useState('');
-  const [boardIdFilter, setBoardIdFilter] = useState<number | ''>('');
+  const [boardIdFilter, setBoardIdFilter] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
 
   const [boards, setBoards] = useState<Board[]>([]);
 
@@ -40,7 +38,7 @@ export default function PostsPage() {
   const [deleting, setDeleting] = useState(false);
 
   const [moveTarget, setMoveTarget] = useState<AdminPost | null>(null);
-  const [moveBoardId, setMoveBoardId] = useState<number | ''>('');
+  const [moveBoardId, setMoveBoardId] = useState<string>('');
 
   useEffect(() => {
     getBoards().then(setBoards).catch(() => {});
@@ -50,12 +48,10 @@ export default function PostsPage() {
     setLoading(true);
     setError(null);
     try {
-      const params: Record<string, string | number> = { page, pageSize: PAGE_SIZE };
-      if (keyword) params.keyword = keyword;
+      const params: Record<string, string | number> = { page, limit: PAGE_SIZE };
+      if (keyword) params.search = keyword;
       if (boardIdFilter) params.boardId = boardIdFilter;
       if (statusFilter) params.status = statusFilter;
-      if (startDate) params.startDate = startDate;
-      if (endDate) params.endDate = endDate;
       const data = await getAdminPosts(params);
       setPosts(data.items || []);
       setTotal(data.total);
@@ -64,7 +60,7 @@ export default function PostsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, keyword, boardIdFilter, statusFilter, startDate, endDate]);
+  }, [page, keyword, boardIdFilter, statusFilter]);
 
   useEffect(() => {
     fetchPosts();
@@ -123,7 +119,7 @@ export default function PostsPage() {
   async function handleMove() {
     if (!moveTarget || !moveBoardId) return;
     try {
-      await movePost(moveTarget.id, moveBoardId as number);
+      await movePost(moveTarget.id, moveBoardId);
       toast.success('帖子已移动');
       setMoveTarget(null);
       setMoveBoardId('');
@@ -134,10 +130,15 @@ export default function PostsPage() {
   }
 
   const statusLabels: Record<string, { text: string; cls: string }> = {
-    published: { text: '已发布', cls: 'bg-emerald-50 text-emerald-500' },
-    deleted: { text: '已删除', cls: 'bg-red-50 text-red-500' },
-    hidden: { text: '已隐藏', cls: 'bg-gray-100 text-gray-400' },
+    approved: { text: '已审核', cls: 'bg-emerald-50 text-emerald-500' },
+    pending: { text: '待审核', cls: 'bg-amber-50 text-amber-600' },
+    rejected: { text: '已驳回', cls: 'bg-red-50 text-red-500' },
   };
+
+  function getStatus(post: AdminPost) {
+    if (post.isDeleted) return { text: '已删除', cls: 'bg-red-50 text-red-500' };
+    return statusLabels[post.auditStatus] || statusLabels.approved;
+  }
 
   return (
     <div>
@@ -156,7 +157,7 @@ export default function PostsPage() {
         </Button>
         <select
           value={boardIdFilter}
-          onChange={(e) => { setBoardIdFilter(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
+          onChange={(e) => { setBoardIdFilter(e.target.value); setPage(1); }}
           className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
         >
           <option value="">全部版块</option>
@@ -170,23 +171,10 @@ export default function PostsPage() {
           className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
         >
           <option value="">全部状态</option>
-          <option value="published">已发布</option>
+          <option value="active">已发布</option>
           <option value="deleted">已删除</option>
-          <option value="hidden">已隐藏</option>
+          <option value="all">全部含已删</option>
         </select>
-        <Input
-          type="date"
-          value={startDate}
-          onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
-          className="w-36"
-        />
-        <span className="text-gray-400 text-sm">至</span>
-        <Input
-          type="date"
-          value={endDate}
-          onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
-          className="w-36"
-        />
       </div>
 
       {loading ? (
@@ -205,16 +193,16 @@ export default function PostsPage() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-1/4">标题</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">作者</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">版块</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">状态</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">回复/赞</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">时间</th>
                   <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {posts.map((p) => {
-                  const st = statusLabels[p.status] || statusLabels.published;
+                  const st = getStatus(p);
                   return (
                     <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="px-4 py-3">
@@ -224,11 +212,11 @@ export default function PostsPage() {
                           <span className="text-sm text-gray-900 truncate block max-w-xs">{p.title}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{p.author.username}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{p.board?.name || '-'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500">{p.boardId || '-'}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${st.cls}`}>{st.text}</span>
                       </td>
+                      <td className="px-4 py-3 text-sm text-gray-500">{p.replyCount}/{p.likeCount}</td>
                       <td className="px-4 py-3 text-sm text-gray-400">
                         {new Date(p.createdAt).toLocaleDateString('zh-CN')}
                       </td>
@@ -287,7 +275,7 @@ export default function PostsPage() {
             <p className="text-sm text-gray-600 mb-3">帖子：{moveTarget?.title}</p>
             <select
               value={moveBoardId}
-              onChange={(e) => setMoveBoardId(Number(e.target.value))}
+              onChange={(e) => setMoveBoardId(e.target.value)}
               className="h-9 w-full px-3 border border-gray-200 rounded-md text-sm bg-white"
             >
               <option value="">选择目标版块</option>
