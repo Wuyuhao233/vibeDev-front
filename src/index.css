@@ -550,3 +550,11 @@ mark.search-highlight {
   border-radius: 2px;
   padding: 0 1px;
 }
+
+/* New Post editor page: full-height ByteMD */
+.new-post-editor .bytemd {
+  height: 100% !important;
+}
+.new-post-editor .bytemd-body {
+  overflow: auto;
+}

@@ -1,14 +1,20 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getBoards, type Board } from '../api/board';
+import { getBoards } from '../api/board';
 import { createPost, checkSensitiveWords } from '../api/post';
 import { useAuthStore } from '../store/authStore';
-import { Button, toast } from '../components/ui';
+import { useBoardStore } from '../store/boardStore';
 import MarkdownSplitEditor from '../components/MarkdownSplitEditor';
 import TagSelector from '../components/TagSelector';
-import ImageUploader from '../components/ImageUploader';
-
-
+import {
+  Button,
+  toast,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../components/ui';
 
 export default function NewPostPage() {
   const navigate = useNavigate();
@@ -16,9 +22,17 @@ export default function NewPostPage() {
   const boardIdParam = searchParams.get('board');
   const { isAuthenticated } = useAuthStore();
 
+  // Board data
+  const storeBoards = useBoardStore((s) => s.boards);
+  const boards = storeBoards.length > 0 ? storeBoards : [];
+
+  useEffect(() => {
+    if (storeBoards.length === 0) {
+      getBoards().catch(() => {});
+    }
+  }, [storeBoards]);
+
   // Form state
-  const [boards, setBoards] = useState<Board[]>([]);
-  const [_boardsLoading, setBoardsLoading] = useState(true);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(
     boardIdParam || null,
   );
@@ -26,30 +40,14 @@ export default function NewPostPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
-  // Validation
+  // UI state
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sensitiveHits, setSensitiveHits] = useState<string[]>([]);
   const [publishing, setPublishing] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-
-  // Load boards
-  useEffect(() => {
-    getBoards()
-      .then((data) => {
-        setBoards(data);
-        if (boardIdParam) {
-          const matched = data.find(
-            (b) => b.id === boardIdParam,
-          );
-          if (matched) setSelectedBoardId(matched.id);
-        }
-      })
-      .catch(() => toast.error('加载版块列表失败'))
-      .finally(() => setBoardsLoading(false));
-  }, [boardIdParam]);
 
   // Sensitive word detection via server API (300ms debounce)
   useEffect(() => {
@@ -73,16 +71,19 @@ export default function NewPostPage() {
     };
   }, [title, content]);
 
-  // Draft save
+  // Draft save (generic key, not board-specific)
   useEffect(() => {
-    if (!selectedBoardId || (!title && !content)) return;
+    if (!title && !content) return;
     const timer = setTimeout(() => {
-      const draft = { boardId: selectedBoardId, tags: selectedTags, title, content, coverImageUrl };
+      const draft = {
+        boardId: selectedBoardId,
+        tags: selectedTags,
+        title,
+        content,
+        coverImageUrl,
+      };
       try {
-        localStorage.setItem(
-          `vibeDev:draft:post:${selectedBoardId}`,
-          JSON.stringify(draft),
-        );
+        localStorage.setItem('vibeDev:draft:post:new', JSON.stringify(draft));
       } catch {
         // localStorage full, ignore
       }
@@ -92,12 +93,12 @@ export default function NewPostPage() {
 
   // Load draft
   useEffect(() => {
-    if (!selectedBoardId) return;
     try {
-      const raw = localStorage.getItem(`vibeDev:draft:post:${selectedBoardId}`);
+      const raw = localStorage.getItem('vibeDev:draft:post:new');
       if (raw) {
         const draft = JSON.parse(raw);
         if (!title && !content) {
+          if (draft.boardId) setSelectedBoardId(draft.boardId);
           setSelectedTags(draft.tags || []);
           setTitle(draft.title || '');
           setContent(draft.content || '');
@@ -107,7 +108,7 @@ export default function NewPostPage() {
     } catch {
       // ignore parse errors
     }
-  }, [selectedBoardId]);
+  }, []);
 
   // Warn on leave
   useEffect(() => {
@@ -140,7 +141,7 @@ export default function NewPostPage() {
     if (title.length < 5) errs.title = '标题长度需在 5-100 字符之间';
     if (title.length > 100) errs.title = '标题长度需在 5-100 字符之间';
     if (!content.trim()) errs.content = '请输入帖子内容';
-    if (sensitiveHits.length > 0) errs.sensitive = '内容包含敏感词：';
+    if (sensitiveHits.length > 0) errs.sensitive = '内容包含敏感词';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }, [selectedBoardId, selectedTags, title, content, sensitiveHits]);
@@ -164,8 +165,8 @@ export default function NewPostPage() {
         coverImageUrl: coverImageUrl || undefined,
         idempotencyKey,
       });
-      // Clear draft
-      localStorage.removeItem(`vibeDev:draft:post:${selectedBoardId}`);
+      localStorage.removeItem('vibeDev:draft:post:new');
+      setShowPublishDialog(false);
       toast.success('发布成功！');
       setTimeout(() => navigate(`/post/${post.id}`, { replace: true }), 500);
     } catch (err: any) {
@@ -174,20 +175,18 @@ export default function NewPostPage() {
     } finally {
       setPublishing(false);
     }
-  }, [validate, selectedBoardId, title, content, selectedTags, coverImageUrl, navigate]);
+  }, [validate, selectedBoardId, title, content, selectedTags, coverImageUrl, navigate, errors]);
 
-  // Character counter color
+  // Title character count color
   const titleCountColor =
-    title.length === 0 || title.length >= 5
-      ? title.length > 100
-        ? 'text-red-500'
-        : 'text-gray-400'
-      : 'text-gray-400';
+    title.length === 0 || (title.length >= 5 && title.length <= 100)
+      ? 'text-gray-400'
+      : 'text-red-500';
 
   // No auth
   if (!isAuthenticated) {
     return (
-      <div className="max-w-2xl mx-auto py-8">
+      <div className="flex items-center justify-center h-full">
         <div className="text-center py-16">
           <p className="text-lg text-gray-500">请先登录后再发帖</p>
         </div>
@@ -196,130 +195,44 @@ export default function NewPostPage() {
   }
 
   return (
-    <div className="new-post max-w-4xl mx-auto py-4">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">发布新帖</h1>
-
-      {/* Board selector */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">选择版块</label>
-        <select
-          value={selectedBoardId || ''}
-          onChange={(e) => {
-            setSelectedBoardId(e.target.value || null);
-            setSelectedTags([]);
-          }}
-          className={`w-full max-w-xs border rounded-md px-3 py-2 text-sm bg-white outline-none transition-colors duration-150 ${
-            errors.board ? 'border-red-500' : 'border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-50'
-          }`}
-        >
-          <option value="">请选择版块</option>
-          {boards.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
-        {errors.board && <p className="mt-1 text-xs text-red-500">{errors.board}</p>}
-      </div>
-
-      {/* Tag selector */}
-      {currentBoard && (
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">选择标签（1-3个）</label>
-          <TagSelector
-            tags={availableTags}
-            selected={selectedTags}
-            onChange={setSelectedTags}
-            max={3}
-            min={1}
-            error={errors.tags}
-          />
-        </div>
-      )}
-
-      {/* Title */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">标题</label>
-        <div className="relative">
+    <div className="new-post-editor flex flex-col h-full">
+      {/* Title input */}
+      <div className="px-8 pt-6 pb-3">
+        <div className="relative max-w-[960px] mx-auto">
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="请输入标题（5-100 字符）"
+            placeholder="输入文章标题..."
             maxLength={100}
-            className={`w-full border rounded-md px-3 py-2.5 text-xl font-medium outline-none transition-colors duration-150 ${
-              errors.title || sensitiveHits.some((w) => title.includes(w))
-                ? 'border-red-500'
-                : 'border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-50'
+            className={`w-full text-3xl font-bold border-none outline-none bg-transparent text-gray-900 placeholder-gray-300 py-2 ${
+              errors.title ? 'text-red-500' : ''
             }`}
           />
-          <span className={`absolute right-3 bottom-2 text-xs ${titleCountColor}`}>
+          <span className={`absolute right-0 bottom-3 text-sm ${titleCountColor}`}>
             {title.length}/100
           </span>
         </div>
-        {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+        {errors.title && <p className="mt-1 text-xs text-red-500 max-w-[960px] mx-auto">{errors.title}</p>}
       </div>
 
-      {/* Cover image upload */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">封面图（可选）</label>
-        {coverImageUrl ? (
-          <div className="relative inline-block">
-            <img
-              src={coverImageUrl}
-              alt="封面图"
-              className="w-48 h-32 object-cover rounded-md border border-gray-200"
-            />
-            <button
-              type="button"
-              onClick={() => setCoverImageUrl('')}
-              className="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white text-xs rounded-full flex items-center justify-center"
-            >
-              ×
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={coverImageUrl}
-              onChange={(e) => setCoverImageUrl(e.target.value)}
-              placeholder="输入封面图 URL 或使用下方图片上传"
-              className="flex-1 border border-gray-200 rounded-md px-3 py-2 text-sm outline-none focus:border-primary-500"
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Markdown editor */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">内容</label>
-        <MarkdownSplitEditor
-          value={content}
-          onChange={setContent}
-          placeholder="请输入帖子内容，支持 Markdown 语法"
-        />
-        {errors.content && <p className="mt-1 text-xs text-red-500">{errors.content}</p>}
-      </div>
-
-      {/* Image uploader */}
-      <div className="mb-4">
-        <ImageUploader
-          images={uploadedImages}
-          onImagesChange={setUploadedImages}
-          maxCount={10}
-          maxSizeMB={5}
-        />
+      {/* Editor */}
+      <div className="flex-1 min-h-0 px-8">
+        <div className="max-w-[960px] mx-auto h-full">
+          <MarkdownSplitEditor
+            value={content}
+            onChange={setContent}
+            placeholder="请输入文章内容，支持 Markdown 语法"
+          />
+        </div>
       </div>
 
       {/* Sensitive word warning */}
       {sensitiveHits.length > 0 && (
-        <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-          <span className="text-red-500 font-medium text-sm">!</span>
-          <span className="text-sm text-red-600">
-            内容包含敏感词：
-          </span>
-          <div className="flex gap-1.5 ml-2">
+        <div className="px-8">
+          <div className="max-w-[960px] mx-auto flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+            <span className="text-red-500 font-medium text-sm">!</span>
+            <span className="text-sm text-red-600">内容包含敏感词：</span>
             {sensitiveHits.map((word) => (
               <span key={word} className="px-1.5 py-px text-xs bg-red-100 text-red-600 rounded">
                 {word}
@@ -329,20 +242,85 @@ export default function NewPostPage() {
         </div>
       )}
 
-      {/* Publish button */}
-      <div className="flex items-center justify-between sticky bottom-0 bg-white py-4 border-t border-gray-100">
-        <span className="text-sm text-gray-400">
-          {selectedBoardId ? '已选择版块' : '请选择版块'} · {selectedTags.length} 个标签 · {content.length} 字
-        </span>
+      {/* Sticky bottom bar */}
+      <div className="sticky bottom-0 bg-white border-t border-gray-100 px-8 py-3 flex items-center justify-between">
+        <span className="text-sm text-gray-400">{content.length} 字</span>
         <Button
-          variant="default"
           size="lg"
           disabled={publishing || sensitiveHits.length > 0}
-          onClick={handlePublish}
+          onClick={() => setShowPublishDialog(true)}
         >
-          {publishing ? '发布中...' : sensitiveHits.length > 0 ? '内容包含违规词汇' : '发布'}
+          {sensitiveHits.length > 0 ? '内容包含违规词汇' : '发布'}
         </Button>
       </div>
+
+      {/* Publish dialog */}
+      <Dialog open={showPublishDialog} onOpenChange={(v) => !v && setShowPublishDialog(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>发布文章</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Board selector */}
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">选择版块</label>
+              <select
+                value={selectedBoardId || ''}
+                onChange={(e) => {
+                  setSelectedBoardId(e.target.value || null);
+                  setSelectedTags([]);
+                }}
+                className={`h-9 w-full px-3 border rounded-md text-sm bg-white outline-none ${
+                  errors.board ? 'border-red-500' : 'border-gray-200'
+                }`}
+              >
+                <option value="">请选择版块</option>
+                {boards.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+              {errors.board && <p className="mt-1 text-xs text-red-500">{errors.board}</p>}
+            </div>
+
+            {/* Tag selector */}
+            {currentBoard && (
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">选择标签（1-3个）</label>
+                <TagSelector
+                  tags={availableTags}
+                  selected={selectedTags}
+                  onChange={setSelectedTags}
+                  max={3}
+                  min={1}
+                  error={errors.tags}
+                />
+              </div>
+            )}
+
+            {/* Cover image URL */}
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">封面图 URL（可选）</label>
+              <input
+                type="text"
+                value={coverImageUrl}
+                onChange={(e) => setCoverImageUrl(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm outline-none focus:border-primary-500"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPublishDialog(false)}>
+              取消
+            </Button>
+            <Button onClick={handlePublish} disabled={publishing}>
+              {publishing ? '发布中...' : '确认发布'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

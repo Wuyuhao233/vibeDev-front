@@ -11,6 +11,10 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
+    "@bytemd/plugin-frontmatter": "^1.22.0",
+    "@bytemd/plugin-gfm": "^1.22.0",
+    "@bytemd/plugin-highlight": "^1.22.0",
+    "@bytemd/react": "^1.22.0",
     "@fontsource-variable/geist": "^5.2.8",
     "@fontsource/noto-sans-sc": "^5.2.9",
     "axios": "^1.16.0",

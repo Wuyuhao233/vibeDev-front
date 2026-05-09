@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import LeftSidebar from './LeftSidebar';
 import { getBoards } from '../api/board';
@@ -7,6 +7,8 @@ import { useBoardStore } from '../store/boardStore';
 
 export default function MainLayout() {
   const setBoards = useBoardStore((s) => s.setBoards);
+  const location = useLocation();
+  const isEditorRoute = location.pathname.startsWith('/post/new');
 
   useEffect(() => {
     getBoards()
@@ -17,12 +19,18 @@ export default function MainLayout() {
   return (
     <div className="min-h-screen bg-[var(--color-bg-page)]">
       <Navbar />
-      <div className="max-w-content mx-auto flex px-6 py-6 gap-6">
-        <LeftSidebar />
-        <main className="flex-1 min-w-0">
+      {isEditorRoute ? (
+        <main className="min-h-[calc(100vh-3.5rem)]">
           <Outlet />
         </main>
-      </div>
+      ) : (
+        <div className="max-w-content mx-auto flex px-6 py-6 gap-6">
+          <LeftSidebar />
+          <main className="flex-1 min-w-0">
+            <Outlet />
+          </main>
+        </div>
+      )}
     </div>
   );
 }
