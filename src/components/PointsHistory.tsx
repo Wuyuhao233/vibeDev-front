@@ -76,17 +76,17 @@ export default function PointsHistory({ username }: PointsHistoryProps) {
             className="flex items-center justify-between px-4 py-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors duration-150"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-gray-900">{record.description}</p>
+              <p className="text-sm text-gray-900">{record.reasonLabel}</p>
               <p className="text-xs text-gray-400 mt-0.5">
                 {formatRelativeTime(record.createdAt)}
               </p>
             </div>
             <span
               className={`flex-shrink-0 ml-4 text-sm font-medium ${
-                record.points >= 0 ? 'text-emerald-500' : 'text-red-500'
+                record.amount >= 0 ? 'text-emerald-500' : 'text-red-500'
               }`}
             >
-              {record.points > 0 ? '+' : ''}{record.points}
+              {record.amount > 0 ? '+' : ''}{record.amount}
             </span>
           </div>
         ))}

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import * as userApi from '../../api/user';
+import type { UserProfile } from '../../api/user';
 import {
   getFolders,
   getFolderItems,
@@ -23,19 +24,6 @@ import LevelProgress from '../../components/LevelProgress';
 import PointsHistory from '../../components/PointsHistory';
 import { toast } from '../../components/ui';
 import { formatRelativeTime } from '../../utils/relativeTime';
-
-interface UserProfile {
-  id: number;
-  username: string;
-  email?: string;
-  avatar: string | null;
-  bio: string | null;
-  level: number;
-  points: number;
-  postCount: number;
-  replyCount: number;
-  createdAt: string;
-}
 
 type TabKey = 'posts' | 'replies' | 'collections' | 'history' | 'points';
 
@@ -292,13 +280,11 @@ export default function UserProfilePage() {
               <h1 className="text-3xl font-bold text-gray-900">{profile.username}</h1>
               <LevelBadge level={(profile.level || 1) as 1 | 2 | 3 | 4 | 5 | 6} />
             </div>
-            {profile.bio && (
-              <p className="text-sm text-gray-500 mb-3">{profile.bio}</p>
+            {profile.signature && (
+              <p className="text-sm text-gray-500 mb-3">{profile.signature}</p>
             )}
             <div className="flex items-center gap-6 text-sm text-gray-500">
               <span>积分：{profile.points ?? 0}</span>
-              <span>帖子：{profile.postCount ?? 0}</span>
-              <span>回复：{profile.replyCount ?? 0}</span>
               <span>注册于：{formatRelativeTime(profile.createdAt)}</span>
             </div>
             <LevelProgress points={profile.points ?? 0} className="mt-4" />

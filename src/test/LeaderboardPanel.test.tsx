@@ -91,7 +91,7 @@ describe('LeaderboardPanel', () => {
     await user.click(screen.getByText('月榜'));
 
     await waitFor(() => {
-      expect(pointsApi.getLeaderboard).toHaveBeenCalledWith('monthly', 1, 20);
+      expect(pointsApi.getLeaderboard).toHaveBeenCalledWith('month', 1, 20);
     });
   });
 

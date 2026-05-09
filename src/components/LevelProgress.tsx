@@ -4,12 +4,12 @@ const LEVEL_THRESHOLDS: { level: 1 | 2 | 3 | 4 | 5 | 6; min: number }[] = [
   { level: 1, min: 0 },
   { level: 2, min: 100 },
   { level: 3, min: 300 },
-  { level: 4, min: 600 },
-  { level: 5, min: 1000 },
-  { level: 6, min: 2000 },
+  { level: 4, min: 1000 },
+  { level: 5, min: 3000 },
+  { level: 6, min: 10000 },
 ];
 
-const LEVEL_MAX = 9999;
+const LEVEL_MAX = 99999;
 
 function getLevelInfo(points: number) {
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {

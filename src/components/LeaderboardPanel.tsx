@@ -6,13 +6,12 @@ import { Avatar } from './ui';
 import { Skeleton } from './ui';
 import { Empty } from './ui';
 import { ErrorState } from './ui';
-import { Pagination } from './ui';
 
-type Period = 'weekly' | 'monthly' | 'all';
+type Period = 'week' | 'month' | 'all';
 
 const TABS: { key: Period; label: string }[] = [
-  { key: 'weekly', label: '周榜' },
-  { key: 'monthly', label: '月榜' },
+  { key: 'week', label: '周榜' },
+  { key: 'month', label: '月榜' },
   { key: 'all', label: '总榜' },
 ];
 
@@ -20,28 +19,27 @@ const PAGE_SIZE = 20;
 
 export default function LeaderboardPanel() {
   const currentUser = useAuthStore((s) => s.user);
-  const [period, setPeriod] = useState<Period>('weekly');
+  const [period, setPeriod] = useState<Period>('week');
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [currentUserRank, setCurrentUserRank] = useState<{ rank: number; points: number } | null>(null);
+
+  const currentUserRank = currentUser
+    ? entries.find((e) => e.userId === currentUser.id)
+    : null;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const data = await pointsApi.getLeaderboard(period, page, PAGE_SIZE);
-      setEntries(data.items);
-      setTotal(data.total);
-      setCurrentUserRank(data.currentUser);
+      const data = await pointsApi.getLeaderboard(period, PAGE_SIZE);
+      setEntries(data.entries);
     } catch {
       setError('加载失败');
     } finally {
       setLoading(false);
     }
-  }, [period, page]);
+  }, [period]);
 
   useEffect(() => {
     fetchData();
@@ -49,7 +47,6 @@ export default function LeaderboardPanel() {
 
   const handlePeriodChange = (p: Period) => {
     setPeriod(p);
-    setPage(1);
   };
 
   return (
@@ -135,7 +132,7 @@ export default function LeaderboardPanel() {
 
                     {/* Avatar */}
                     <Avatar
-                      src={entry.avatar || undefined}
+                      src={entry.avatarUrl || undefined}
                       name={entry.username}
                       size="sm"
                     />
@@ -154,12 +151,6 @@ export default function LeaderboardPanel() {
                 );
               })}
             </div>
-            <Pagination
-              current={page}
-              total={total}
-              pageSize={PAGE_SIZE}
-              onChange={setPage}
-            />
           </>
         )}
       </div>

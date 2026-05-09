@@ -39,7 +39,7 @@ export default function CheckInButton() {
         ? ` 连续签到 ${result.consecutiveDays} 天，额外奖励已发放！`
         : ` 已连续签到 ${result.consecutiveDays} 天`;
 
-      toast.success(`签到成功！获得 ${result.points} 积分。${bonusMsg}`);
+      toast.success(`签到成功！获得 ${result.pointsAwarded} 积分。${bonusMsg}`);
     } catch (err) {
       if (err instanceof ApiError) {
         toast.error(err.message || '签到失败，请重试');

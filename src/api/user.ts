@@ -9,6 +9,7 @@ export interface UserProfile {
   avatarUrl: string;
   role: string;
   level: number;
+  levelTitle: string;
   points: number;
   isActivated: boolean;
   isBanned: boolean;
