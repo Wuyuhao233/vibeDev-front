@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import * as pointsApi from '../api/points';
 import type { LeaderboardEntry } from '../api/points';
 import { useAuthStore } from '../store/authStore';
-import { Avatar } from './ui';
+import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import { Skeleton } from './ui';
-import { Empty } from './ui';
-import { ErrorState } from './ui';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from './ui';
+import { ErrorEmpty } from './shared';
 
 type Period = 'week' | 'month' | 'all';
 
@@ -91,16 +91,17 @@ export default function LeaderboardPanel() {
             ))}
           </div>
         ) : error ? (
-          <ErrorState
-            title="排行榜加载失败"
+          <ErrorEmpty
             description="请检查网络连接后重试"
             onRetry={fetchData}
           />
         ) : entries.length === 0 ? (
-          <Empty
-            title="暂无排行数据"
-            description="快去参与互动获取积分吧"
-          />
+          <Empty>
+            <EmptyHeader>
+              <EmptyTitle>暂无排行数据</EmptyTitle>
+              <EmptyDescription>快去参与互动获取积分吧</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <>
             <div className="flex flex-col">
@@ -132,10 +133,11 @@ export default function LeaderboardPanel() {
 
                     {/* Avatar */}
                     <Avatar
-                      src={entry.avatarUrl || undefined}
-                      name={entry.username}
                       size="sm"
-                    />
+                    >
+                      {entry.avatarUrl && <AvatarImage src={entry.avatarUrl} alt={entry.username} />}
+                      <AvatarFallback>{entry.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                    </Avatar>
 
                     {/* Username */}
                     <span className={`flex-1 text-sm truncate ${isMe ? 'font-medium text-primary-600' : 'text-gray-900'}`}>

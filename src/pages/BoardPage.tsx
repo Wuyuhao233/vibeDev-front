@@ -6,7 +6,8 @@ import { useAuthStore } from '../store/authStore';
 import PostCard from '../components/PostCard';
 import SortSwitcher from '../components/SortSwitcher';
 import TagFilterBar from '../components/TagFilterBar';
-import { Pagination, Empty, ErrorState } from '../components/ui';
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '../components/ui';
+import { ErrorEmpty, PaginationComponent } from '../components/shared';
 import { toast } from '../components/ui';
 import type { PostCardData } from '../types/board';
 
@@ -156,24 +157,26 @@ export default function BoardPage() {
   if (boardNotFound) {
     return (
       <div className="board-content__not-found">
-        <Empty
-          icon={
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-              <path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          }
-          title="版块不存在"
-          description="该版块可能已被删除或归档"
-          action={
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                <path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </EmptyMedia>
+            <EmptyTitle>版块不存在</EmptyTitle>
+            <EmptyDescription>该版块可能已被删除或归档</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
             <Link
               to="/"
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
             >
               返回首页
             </Link>
-          }
-        />
+          </EmptyContent>
+        </Empty>
       </div>
     );
   }
@@ -181,7 +184,7 @@ export default function BoardPage() {
   // Board error
   if (boardError && !board) {
     return (
-      <ErrorState
+      <ErrorEmpty
         title="加载版块信息失败"
         description={boardError}
         onRetry={fetchPosts}
@@ -273,42 +276,46 @@ export default function BoardPage() {
           ))}
         </div>
       ) : postsError ? (
-        <ErrorState
+        <ErrorEmpty
           title="加载帖子列表失败"
           description={postsError}
           onRetry={fetchPosts}
         />
       ) : posts.length === 0 ? (
         activeTagId ? (
-          <Empty
-            icon={
-              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="text-gray-300">
-                <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" strokeWidth="2" />
-                <path d="M20 28h24M20 36h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            }
-            title="该标签下暂无帖子"
-            action={
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="text-gray-300">
+                  <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" strokeWidth="2" />
+                  <path d="M20 28h24M20 36h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </EmptyMedia>
+              <EmptyTitle>该标签下暂无帖子</EmptyTitle>
+            </EmptyHeader>
+            <EmptyContent>
               <button
                 onClick={() => handleTagChange(null)}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-500 bg-white border border-primary-500 rounded-md hover:bg-primary-50 transition-colors duration-150"
               >
                 返回全部
               </button>
-            }
-          />
+            </EmptyContent>
+          </Empty>
         ) : (
-          <Empty
-            title="该版块暂无帖子"
-            action={
+          <Empty>
+            <EmptyHeader>
+              <EmptyTitle>该版块暂无帖子</EmptyTitle>
+            </EmptyHeader>
+            <EmptyContent>
               <Link
                 to="/post/new"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
               >
                 发布第一个帖子
               </Link>
-            }
-          />
+            </EmptyContent>
+          </Empty>
         )
       ) : (
         <>
@@ -317,11 +324,11 @@ export default function BoardPage() {
               <PostCard key={post.id} post={post} />
             ))}
           </div>
-          <Pagination
-            current={pageParam}
+          <PaginationComponent
+            currentPage={pageParam}
             total={total}
             pageSize={PAGE_SIZE}
-            onChange={handlePageChange}
+            onPageChange={handlePageChange}
           />
         </>
       )}

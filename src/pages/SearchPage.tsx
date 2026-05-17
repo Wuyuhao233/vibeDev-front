@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import SearchInput from '../components/SearchInput';
-import { Avatar } from '../components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui';
 import LevelBadge from '../components/ui/LevelBadge';
 import RelativeTime from '../components/ui/RelativeTime';
 import { formatCount } from '../utils/formatCount';
@@ -573,7 +573,10 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
           {/* Meta row */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
-              <Avatar name={item.author.username} size={28} />
+              <Avatar size="sm">
+                {item.author.avatarUrl && <AvatarImage src={item.author.avatarUrl} alt={item.author.username} />}
+                <AvatarFallback>{item.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+              </Avatar>
               <span className="text-sm text-gray-500">{item.author.username}</span>
               <LevelBadge level={Math.min(Math.max(item.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6} />
             </div>

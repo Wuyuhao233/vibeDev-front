@@ -5,7 +5,7 @@ import NotificationDropdown from './NotificationDropdown';
 import CheckInButton from './CheckInButton';
 import SearchInput from './SearchInput';
 import ThemeToggle from './ThemeToggle';
-import { Avatar } from './ui';
+import { Avatar, AvatarFallback, AvatarImage } from './ui';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -74,7 +74,9 @@ export default function Navbar() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 p-1 rounded-md hover:bg-muted transition-colors duration-150"
                 >
-                  <Avatar name={user?.username || ''} size="sm" />
+                  <Avatar size="sm">
+                    <AvatarFallback>{user?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                  </Avatar>
                   <span className="text-sm text-foreground max-w-[100px] truncate">{user?.username}</span>
                   <svg
                     width="12"

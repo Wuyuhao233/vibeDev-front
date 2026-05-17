@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getReviewStats } from '../../api/admin';
 import type { ReviewStatsResponse } from '../../types/admin';
-import { Spinner, ErrorState } from '../../components/ui';
+import { Spinner } from '../../components/ui';
+import { ErrorEmpty } from '../../components/shared';
 
 function formatPercent(v: number): string {
   return (v * 100).toFixed(1) + '%';
@@ -73,7 +74,7 @@ export default function ReviewStatsPage() {
   }
 
   if (error) {
-    return <ErrorState title="加载失败" description={error} onRetry={fetchData} />;
+    return <ErrorEmpty description={error} onRetry={fetchData} />;
   }
 
   if (!data) return null;

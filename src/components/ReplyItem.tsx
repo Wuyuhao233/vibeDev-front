@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Avatar } from './ui';
+import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import LevelBadge from './ui/LevelBadge';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -88,11 +88,12 @@ export default function ReplyItem({
           tabIndex={-1}
         >
           <Avatar
-            src={author.avatarUrl || undefined}
-            name={author.username}
-            size={40}
+            size="sm"
             className="reply-item__avatar"
-          />
+          >
+            {author.avatarUrl && <AvatarImage src={author.avatarUrl} alt={author.username} />}
+            <AvatarFallback>{author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+          </Avatar>
         </button>
 
         <div className="flex-1 min-w-0">

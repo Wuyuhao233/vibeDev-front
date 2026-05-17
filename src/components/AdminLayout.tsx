@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Avatar } from './ui';
+import { Avatar, AvatarFallback, AvatarImage } from './ui';
 
 interface NavItem {
   label: string;
@@ -61,7 +61,9 @@ export default function AdminLayout() {
             ))}
         </nav>
         <div className="p-4 border-t border-border flex items-center gap-3">
-          <Avatar name={user?.username || ''} size="sm" />
+          <Avatar size="sm">
+            <AvatarFallback>{user?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+          </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm text-foreground truncate">{user?.username}</p>
           </div>

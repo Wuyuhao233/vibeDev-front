@@ -6,11 +6,11 @@ import { ApiError } from '../utils/error';
 import { PASSWORD_PATTERN } from '../utils/patterns';
 import { Button } from '../components/ui';
 import { Input } from '../components/ui';
-import { Avatar } from '../components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui';
 import { Dialog } from '../components/ui';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui';
-import { Empty } from '../components/ui';
-import { Pagination } from '../components/ui';
+import { Empty, EmptyHeader, EmptyTitle } from '../components/ui';
+import { ErrorEmpty, PaginationComponent } from '../components/shared';
 import { Skeleton } from '../components/ui';
 import { Spinner } from '../components/ui';
 import { toast } from '../components/ui';
@@ -172,11 +172,10 @@ function ProfileSection() {
 
       {/* Avatar */}
       <div className="flex items-center gap-4 mb-8">
-        <Avatar
-          src={profile?.avatarUrl}
-          name={profile?.username || ''}
-          className="size-8"
-        />
+        <Avatar className="size-8">
+          {profile?.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={profile?.username || ''} />}
+          <AvatarFallback>{profile?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+        </Avatar>
         <label className="px-4 py-2 text-sm font-medium text-primary-500 border border-primary-500 rounded-md hover:bg-primary-50 cursor-pointer transition-colors duration-150">
           更换头像
           <input
@@ -189,26 +188,33 @@ function ProfileSection() {
       </div>
 
       <div className="flex flex-col gap-4 max-w-md">
-        <Input
-          label="昵称"
-          value={nickname}
-          onChange={(e) => {
-            setNickname(e.target.value);
-            setNicknameError('');
-          }}
-          error={nicknameError}
-        />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="nickname" className="text-sm font-medium text-gray-700">昵称</label>
+          <Input
+            id="nickname"
+            value={nickname}
+            onChange={(e) => {
+              setNickname(e.target.value);
+              setNicknameError('');
+            }}
+            aria-invalid={!!nicknameError}
+          />
+          {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}
+        </div>
 
-        <Input
-          label="签名"
-         
-          value={signature}
-          onChange={(e) => {
-            setSignature(e.target.value);
-            setSigError('');
-          }}
-          error={sigError}
-        />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="signature" className="text-sm font-medium text-gray-700">签名</label>
+          <Input
+            id="signature"
+            value={signature}
+            onChange={(e) => {
+              setSignature(e.target.value);
+              setSigError('');
+            }}
+            aria-invalid={!!sigError}
+          />
+          {sigError && <p className="text-xs text-red-500">{sigError}</p>}
+        </div>
 
         <Button onClick={handleSaveProfile} disabled={saving} className="self-start">
           保存修改
@@ -405,15 +411,19 @@ function SecuritySection() {
         <h2 className="text-lg font-semibold text-gray-900 mb-6">修改密码</h2>
         <div className="flex flex-col gap-4 max-w-md">
           <div className="relative">
-            <Input
-              label="当前密码"
-              type={showOld ? 'text' : 'password'}
-              value={oldPassword}
-              onChange={(e) => { setOldPassword(e.target.value); setPwdError(''); }}
-              placeholder="请输入当前密码"
-              error={pwdError}
-              disabled={savingPwd}
-            />
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="old-password" className="text-sm font-medium text-gray-700">当前密码</label>
+              <Input
+                id="old-password"
+                type={showOld ? 'text' : 'password'}
+                value={oldPassword}
+                onChange={(e) => { setOldPassword(e.target.value); setPwdError(''); }}
+                placeholder="请输入当前密码"
+                aria-invalid={!!pwdError}
+                disabled={savingPwd}
+              />
+              {pwdError && <p className="text-xs text-red-500">{pwdError}</p>}
+            </div>
             <button
               type="button"
               onClick={() => setShowOld(!showOld)}
@@ -425,23 +435,27 @@ function SecuritySection() {
           </div>
 
           <div className="relative">
-            <Input
-              label="新密码"
-              type={showNew ? 'text' : 'password'}
-              value={newPassword}
-              onChange={(e) => {
-                setNewPassword(e.target.value);
-                validateNewPassword(e.target.value);
-                if (confirmPassword && e.target.value !== confirmPassword) {
-                  setConfirmError('两次输入的密码不一致');
-                } else {
-                  setConfirmError('');
-                }
-              }}
-              placeholder="至少 8 位，包含大小写字母和数字"
-              error={newPwdError}
-              disabled={savingPwd}
-            />
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="new-password" className="text-sm font-medium text-gray-700">新密码</label>
+              <Input
+                id="new-password"
+                type={showNew ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
+                  validateNewPassword(e.target.value);
+                  if (confirmPassword && e.target.value !== confirmPassword) {
+                    setConfirmError('两次输入的密码不一致');
+                  } else {
+                    setConfirmError('');
+                  }
+                }}
+                placeholder="至少 8 位，包含大小写字母和数字"
+                aria-invalid={!!newPwdError}
+                disabled={savingPwd}
+              />
+              {newPwdError && <p className="text-xs text-red-500">{newPwdError}</p>}
+            </div>
             <button
               type="button"
               onClick={() => setShowNew(!showNew)}
@@ -452,22 +466,26 @@ function SecuritySection() {
             </button>
           </div>
 
-          <Input
-            label="确认新密码"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              if (e.target.value !== newPassword) {
-                setConfirmError('两次输入的密码不一致');
-              } else {
-                setConfirmError('');
-              }
-            }}
-            placeholder="请再次输入新密码"
-            error={confirmError}
-            disabled={savingPwd}
-          />
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="confirm-password" className="text-sm font-medium text-gray-700">确认新密码</label>
+            <Input
+              id="confirm-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (e.target.value !== newPassword) {
+                  setConfirmError('两次输入的密码不一致');
+                } else {
+                  setConfirmError('');
+                }
+              }}
+              placeholder="请再次输入新密码"
+              aria-invalid={!!confirmError}
+              disabled={savingPwd}
+            />
+            {confirmError && <p className="text-xs text-red-500">{confirmError}</p>}
+          </div>
 
           <Button onClick={handleChangePassword} disabled={savingPwd} className="self-start">
             保存修改
@@ -541,7 +559,11 @@ function SecuritySection() {
         {historyLoading ? (
           <Skeleton className="h-10 w-full"/>
         ) : loginHistory.length === 0 ? (
-          <Empty title="暂无登录记录" />
+          <Empty>
+            <EmptyHeader>
+              <EmptyTitle>暂无登录记录</EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -573,11 +595,11 @@ function SecuritySection() {
                 </tbody>
               </table>
             </div>
-            <Pagination
-              current={historyPage}
+            <PaginationComponent
+              currentPage={historyPage}
               total={historyTotal}
               pageSize={20}
-              onChange={setHistoryPage}
+              onPageChange={setHistoryPage}
             />
           </>
         )}
@@ -695,13 +717,16 @@ function DeactivateSection() {
                   你确定要注销账号吗？此操作不可撤销（30 天内可恢复）。
                 </p>
                 <div className="mt-4">
-                  <Input
-                    label="请输入你的注册邮箱进行确认"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="example@email.com"
-                  />
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="deactivate-email" className="text-sm font-medium text-gray-700">请输入你的注册邮箱进行确认</label>
+                    <Input
+                      id="deactivate-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="example@email.com"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -728,13 +753,16 @@ function DeactivateSection() {
                 <h3 className="text-lg font-semibold text-gray-900">身份验证</h3>
                 <p className="mt-2 text-sm text-gray-500">请输入当前登录密码以确认操作</p>
                 <div className="mt-4">
-                  <Input
-                    label="密码"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="请输入密码"
-                  />
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="deactivate-password" className="text-sm font-medium text-gray-700">密码</label>
+                    <Input
+                      id="deactivate-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="请输入密码"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1034,7 +1062,11 @@ function NotificationSection() {
       </div>
 
       {preferences.length === 0 && (
-        <Empty title="暂无通知设置数据" />
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>暂无通知设置数据</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       )}
     </div>
   );

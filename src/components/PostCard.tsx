@@ -1,5 +1,5 @@
 import { /*Link,*/ useNavigate } from 'react-router-dom';
-import { Avatar } from './ui';
+import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import LevelBadge from './ui/LevelBadge';
 import RelativeTime from './ui/RelativeTime';
 import { formatCount } from '../utils/formatCount';
@@ -110,11 +110,12 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
               onKeyDown={(e) => { if (e.key === 'Enter') handleAuthorClick(e as any); }}
             >
               <Avatar
-                src={post.author.avatarUrl || undefined}
-                name={post.author.username}
-                size={28}
+                size="sm"
                 className="post-card__author-avatar"
-              />
+              >
+                {post.author.avatarUrl && <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />}
+                <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+              </Avatar>
               <span className="post-card__author-name text-sm text-gray-500 max-w-[80px] truncate">
                 {post.author.username}
               </span>

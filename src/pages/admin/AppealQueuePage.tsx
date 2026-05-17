@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAppeals, approveAppeal, rejectAppeal } from '../../api/admin';
 import type { AppealItem } from '../../types/admin';
-import { Spinner, ErrorState, Badge, Pagination } from '../../components/ui';
+import { Spinner, Badge } from '../../components/ui';
+import { ErrorEmpty, PaginationComponent } from '../../components/shared';
 import { toast } from 'sonner';
 
 export default function AppealQueuePage() {
@@ -100,7 +101,7 @@ export default function AppealQueuePage() {
           <span className="ml-3 text-gray-500">加载中...</span>
         </div>
       ) : error ? (
-        <ErrorState title="加载失败" description={error} onRetry={fetchData} />
+        <ErrorEmpty description={error} onRetry={fetchData} />
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
           <p className="text-base font-medium text-gray-500">暂无申诉记录</p>
@@ -176,9 +177,10 @@ export default function AppealQueuePage() {
 
           {total > pageSize && (
             <div className="mt-4">
-              <Pagination
+              <PaginationComponent
                 currentPage={page}
-                totalPages={Math.ceil(total / pageSize)}
+                total={total}
+                pageSize={pageSize}
                 onPageChange={setPage}
               />
             </div>

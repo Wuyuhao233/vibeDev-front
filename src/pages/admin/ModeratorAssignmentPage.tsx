@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getModeratorList, updateUserRole, getAdminBoards, getUsers } from '../../api/admin';
 import type { AdminBoard } from '../../types/admin';
-import { Spinner, ErrorState, Badge, Button } from '../../components/ui';
+import { Spinner, Badge, Button } from '../../components/ui';
+import { ErrorEmpty } from '../../components/shared';
 import { toast } from 'sonner';
 
 interface ModeratorItem {
@@ -93,7 +94,7 @@ export default function ModeratorAssignmentPage() {
   }
 
   if (error) {
-    return <ErrorState title="加载失败" description={error} onRetry={fetchData} />;
+    return <ErrorEmpty description={error} onRetry={fetchData} />;
   }
 
   return (

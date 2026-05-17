@@ -1,11 +1,11 @@
-import { useState, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import * as authApi from '../../api/auth';
 import { ApiError } from '../../utils/error';
 import { USERNAME_PATTERN, EMAIL_PATTERN, PASSWORD_PATTERN } from '../../utils/patterns';
 import { Button, Input, toast } from '../../components/ui';
 
-type PageState = 'form' | 'sent';
+const CODE_COUNTDOWN = 60;
 
 function getPasswordStrength(pwd: string): { label: string; level: number; color: string } {
   if (pwd.length < 8) return { label: '弱', level: 1, color: 'bg-red-500' };
@@ -21,8 +21,9 @@ function getPasswordStrength(pwd: string): { label: string; level: number; color
 }
 
 export default function RegisterPage() {
-  const [pageState, setPageState] = useState<PageState>('form');
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -31,15 +32,55 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   // Validation
-  const [usernameError, setUsernameError] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmError, setConfirmError] = useState('');
   const [globalError, setGlobalError] = useState('');
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState(false);
 
+  // Send code countdown
+  const [codeCountdown, setCodeCountdown] = useState(0);
+  const [sendingCode, setSendingCode] = useState(false);
+  const countdownRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (codeCountdown <= 0) return;
+    countdownRef.current = setTimeout(() => setCodeCountdown(codeCountdown - 1), 1000);
+    return () => {
+      if (countdownRef.current) clearTimeout(countdownRef.current);
+    };
+  }, [codeCountdown]);
+
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const validateEmail = (value: string) => {
+    if (!value.trim()) {
+      setEmailError('请输入邮箱');
+      return false;
+    }
+    if (!EMAIL_PATTERN.test(value)) {
+      setEmailError('邮箱格式不正确');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
+
+  const validateCode = (value: string) => {
+    if (!value.trim()) {
+      setCodeError('请输入验证码');
+      return false;
+    }
+    if (!/^\d{6}$/.test(value)) {
+      setCodeError('验证码为6位数字');
+      return false;
+    }
+    setCodeError('');
+    return true;
+  };
 
   const validateUsername = useCallback((value: string) => {
     if (!value.trim()) {
@@ -82,19 +123,6 @@ export default function RegisterPage() {
     }
   };
 
-  const validateEmail = (value: string) => {
-    if (!value.trim()) {
-      setEmailError('请输入邮箱');
-      return false;
-    }
-    if (!EMAIL_PATTERN.test(value)) {
-      setEmailError('邮箱格式不正确');
-      return false;
-    }
-    setEmailError('');
-    return true;
-  };
-
   const validatePassword = (value: string) => {
     if (value.length < 8) {
       setPasswordError('密码至少 8 位');
@@ -117,19 +145,46 @@ export default function RegisterPage() {
     return true;
   };
 
+  const handleSendCode = async () => {
+    if (!validateEmail(email)) return;
+    if (codeCountdown > 0) return;
+
+    setSendingCode(true);
+    try {
+      await authApi.sendRegisterCode(email);
+      setCodeCountdown(CODE_COUNTDOWN);
+      toast.success('验证码已发送');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const errorCode = err.code;
+        if (errorCode === 'EMAIL_TAKEN (10007)') {
+          setEmailError('该邮箱已被注册');
+        } else if (errorCode === 'RATE_LIMITED (40001)') {
+          toast.error('发送过于频繁，请稍后再试');
+        } else {
+          toast.error(err.message);
+        }
+      } else {
+        toast.error('网络连接失败，请检查网络');
+      }
+    } finally {
+      setSendingCode(false);
+    }
+  };
+
   const strength = getPasswordStrength(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setGlobalError('');
 
-    const validUsername = validateUsername(username);
     const validEmail = validateEmail(email);
+    const validCode = validateCode(code);
+    const validUsername = validateUsername(username);
     const validPassword = validatePassword(password);
     const validConfirm = validateConfirmPassword(confirmPassword, password);
 
-    if (!validUsername || !validEmail || !validPassword || !validConfirm) {
-      // Scroll to first error
+    if (!validEmail || !validCode || !validUsername || !validPassword || !validConfirm) {
       const firstError = document.querySelector('.text-red-500');
       firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -142,17 +197,20 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      await authApi.register({ username, email, password });
-      setPageState('sent');
+      await authApi.register({ email, code, username, password });
+      toast.success('注册成功');
+      navigate('/login');
     } catch (err) {
       if (err instanceof ApiError) {
-        const code = err.code;
-        if (code === 'USERNAME_TAKEN (10006)') {
+        const errorCcode = err.code;
+        if (errorCcode === 'INVALID_VERIFY_CODE (10008)') {
+          setCodeError('验证码错误或已过期');
+        } else if (errorCcode === 'USERNAME_TAKEN (10006)') {
           setUsernameError('用户名已被占用');
-        } else if (code === 'EMAIL_TAKEN (10007)') {
+        } else if (errorCcode === 'EMAIL_TAKEN (10007)') {
           setEmailError('该邮箱已被注册，请直接登录或使用找回密码');
-        } else if (code === 'RATE_LIMITED (40001)') {
-          setGlobalError('验证邮件发送过于频繁，请 24 小时后重试');
+        } else if (errorCcode === 'RATE_LIMITED (40001)') {
+          setGlobalError('操作过于频繁，请稍后重试');
         } else {
           setGlobalError(err.message);
         }
@@ -163,29 +221,6 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
-
-  if (pageState === 'sent') {
-    return (
-      <div className="max-w-md mx-auto mt-16">
-        <div className="bg-white rounded-lg shadow-card p-8 text-center">
-          <div className="mb-4 text-4xl">📧</div>
-          <h1 className="text-lg font-semibold text-gray-900 mb-2">验证邮件已发送</h1>
-          <p className="text-sm text-gray-500 mb-1">
-            验证邮件已发送至 <span className="font-medium text-gray-700">{email}</span>
-          </p>
-          <p className="text-sm text-gray-400 mb-6">
-            请前往邮箱查看验证邮件，点击邮件中的链接完成激活。链接有效期为 1 小时。
-          </p>
-          <Link
-            to="/login"
-            className="inline-block px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
-          >
-            返回登录
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-md mx-auto mt-12">
@@ -199,6 +234,59 @@ export default function RegisterPage() {
         )}
 
         <div className="flex flex-col gap-4">
+          {/* Email with send code button */}
+          <div>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <Input
+                  label="邮箱"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    validateEmail(e.target.value);
+                  }}
+                  placeholder="example@email.com"
+                  error={emailError}
+                  disabled={loading}
+                  autoComplete="email"
+                />
+              </div>
+              <div className="pt-7">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={sendingCode || codeCountdown > 0 || !!emailError || !email}
+                  onClick={handleSendCode}
+                  className="whitespace-nowrap h-9"
+                >
+                  {sendingCode
+                    ? '发送中...'
+                    : codeCountdown > 0
+                      ? `${codeCountdown}s`
+                      : '发送验证码'}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <Input
+            label="验证码"
+            type="text"
+            value={code}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+              setCode(val);
+              validateCode(val);
+            }}
+            placeholder="请输入6位数字验证码"
+            error={codeError}
+            disabled={loading}
+            autoComplete="one-time-code"
+            maxLength={6}
+          />
+
           <div>
             <Input
               label="用户名"
@@ -217,20 +305,6 @@ export default function RegisterPage() {
               <p className="text-xs text-emerald-500 mt-1">用户名可用</p>
             )}
           </div>
-
-          <Input
-            label="邮箱"
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              validateEmail(e.target.value);
-            }}
-            placeholder="example@email.com"
-            error={emailError}
-            disabled={loading}
-            autoComplete="email"
-          />
 
           <div>
             <div className="relative">
@@ -303,7 +377,7 @@ export default function RegisterPage() {
             size="lg"
             className="w-full mt-2"
           >
-            {loading ? '正在发送验证邮件...' : '注册'}
+            {loading ? '注册中...' : '注册'}
           </Button>
         </div>
 

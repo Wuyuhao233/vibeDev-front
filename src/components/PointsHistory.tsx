@@ -2,9 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import * as pointsApi from '../api/points';
 import type { PointsRecord } from '../api/points';
 import { Skeleton } from './ui';
-import { Empty } from './ui';
-import { ErrorState } from './ui';
-import { Pagination } from './ui';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from './ui';
+import { ErrorEmpty, PaginationComponent } from './shared';
 import { formatRelativeTime } from '../utils/relativeTime';
 
 interface PointsHistoryProps {
@@ -50,8 +49,7 @@ export default function PointsHistory({ username }: PointsHistoryProps) {
 
   if (error) {
     return (
-      <ErrorState
-        title="积分记录加载失败"
+      <ErrorEmpty
         description="请检查网络连接后重试"
         onRetry={fetchData}
       />
@@ -60,10 +58,12 @@ export default function PointsHistory({ username }: PointsHistoryProps) {
 
   if (records.length === 0) {
     return (
-      <Empty
-        title="暂无积分记录"
-        description="参与签到、发帖、回复等操作获取积分"
-      />
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>暂无积分记录</EmptyTitle>
+          <EmptyDescription>参与签到、发帖、回复等操作获取积分</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   }
 
@@ -91,11 +91,11 @@ export default function PointsHistory({ username }: PointsHistoryProps) {
           </div>
         ))}
       </div>
-      <Pagination
-        current={page}
+      <PaginationComponent
+        currentPage={page}
         total={total}
         pageSize={PAGE_SIZE}
-        onChange={setPage}
+        onPageChange={setPage}
       />
     </div>
   );

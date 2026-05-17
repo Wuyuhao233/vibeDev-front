@@ -5,14 +5,16 @@ import {
   Button,
   Input,
   Spinner,
-  ErrorState,
   Empty,
+  EmptyHeader,
+  EmptyTitle,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '../../components/ui';
+import { ErrorEmpty } from '../../components/shared';
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -88,9 +90,13 @@ export default function AdminSettings() {
           <span className="ml-3 text-gray-500">加载中...</span>
         </div>
       ) : error ? (
-        <ErrorState title="加载失败" description={error} onRetry={fetchSettings} />
+        <ErrorEmpty description={error} onRetry={fetchSettings} />
       ) : entries.length === 0 ? (
-        <Empty title="暂无设置项" />
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>暂无设置项</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="w-full">

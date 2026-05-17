@@ -5,7 +5,8 @@ import remarkGfm from 'remark-gfm';
 import { getPost, deletePost, recordPostView, pinPost, unpinPost, toggleEssence, type PostDetail } from '../api/post';
 import { getReplies, createReply, deleteReply, type Reply } from '../api/reply';
 import { useAuthStore } from '../store/authStore';
-import { Avatar, LevelBadge, TagBadge, Empty, ErrorState, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui';
+import { Avatar, AvatarFallback, AvatarImage, LevelBadge, Badge, Empty, EmptyHeader, EmptyTitle, EmptyContent, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui';
+import { ErrorEmpty } from '../components/shared';
 import { toast } from '../components/ui';
 import PostDetailSkeleton from '../components/PostDetailSkeleton';
 import LikeButton from '../components/LikeButton';
@@ -242,30 +243,29 @@ export default function PostPage() {
 
   // Error
   if (error) {
-    return <ErrorState description={error} onRetry={fetchPost} />;
+    return <ErrorEmpty description={error || undefined} onRetry={fetchPost} />;
   }
 
   // Not found
   if (notFound) {
     return (
-      <Empty
-        icon={
+      <Empty>
+        <EmptyHeader>
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
             <path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
-        }
-       
-       
-        action={
+          <EmptyTitle>内容不存在</EmptyTitle>
+        </EmptyHeader>
+        <EmptyContent>
           <Link
             to="/"
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600"
           >
             返回首页
           </Link>
-        }
-      />
+        </EmptyContent>
+      </Empty>
     );
   }
 
@@ -326,9 +326,9 @@ export default function PostPage() {
             <span>›</span>
             <div className="flex items-center gap-1.5">
               {post.tags.map((tag) => (
-                <TagBadge key={tag.id} className="text-xs">
+                <Badge key={tag.id} variant="outline" className="text-xs">
                   {tag.name}
-                </TagBadge>
+                </Badge>
               ))}
             </div>
           </>
@@ -338,11 +338,10 @@ export default function PostPage() {
       {/* Author header */}
       <div className="flex items-center gap-3 mb-4">
         <Link to={`/u/${post.author.username}`}>
-          <Avatar
-            src={post.author.avatarUrl || undefined}
-            name={post.author.username}
-            size="default"
-          />
+          <Avatar size="default">
+            {post.author.avatarUrl && <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />}
+            <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+          </Avatar>
         </Link>
         <div>
           <Link to={`/u/${post.author.username}`} className="text-base font-medium text-gray-900 hover:text-primary-500">

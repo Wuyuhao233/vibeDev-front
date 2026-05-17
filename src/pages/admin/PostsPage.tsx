@@ -7,16 +7,18 @@ import type { AdminPost } from '../../types/admin';
 import {
   Button,
   Input,
-  Pagination,
   Spinner,
-  ErrorState,
   Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '../../components/ui';
+import { ErrorEmpty, PaginationComponent } from '../../components/shared';
 
 const PAGE_SIZE = 20;
 
@@ -183,9 +185,14 @@ export default function PostsPage() {
           <span className="ml-3 text-gray-500">加载中...</span>
         </div>
       ) : error ? (
-        <ErrorState title="加载失败" description={error} onRetry={fetchPosts} />
+        <ErrorEmpty description={error} onRetry={fetchPosts} />
       ) : posts.length === 0 ? (
-        <Empty title="暂无帖子" description={keyword || boardIdFilter || statusFilter ? '没有匹配的帖子' : undefined} />
+        <Empty>
+                  <EmptyHeader>
+                    <EmptyTitle>暂无帖子</EmptyTitle>
+                    {(keyword || boardIdFilter || statusFilter) && <EmptyDescription>没有匹配的帖子</EmptyDescription>}
+                  </EmptyHeader>
+                </Empty>
       ) : (
         <>
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
@@ -241,7 +248,7 @@ export default function PostsPage() {
             </table>
           </div>
           <div className="mt-4">
-            <Pagination total={total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
+            <PaginationComponent currentPage={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
           </div>
         </>
       )}

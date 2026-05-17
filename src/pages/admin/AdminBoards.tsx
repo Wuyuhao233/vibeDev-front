@@ -21,9 +21,12 @@ import {
   Button,
   Input,
   Spinner,
-  ErrorState,
   Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
 } from '../../components/ui';
+import { ErrorEmpty } from '../../components/shared';
 
 export default function AdminBoards() {
   const [boards, setBoards] = useState<AdminBoard[]>([]);
@@ -189,7 +192,7 @@ export default function AdminBoards() {
   }
 
   if (error) {
-    return <ErrorState title="加载失败" description={error} onRetry={fetchBoards} />;
+    return <ErrorEmpty description={error} onRetry={fetchBoards} />;
   }
 
   return (
@@ -200,7 +203,12 @@ export default function AdminBoards() {
       </div>
 
       {boards.length === 0 ? (
-        <Empty title="暂无版块" description="点击上方按钮创建第一个版块" />
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>暂无版块</EmptyTitle>
+            <EmptyDescription>点击上方按钮创建第一个版块</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="w-full">

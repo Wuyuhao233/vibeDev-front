@@ -12,16 +12,17 @@ import type { SensitiveWord } from '../../types/admin';
 import {
   Button,
   Input,
-  Pagination,
   Spinner,
-  ErrorState,
   Empty,
+  EmptyHeader,
+  EmptyTitle,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '../../components/ui';
+import { ErrorEmpty, PaginationComponent } from '../../components/shared';
 
 const PAGE_SIZE = 20;
 
@@ -184,9 +185,14 @@ export default function AdminSensitiveWords() {
           <span className="ml-3 text-gray-500">加载中...</span>
         </div>
       ) : error ? (
-        <ErrorState title="加载失败" description={error} onRetry={fetchWords} />
+        <ErrorEmpty description={error} onRetry={fetchWords} />
       ) : words.length === 0 ? (
-        <Empty title="暂无敏感词" description="点击上方按钮添加" />
+        <Empty>
+                  <EmptyHeader>
+                    <EmptyTitle>暂无敏感词</EmptyTitle>
+                    <EmptyDescription>点击上方按钮添加</EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
       ) : (
         <>
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
@@ -230,7 +236,7 @@ export default function AdminSensitiveWords() {
             </table>
           </div>
           <div className="mt-4">
-            <Pagination total={total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
+            <PaginationComponent currentPage={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
           </div>
         </>
       )}

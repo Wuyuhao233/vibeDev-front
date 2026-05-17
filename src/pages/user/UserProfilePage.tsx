@@ -11,12 +11,11 @@ import {
   type CollectionItem,
 } from '../../api/collection';
 import { ApiError } from '../../utils/error';
-import { Avatar } from '../../components/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui';
 import { LevelBadge } from '../../components/ui';
 import { Skeleton } from '../../components/ui';
-import { Empty } from '../../components/ui';
-import { ErrorState } from '../../components/ui';
-import { Pagination } from '../../components/ui';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '../../components/ui';
+import { ErrorEmpty, PaginationComponent } from '../../components/shared';
 import CollectionList from '../../components/CollectionList';
 import CollectionFolderManager from '../../components/CollectionFolderManager';
 import BatchMoveBar from '../../components/BatchMoveBar';
@@ -252,9 +251,8 @@ export default function UserProfilePage() {
   if (profileError) {
     return (
       <div className="bg-white rounded-lg shadow-card p-6">
-        <ErrorState
-          title={profileError}
-          description={profileError === '加载失败' ? '请检查网络连接后重试' : ''}
+        <ErrorEmpty
+          description={profileError === '加载失败' ? '请检查网络连接后重试' : undefined}
           onRetry={profileError === '加载失败' ? fetchProfile : undefined}
         />
       </div>
@@ -270,11 +268,10 @@ export default function UserProfilePage() {
       {/* User Info Card */}
       <div className="bg-white rounded-lg shadow-card p-6 mb-6">
         <div className="flex items-start gap-6">
-          <Avatar
-            src={profile.avatarUrl || undefined}
-            name={profile.username}
-            size="lg"
-          />
+          <Avatar size="lg">
+            {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={profile.username} />}
+            <AvatarFallback>{profile.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+          </Avatar>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-3xl font-bold text-gray-900">{profile.username}</h1>
@@ -354,20 +351,22 @@ export default function UserProfilePage() {
               ))}
             </div>
           ) : items.length === 0 ? (
-            <Empty
-              title={EMPTY_TITLES[activeTab]}
-              description={EMPTY_DESCRIPTIONS[activeTab]}
-              action={
-                !isOwner ? (
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>{EMPTY_TITLES[activeTab]}</EmptyTitle>
+                <EmptyDescription>{EMPTY_DESCRIPTIONS[activeTab]}</EmptyDescription>
+              </EmptyHeader>
+              {!isOwner ? (
+                <EmptyContent>
                   <Link
                     to="/"
                     className="inline-block px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
                   >
                     去逛逛
                   </Link>
-                ) : undefined
-              }
-            />
+                </EmptyContent>
+              ) : null}
+            </Empty>
           ) : (
             <>
               <div className="flex flex-col gap-3">
@@ -403,11 +402,11 @@ export default function UserProfilePage() {
                   </div>
                 ))}
               </div>
-              <Pagination
-                current={page}
+              <PaginationComponent
+                currentPage={page}
                 total={total}
                 pageSize={PAGE_SIZE}
-                onChange={setPage}
+                onPageChange={setPage}
               />
             </>
           )}

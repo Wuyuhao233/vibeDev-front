@@ -1,6 +1,6 @@
 // shadcn components
 export { Button, buttonVariants } from './Button';
-export { Input } from './InputCompat';
+export { Input } from './Input';
 export {
   Dialog,
   DialogClose,
@@ -26,8 +26,8 @@ export {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './AlertDialog';
-export { Pagination } from './PaginationCompat';
 export {
+  Pagination,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
@@ -35,14 +35,17 @@ export {
   PaginationNext,
   PaginationPrevious,
 } from './Pagination';
-export { Pagination as ShadcnPagination } from './Pagination';
-export { Avatar } from './AvatarCompat';
-export { AvatarFallback, AvatarImage, AvatarBadge, AvatarGroup, AvatarGroupCount } from './Avatar';
+export { Avatar, AvatarFallback, AvatarImage, AvatarBadge, AvatarGroup, AvatarGroupCount } from './Avatar';
 export { Skeleton } from './Skeleton';
 export { Spinner } from './Spinner';
-export { Empty } from './EmptyCompat';
-export { EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from './Empty';
-export { Empty as ShadcnEmpty } from './Empty';
+export {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from './Empty';
 export { Badge, badgeVariants } from './Badge';
 export { Separator } from './Separator';
 
@@ -50,7 +53,5 @@ export { Separator } from './Separator';
 export { toast } from 'sonner';
 
 // business components (no shadcn equivalent)
-export { default as ErrorState } from './ErrorState';
 export { default as LevelBadge } from './LevelBadge';
-export { default as TagBadge } from './TagBadge';
 export { default as RelativeTime } from './RelativeTime';

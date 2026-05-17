@@ -1,6 +1,6 @@
 import ReplyItem from './ReplyItem';
-import { Pagination, Empty } from './ui';
-import ErrorState from './ui/ErrorState';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from './ui';
+import { ErrorEmpty, PaginationComponent } from './shared';
 import type { Reply } from '../api/reply';
 
 const DEPTH_COLORS = [
@@ -182,21 +182,21 @@ export default function ReplyTree({
   }
 
   if (error) {
-    return <ErrorState title="加载回复失败" description={error} onRetry={onRetry} />;
+    return <ErrorEmpty description={error} onRetry={onRetry} />;
   }
 
   if (!loading && replies.length === 0) {
     return (
-      <Empty
-        icon={
+      <Empty>
+        <EmptyHeader>
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="text-gray-300">
             <path d="M32 12v26M20 26l12 12 12-12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M44 40v4a4 4 0 01-4 4H24a4 4 0 01-4-4v-4" stroke="currentColor" strokeWidth="2" />
           </svg>
-        }
-        title="暂无回复"
-        description="来发表第一条回复吧"
-      />
+          <EmptyTitle>暂无回复</EmptyTitle>
+          <EmptyDescription>来发表第一条回复吧</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   }
 
@@ -230,11 +230,11 @@ export default function ReplyTree({
         ))}
       </div>
 
-      <Pagination
-        current={page}
+      <PaginationComponent
+        currentPage={page}
         total={total}
         pageSize={pageSize}
-        onChange={onPageChange}
+        onPageChange={onPageChange}
       />
     </div>
   );

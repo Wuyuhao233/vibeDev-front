@@ -4,7 +4,8 @@ import { useAuthStore } from '../store/authStore';
 import { getHomeFeed, type FeedItem } from '../api/feed';
 import { getFollowedTags } from '../api/tag';
 import PostCard from '../components/PostCard';
-import { Empty, ErrorState } from '../components/ui';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '../components/ui';
+import { ErrorEmpty } from '../components/shared';
 import { toast } from '../components/ui';
 import type { PostCardData } from '../types/board';
 
@@ -148,8 +149,7 @@ export default function HomePage() {
 
     if (error) {
       return (
-        <ErrorState
-          title="加载失败"
+        <ErrorEmpty
           description={error}
           onRetry={() => fetchPosts(1, false)}
         />
@@ -160,52 +160,64 @@ export default function HomePage() {
       if (activeTab === 'following') {
         if (hasFollowedTags === false) {
           return (
-            <Empty
-              title="你还没有关注的标签"
-              description="去版块页面关注感兴趣的标签吧"
-              action={
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>你还没有关注的标签</EmptyTitle>
+                <EmptyDescription>去版块页面关注感兴趣的标签吧</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
                 <Link
                   to="/board/1"
                   className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
                 >
                   去看看
                 </Link>
-              }
-            />
+              </EmptyContent>
+            </Empty>
           );
         }
         return (
-          <Empty
-            title="关注标签下暂无帖子"
-            description="关注感兴趣的标签，这里会展示你关注的标签下的帖子"
-            action={
+          <Empty>
+            <EmptyHeader>
+              <EmptyTitle>关注标签下暂无帖子</EmptyTitle>
+              <EmptyDescription>关注感兴趣的标签，这里会展示你关注的标签下的帖子</EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
               <Link
                 to="/board/1"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
               >
                 去逛逛
               </Link>
-            }
-          />
+            </EmptyContent>
+          </Empty>
         );
       }
       if (activeTab === 'trending' || activeTab === 'recommend') {
         return (
-          <Empty
-            title="暂无热门帖子"
-            description="快去发第一个帖子吧"
-            action={
+          <Empty>
+            <EmptyHeader>
+              <EmptyTitle>暂无热门帖子</EmptyTitle>
+              <EmptyDescription>快去发第一个帖子吧</EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
               <Link
                 to="/post/new"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
               >
                 发布帖子
               </Link>
-            }
-          />
+            </EmptyContent>
+          </Empty>
         );
       }
-      return <Empty title="暂无内容" />;
+      return (
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>暂无内容</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
+      );
     }
 
     return (

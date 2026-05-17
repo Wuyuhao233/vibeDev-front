@@ -7,16 +7,17 @@ import type { Board } from '../../api/board';
 import type { AdminReport } from '../../types/admin';
 import {
   Button,
-  Pagination,
   Spinner,
-  ErrorState,
   Empty,
+  EmptyHeader,
+  EmptyTitle,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '../../components/ui';
+import { ErrorEmpty, PaginationComponent } from '../../components/shared';
 
 const PAGE_SIZE = 20;
 
@@ -135,9 +136,14 @@ export default function ReportsPage() {
           <span className="ml-3 text-gray-500">加载中...</span>
         </div>
       ) : error ? (
-        <ErrorState title="加载失败" description={error} onRetry={fetchReports} />
+        <ErrorEmpty description={error} onRetry={fetchReports} />
       ) : reports.length === 0 ? (
-        <Empty title="暂无举报" description={statusFilter || typeFilter || boardIdFilter ? '没有匹配的举报' : undefined} />
+        <Empty>
+                  <EmptyHeader>
+                    <EmptyTitle>暂无举报</EmptyTitle>
+                    {(statusFilter || typeFilter || boardIdFilter) && <EmptyDescription>没有匹配的举报</EmptyDescription>}
+                  </EmptyHeader>
+                </Empty>
       ) : (
         <>
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
@@ -200,7 +206,7 @@ export default function ReportsPage() {
             </table>
           </div>
           <div className="mt-4">
-            <Pagination total={total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
+            <PaginationComponent currentPage={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
           </div>
         </>
       )}

@@ -15,6 +15,8 @@ import {
   DialogTitle,
   DialogFooter,
   Avatar,
+  AvatarFallback,
+  AvatarImage,
 } from '../components/ui';
 
 export default function NewPostPage() {
@@ -249,7 +251,10 @@ export default function NewPostPage() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 p-1 rounded-md hover:bg-muted transition-colors duration-150"
               >
-                <Avatar name={user?.username || ''} src={user?.avatarUrl || undefined} size="sm" />
+                <Avatar size="sm">
+                  {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user?.username || ''} />}
+                  <AvatarFallback>{user?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                </Avatar>
                 <svg
                   width="12"
                   height="12"

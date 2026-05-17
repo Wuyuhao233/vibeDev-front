@@ -6,8 +6,8 @@ import type { AdminReport } from '../../types/admin';
 import {
   Button,
   Spinner,
-  ErrorState,
 } from '../../components/ui';
+import { ErrorEmpty } from '../../components/shared';
 
 export default function AdminReportDetail() {
   const { id } = useParams<{ id: string }>();
@@ -70,11 +70,11 @@ export default function AdminReportDetail() {
   }
 
   if (error) {
-    return <ErrorState title="加载失败" description={error} onRetry={fetchDetail} />;
+    return <ErrorEmpty description={error} onRetry={fetchDetail} />;
   }
 
   if (!report) {
-    return <ErrorState title="举报不存在" description="该举报可能已被删除" />;
+    return <ErrorEmpty title="举报不存在" description="该举报可能已被删除" />;
   }
 
   return (

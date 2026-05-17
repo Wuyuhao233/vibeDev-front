@@ -5,17 +5,21 @@ import type { AdminUser } from '../../types/admin';
 import {
   Button,
   Input,
-  Pagination,
   Spinner,
-  ErrorState,
   Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
   Avatar,
+  AvatarFallback,
+  AvatarImage,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '../../components/ui';
+import { ErrorEmpty, PaginationComponent } from '../../components/shared';
 
 const PAGE_SIZE = 20;
 
@@ -172,9 +176,14 @@ export default function UsersPage() {
           <span className="ml-3 text-gray-500">加载中...</span>
         </div>
       ) : error ? (
-        <ErrorState title="加载失败" description={error} onRetry={fetchUsers} />
+        <ErrorEmpty description={error} onRetry={fetchUsers} />
       ) : users.length === 0 ? (
-        <Empty title="暂无用户" description={keyword || roleFilter || statusFilter ? '没有匹配的用户' : undefined} />
+        <Empty>
+                  <EmptyHeader>
+                    <EmptyTitle>暂无用户</EmptyTitle>
+                    {(keyword || roleFilter || statusFilter) && <EmptyDescription>没有匹配的用户</EmptyDescription>}
+                  </EmptyHeader>
+                </Empty>
       ) : (
         <>
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
@@ -197,7 +206,10 @@ export default function UsersPage() {
                     <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <Avatar name={u.username} src={u.avatarUrl || undefined} size="xs" />
+                          <Avatar size="sm">
+                                              {u.avatarUrl && <AvatarImage src={u.avatarUrl} alt={u.username} />}
+                                              <AvatarFallback>{u.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                                            </Avatar>
                           <span className="text-sm text-gray-900">{u.username}</span>
                         </div>
                       </td>
@@ -240,7 +252,7 @@ export default function UsersPage() {
             </table>
           </div>
           <div className="mt-4">
-            <Pagination total={total} page={page} pageSize={PAGE_SIZE} onChange={setPage} />
+            <PaginationComponent currentPage={page} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
           </div>
         </>
       )}

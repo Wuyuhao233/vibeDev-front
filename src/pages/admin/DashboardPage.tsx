@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getDashboardStats } from '../../api/admin';
 import type { DashboardStats, TrendItem } from '../../types/admin';
-import { Spinner, ErrorState } from '../../components/ui';
+import { Spinner } from '../../components/ui';
+import { ErrorEmpty } from '../../components/shared';
 
 const DASHBOARD_REFRESH_INTERVAL = 60_000;
 
@@ -45,7 +46,7 @@ export default function DashboardPage() {
   }
 
   if (error) {
-    return <ErrorState title="加载失败" description={error} onRetry={fetchData} />;
+    return <ErrorEmpty description={error} onRetry={fetchData} />;
   }
 
   const cards = stats

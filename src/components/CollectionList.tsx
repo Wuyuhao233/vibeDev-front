@@ -1,7 +1,7 @@
 import type { CollectionFolder, CollectionItem } from '../api/collection';
 import FolderTabs from './FolderTabs';
-import { Empty } from './ui';
-import ErrorState from './ui/ErrorState';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from './ui';
+import { ErrorEmpty } from './shared';
 
 interface CollectionListProps {
   folders: CollectionFolder[];
@@ -47,12 +47,14 @@ export default function CollectionList({
           <span className="ml-2 text-sm text-gray-400">加载中...</span>
         </div>
       ) : error ? (
-        <ErrorState title="加载收藏失败" description={error} onRetry={onRetry} />
+        <ErrorEmpty description={error} onRetry={onRetry} />
       ) : items.length === 0 ? (
-        <Empty
-          title="暂无收藏"
-          description={selectedFolderId === null ? '遇到好内容记得收藏哦' : '该收藏夹为空'}
-        />
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>暂无收藏</EmptyTitle>
+            <EmptyDescription>{selectedFolderId === null ? '遇到好内容记得收藏哦' : '该收藏夹为空'}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="divide-y divide-gray-100">
           {items.map((item) => {

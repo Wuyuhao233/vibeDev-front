@@ -7,8 +7,9 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  username: string;
   email: string;
+  code: string;
+  username: string;
   password: string;
 }
 
@@ -33,6 +34,10 @@ export async function login(data: LoginRequest) {
 
 export async function register(data: RegisterRequest) {
   await client.post('/auth/register', data);
+}
+
+export async function sendRegisterCode(email: string) {
+  await client.post('/auth/send-register-code', { email });
 }
 
 export async function refresh(refreshToken: string) {
