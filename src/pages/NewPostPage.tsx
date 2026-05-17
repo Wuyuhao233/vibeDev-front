@@ -352,7 +352,7 @@ export default function NewPostPage() {
                 }`}
               >
                 <option value="">请选择版块</option>
-                {boards.map((b) => (
+                {boards.filter((b) => b.name !== '关注' && b.name !== '排行榜').map((b) => (
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </select>

@@ -231,8 +231,6 @@ export default function HomePage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-foreground mb-6">首页</h1>
-
       {/* Tab Navigation */}
       <nav className="home-tabs__nav flex border-b border-border mb-6">
         {TABS.map((tab) => (

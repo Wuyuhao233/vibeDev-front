@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { Viewer } from '@bytemd/react';
+import gfm from '@bytemd/plugin-gfm';
+import highlight from '@bytemd/plugin-highlight';
+import 'bytemd/dist/index.css';
+import 'github-markdown-css/github-markdown.css';
 import { getPost, deletePost, recordPostView, pinPost, unpinPost, toggleEssence, type PostDetail } from '../api/post';
 import { getReplies, createReply, deleteReply, type Reply } from '../api/reply';
 import { useAuthStore } from '../store/authStore';
@@ -384,15 +387,13 @@ export default function PostPage() {
 
       {/* Content */}
       <div
-        className={`prose max-w-none mb-6 prose-headings:text-foreground prose-a:text-primary prose-code:text-sm prose-code:bg-muted/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-foreground prose-pre:text-background prose-img:rounded-lg prose-img:max-w-full prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-table:border prose-th:bg-muted/30 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 ${
+        className={`markdown-body max-w-none mb-6 ${
           post.auditStatus === 'REJECTED'
-            ? 'text-muted-foreground line-through prose-p:text-muted-foreground'
-            : 'prose-p:text-foreground prose-p:leading-relaxed'
+            ? 'text-muted-foreground line-through'
+            : ''
         }`}
       >
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {post.contentMarkdown}
-        </ReactMarkdown>
+        <Viewer value={post.contentMarkdown} plugins={[gfm(), highlight()]} />
       </div>
 
       {/* Tags */}

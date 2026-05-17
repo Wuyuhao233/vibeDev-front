@@ -590,3 +590,48 @@ mark.search-highlight {
 .new-post-editor .bytemd {
   height: 100% !important;
 }
+
+/* === Post detail page: ByteMD Viewer dark mode === */
+.dark .markdown-body {
+  color: var(--foreground);
+  background: transparent;
+}
+.dark .markdown-body h1, .dark .markdown-body h2, .dark .markdown-body h3,
+.dark .markdown-body h4, .dark .markdown-body h5, .dark .markdown-body h6 {
+  color: var(--foreground);
+  border-bottom-color: var(--border);
+}
+.dark .markdown-body code {
+  background: var(--muted);
+  color: var(--foreground);
+}
+.dark .markdown-body pre {
+  background: var(--muted);
+}
+.dark .markdown-body pre code {
+  background: transparent;
+}
+.dark .markdown-body blockquote {
+  color: var(--muted-foreground);
+  border-left-color: var(--border);
+}
+.dark .markdown-body table tr {
+  background-color: transparent;
+  border-color: var(--border);
+}
+.dark .markdown-body table th,
+.dark .markdown-body table td {
+  border-color: var(--border);
+}
+.dark .markdown-body table tr:nth-child(2n) {
+  background-color: var(--muted);
+}
+.dark .markdown-body img {
+  background: transparent;
+}
+.dark .markdown-body hr {
+  background-color: var(--border);
+}
+.dark .markdown-body a {
+  color: var(--primary);
+}

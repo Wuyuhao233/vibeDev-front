@@ -120,7 +120,7 @@ export default function LeftSidebar() {
   };
 
   return (
-    <aside className="board-sidebar w-sidebar flex-shrink-0 pr-6">
+    <aside className="board-sidebar w-sidebar flex-shrink-0 pr-6 sticky top-[5rem] self-start max-h-[calc(100vh-5rem)] overflow-y-auto">
       {/* Loading */}
       {loading && (
         <div className="board-sidebar__skeleton flex flex-col gap-3">
