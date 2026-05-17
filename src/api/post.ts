@@ -37,7 +37,7 @@ export interface PostDetail {
 
 export interface CreatePostData {
   boardId: string;
-  tagIds: string[];
+  tagNames?: string[];
   title: string;
   content: string;
   coverImageUrl?: string;
@@ -47,7 +47,7 @@ export interface CreatePostData {
 export interface UpdatePostData {
   title?: string;
   content?: string;
-  tagIds?: string[];
+  tagNames?: string[];
   coverImageUrl?: string;
   version: number;
 }

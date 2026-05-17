@@ -218,27 +218,6 @@ export default function BoardPage() {
 
   return (
     <div className="board-content">
-      {/* Header */}
-      <div className="board-content__header mb-6">
-        <h1 className="board-content__title text-3xl font-bold text-foreground mb-1">
-          {board?.name || '加载中...'}
-        </h1>
-        {board?.description && (
-          <p className="text-sm text-muted-foreground mb-3">{board.description}</p>
-        )}
-        <div className="board-content__actions flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
-            共 {total} 个帖子
-          </span>
-          <Link
-            to="/post/new"
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
-          >
-            发布新帖
-          </Link>
-        </div>
-      </div>
-
       {/* Tag Filter Bar */}
       {board?.tags && board.tags.length > 0 && (
         <TagFilterBar

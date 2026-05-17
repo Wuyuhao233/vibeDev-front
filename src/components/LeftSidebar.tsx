@@ -121,10 +121,6 @@ export default function LeftSidebar() {
 
   return (
     <aside className="board-sidebar w-sidebar flex-shrink-0 pr-6">
-      <h3 className="board-sidebar__header text-sm font-semibold text-foreground mb-3">
-        版块导航
-      </h3>
-
       {/* Loading */}
       {loading && (
         <div className="board-sidebar__skeleton flex flex-col gap-3">
@@ -154,22 +150,22 @@ export default function LeftSidebar() {
             <li key={board.id}>
               <Link
                 to={`/board/${board.id}`}
-                className={`board-nav-item flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors duration-150 ${
+                className={`board-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[15px] transition-colors duration-150 ${
                   isActive(board)
                     ? 'board-nav-item--active bg-[var(--color-bg-active)] text-primary border-l-[3px] border-primary font-medium'
                     : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
                 {board.icon ? (
-                  <img src={board.icon} alt="" className="board-nav-item__icon w-5 h-5 rounded object-cover" />
+                  <span className="board-nav-item__icon w-6 h-6 flex items-center justify-center text-lg">{board.icon}</span>
                 ) : (
-                  <span className="board-nav-item__icon w-5 h-5 rounded bg-[var(--color-skeleton)] flex items-center justify-center text-[10px] text-muted-foreground">
+                  <span className="board-nav-item__icon w-6 h-6 rounded bg-[var(--color-skeleton)] flex items-center justify-center text-xs text-muted-foreground">
                     {board.name.charAt(0)}
                   </span>
                 )}
                 <span className="board-nav-item__name truncate flex-1">{board.name}</span>
                 {board.postCount > 0 && (
-                  <span className="board-nav-item__count text-xs text-muted-foreground">{board.postCount}</span>
+                  <span className="board-nav-item__count text-[13px] text-muted-foreground">{board.postCount}</span>
                 )}
               </Link>
             </li>

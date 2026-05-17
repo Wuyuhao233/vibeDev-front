@@ -160,7 +160,7 @@ export default function NewPostPage() {
   const validate = useCallback((): boolean => {
     const errs: Record<string, string> = {};
     if (!selectedBoardId) errs.board = '请选择版块';
-    if (selectedTags.length < 1) errs.tags = '请至少选择一个标签';
+    if (selectedTags.length > 3) errs.tags = '标签最多3个';
     if (title.length < 5) errs.title = '标题长度需在 5-100 字符之间';
     if (title.length > 100) errs.title = '标题长度需在 5-100 字符之间';
     if (!content.trim()) errs.content = '请输入帖子内容';
@@ -184,7 +184,7 @@ export default function NewPostPage() {
         boardId: selectedBoardId!,
         title: title.trim(),
         content: content.trim(),
-        tagIds: selectedTags,
+        tagNames: selectedTags.length > 0 ? selectedTags : undefined,
         coverImageUrl: coverImageUrl || undefined,
         idempotencyKey,
       });
@@ -362,13 +362,13 @@ export default function NewPostPage() {
             {/* Tag selector */}
             {currentBoard && (
               <div>
-                <label className="block text-sm text-foreground mb-1">选择标签（1-3个）</label>
+                <label className="block text-sm text-foreground mb-1">选择标签（可选，最多3个）</label>
                 <TagSelector
                   tags={availableTags}
                   selected={selectedTags}
                   onChange={setSelectedTags}
                   max={3}
-                  min={1}
+                  min={0}
                   error={errors.tags}
                 />
               </div>

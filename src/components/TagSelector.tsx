@@ -14,17 +14,30 @@ export default function TagSelector({
   selected,
   onChange,
   max = 3,
-  min = 1,
+  min = 0,
   error,
 }: TagSelectorProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // selected stores tag names (strings)
+  const selectedSet = new Set(selected);
+
+  // Existing tags that match search and are not already selected
   const filteredTags = tags.filter(
-    (t) => !selected.includes(t.id) && t.name.toLowerCase().includes(search.toLowerCase()),
+    (t) => !selectedSet.has(t.name) && t.name.toLowerCase().includes(search.toLowerCase()),
   );
-  const selectedTags = tags.filter((t) => selected.includes(t.id));
+
+  // Whether the current search text can be added as a custom tag
+  const trimmedSearch = search.trim();
+  const canAddCustom =
+    trimmedSearch.length > 0 &&
+    trimmedSearch.length <= 20 &&
+    !selectedSet.has(trimmedSearch) &&
+    selected.length < max &&
+    !tags.some((t) => t.name.toLowerCase() === trimmedSearch.toLowerCase());
+
   const atMax = selected.length >= max;
 
   useEffect(() => {
@@ -38,17 +51,17 @@ export default function TagSelector({
   }, []);
 
   const handleSelect = useCallback(
-    (id: string) => {
-      if (atMax || selected.includes(id)) return;
-      onChange([...selected, id]);
+    (name: string) => {
+      if (atMax || selectedSet.has(name)) return;
+      onChange([...selected, name]);
       setSearch('');
     },
     [selected, atMax, onChange],
   );
 
   const handleRemove = useCallback(
-    (id: string) => {
-      onChange(selected.filter((s) => s !== id));
+    (name: string) => {
+      onChange(selected.filter((s) => s !== name));
     },
     [selected, onChange],
   );
@@ -58,8 +71,12 @@ export default function TagSelector({
       if (e.key === 'Backspace' && !search && selected.length > 0) {
         handleRemove(selected[selected.length - 1]);
       }
+      if (e.key === 'Enter' && canAddCustom) {
+        e.preventDefault();
+        handleSelect(trimmedSearch);
+      }
     },
-    [search, selected, handleRemove],
+    [search, selected, handleRemove, canAddCustom, trimmedSearch, handleSelect],
   );
 
   return (
@@ -70,20 +87,20 @@ export default function TagSelector({
         }`}
         onClick={() => setOpen(true)}
       >
-        {selectedTags.map((tag) => (
+        {selected.map((name) => (
           <span
-            key={tag.id}
+            key={name}
             className="tag-chip inline-flex items-center gap-1 rounded px-2 py-px text-xs text-muted-foreground bg-muted/50"
           >
-            {tag.name}
+            {name}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                handleRemove(tag.id);
+                handleRemove(name);
               }}
               className="text-muted-foreground hover:text-foreground/80 leading-none"
-              aria-label={`移除标签 ${tag.name}`}
+              aria-label={`移除标签 ${name}`}
             >
               ×
             </button>
@@ -95,7 +112,7 @@ export default function TagSelector({
           onChange={(e) => setSearch(e.target.value)}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder={selected.length === 0 ? `选择标签（${min}-${max}个）` : selected.length < max ? '继续添加...' : `最多${max}个`}
+          placeholder={selected.length === 0 ? `输入或选择标签（最多${max}个）` : selected.length < max ? '继续添加...' : `最多${max}个`}
           disabled={atMax}
           className="flex-1 min-w-[80px] border-none outline-none text-sm bg-transparent placeholder:text-muted-foreground"
         />
@@ -106,22 +123,33 @@ export default function TagSelector({
 
       {open && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-modal z-10 max-h-48 overflow-y-auto">
-          {filteredTags.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-muted-foreground">无匹配标签</div>
-          ) : (
-            filteredTags.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                onClick={() => handleSelect(tag.id)}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-muted/30 transition-colors duration-150 ${
-                  atMax ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                disabled={atMax}
-              >
-                {tag.name}
-              </button>
-            ))
+          {filteredTags.length === 0 && !canAddCustom && (
+            <div className="px-3 py-2 text-sm text-muted-foreground">
+              {trimmedSearch ? '按 Enter 添加自定义标签' : '输入标签名添加自定义标签'}
+            </div>
+          )}
+          {filteredTags.map((tag) => (
+            <button
+              key={tag.id}
+              type="button"
+              onClick={() => handleSelect(tag.name)}
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-muted/30 transition-colors duration-150 ${
+                atMax ? 'opacity-50 cursor-not-allowed' : ''
+              }`
+              }
+              disabled={atMax}
+            >
+              {tag.name}
+            </button>
+          ))}
+          {canAddCustom && (
+            <button
+              type="button"
+              onClick={() => handleSelect(trimmedSearch)}
+              className="w-full text-left px-3 py-2 text-sm text-primary hover:bg-muted/30 transition-colors duration-150"
+            >
+              + 添加「{trimmedSearch}」
+            </button>
           )}
         </div>
       )}
