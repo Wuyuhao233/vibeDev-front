@@ -64,7 +64,7 @@ export default function AdminReportDetail() {
     return (
       <div className="flex items-center justify-center py-16">
         <Spinner size="lg" />
-        <span className="ml-3 text-gray-500">加载中...</span>
+        <span className="ml-3 text-muted-foreground">加载中...</span>
       </div>
     );
   }
@@ -80,64 +80,64 @@ export default function AdminReportDetail() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate(-1)} className="text-sm text-gray-500 hover:text-primary-500">
+        <button onClick={() => navigate(-1)} className="text-sm text-muted-foreground hover:text-primary">
           ← 返回
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">举报详情 #{report.id}</h1>
+        <h1 className="text-2xl font-bold text-foreground">举报详情 #{report.id}</h1>
       </div>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Report info */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">举报信息</h2>
+        <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-foreground mb-4">举报信息</h2>
           <dl className="space-y-3">
             <div className="flex justify-between">
-              <dt className="text-sm text-gray-500">类型</dt>
-              <dd className="text-sm text-gray-900">{report.type === 'post' ? '帖子' : '回复'}</dd>
+              <dt className="text-sm text-muted-foreground">类型</dt>
+              <dd className="text-sm text-foreground">{report.type === 'post' ? '帖子' : '回复'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-sm text-gray-500">原因</dt>
-              <dd className="text-sm text-gray-900">{report.reason}</dd>
+              <dt className="text-sm text-muted-foreground">原因</dt>
+              <dd className="text-sm text-foreground">{report.reason}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-sm text-gray-500">举报人</dt>
-              <dd className="text-sm text-gray-900">{report.reporter.username}</dd>
+              <dt className="text-sm text-muted-foreground">举报人</dt>
+              <dd className="text-sm text-foreground">{report.reporter.username}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-sm text-gray-500">版块</dt>
-              <dd className="text-sm text-gray-900">{report.boardName || '-'}</dd>
+              <dt className="text-sm text-muted-foreground">版块</dt>
+              <dd className="text-sm text-foreground">{report.boardName || '-'}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-sm text-gray-500">状态</dt>
+              <dt className="text-sm text-muted-foreground">状态</dt>
               <dd>
                 <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
                   report.status === 'pending'
                     ? 'bg-amber-50 text-amber-600'
-                    : 'bg-gray-100 text-gray-400'
+                    : 'bg-muted/50 text-muted-foreground'
                 }`}>
                   {report.status === 'pending' ? '待处理' : '已处理'}
                 </span>
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-sm text-gray-500">时间</dt>
-              <dd className="text-sm text-gray-900">
+              <dt className="text-sm text-muted-foreground">时间</dt>
+              <dd className="text-sm text-foreground">
                 {new Date(report.createdAt).toLocaleString('zh-CN')}
               </dd>
             </div>
             {report.description && (
               <div>
-                <dt className="text-sm text-gray-500 mb-1">详细描述</dt>
-                <dd className="text-sm text-gray-700 bg-gray-50 rounded p-3">{report.description}</dd>
+                <dt className="text-sm text-muted-foreground mb-1">详细描述</dt>
+                <dd className="text-sm text-foreground bg-muted/30 rounded p-3">{report.description}</dd>
               </div>
             )}
           </dl>
         </div>
 
         {/* Target content */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">被举报内容</h2>
-          <div className="bg-gray-50 rounded p-4 text-sm text-gray-700 max-h-64 overflow-y-auto whitespace-pre-wrap">
+        <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-foreground mb-4">被举报内容</h2>
+          <div className="bg-muted/30 rounded p-4 text-sm text-foreground max-h-64 overflow-y-auto whitespace-pre-wrap">
             {report.targetContent || '(内容已无法显示)'}
           </div>
         </div>
@@ -145,11 +145,11 @@ export default function AdminReportDetail() {
 
       {/* Handling panel */}
       {report.status === 'pending' && !handled ? (
-        <div className="mt-6 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">处理</h2>
+        <div className="mt-6 bg-card rounded-lg border border-border p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-foreground mb-4">处理</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-2">处理方式</label>
+              <label className="block text-sm text-foreground mb-2">处理方式</label>
               <div className="flex gap-2">
                 {(['ignore', 'warn', 'delete_post', 'ban'] as const).map((a) => (
                   <button
@@ -157,8 +157,8 @@ export default function AdminReportDetail() {
                     onClick={() => setAction(a)}
                     className={`px-4 py-2 text-sm rounded-md border transition-colors ${
                       action === a
-                        ? 'bg-primary-500 text-white border-primary-500'
-                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-card text-foreground/80 border-border hover:bg-muted/30'
                     }`}
                   >
                     {actionLabels[a]}
@@ -167,13 +167,13 @@ export default function AdminReportDetail() {
               </div>
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">
+              <label className="block text-sm text-foreground mb-1">
                 处理说明 <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                className="w-full h-28 px-3 py-2 border border-gray-200 rounded-md text-sm resize-none focus:outline-none focus:border-primary-500"
+                className="w-full h-28 px-3 py-2 border border-border rounded-md text-sm resize-none focus:outline-none focus:border-primary"
                 placeholder="请填写处理原因和说明，将记录在系统中..."
               />
             </div>

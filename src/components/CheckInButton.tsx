@@ -59,7 +59,7 @@ export default function CheckInButton() {
       disabled={checkedIn || loading}
       className={`flex items-center gap-1.5 px-2.5 py-1.5 text-sm rounded-md transition-colors duration-150 ${
         checkedIn
-          ? 'text-gray-400 cursor-default'
+          ? 'text-muted-foreground cursor-default'
           : 'text-amber-500 hover:bg-amber-50 active:bg-amber-100'
       }`}
       title={checkedIn ? '今日已签到' : '签到领积分'}

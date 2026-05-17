@@ -82,12 +82,12 @@ export default function AdminSettings() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">系统设置</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">系统设置</h1>
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
-          <span className="ml-3 text-gray-500">加载中...</span>
+          <span className="ml-3 text-muted-foreground">加载中...</span>
         </div>
       ) : error ? (
         <ErrorEmpty description={error} onRetry={fetchSettings} />
@@ -98,24 +98,24 @@ export default function AdminSettings() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="bg-card rounded-lg border border-border shadow-sm">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-muted/30 border-b border-border">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-1/4">键</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">值</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">操作</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-1/4">键</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">值</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">操作</th>
               </tr>
             </thead>
             <tbody>
               {entries.map(([key, value]) => (
-                <tr key={key} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-900 font-mono">{key}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500 max-w-md truncate">{value}</td>
+                <tr key={key} className="border-b border-border hover:bg-muted/30">
+                  <td className="px-4 py-3 text-sm text-foreground font-mono">{key}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground max-w-md truncate">{value}</td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => openEdit(key, key, value)}
-                      className="text-xs text-primary-500 hover:text-primary-600"
+                      className="text-xs text-primary hover:text-primary"
                     >
                       编辑
                     </button>
@@ -128,9 +128,9 @@ export default function AdminSettings() {
       )}
 
       {entries.length > 0 && (
-        <div className="mt-6 bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">全站积分重算</h2>
-          <p className="text-sm text-gray-500 mb-4">
+        <div className="mt-6 bg-card rounded-lg border border-border shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-2">全站积分重算</h2>
+          <p className="text-sm text-muted-foreground mb-4">
             根据积分日志重新计算所有用户的积分和等级。此操作不可撤销，建议在低峰期执行。
           </p>
           <Button
@@ -150,7 +150,7 @@ export default function AdminSettings() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">值</label>
+              <label className="block text-sm text-foreground mb-1">值</label>
               <Input
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}

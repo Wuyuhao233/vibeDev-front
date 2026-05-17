@@ -76,7 +76,7 @@ export default function AppealDialog({
           <DialogTitle>申诉</DialogTitle>
         </DialogHeader>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-foreground mb-1.5">
             申诉理由
             <span className="text-red-500 ml-0.5">*</span>
           </label>
@@ -86,11 +86,11 @@ export default function AppealDialog({
             placeholder="请说明您认为审核结果有误的原因..."
             maxLength={500}
             rows={5}
-            className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm outline-none resize-none transition-colors duration-150 focus:border-primary-500 focus:ring-2 focus:ring-primary-50"
+            className="w-full border border-border rounded-md px-3 py-2 text-sm outline-none resize-none transition-colors duration-150 focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-400">请详细描述您的申诉理由</span>
-            <span className={`text-xs ${reason.length > 500 ? 'text-red-500' : 'text-gray-400'}`}>
+            <span className="text-xs text-muted-foreground">请详细描述您的申诉理由</span>
+            <span className={`text-xs ${reason.length > 500 ? 'text-red-500' : 'text-muted-foreground'}`}>
               {reason.length}/500
             </span>
           </div>

@@ -129,8 +129,8 @@ export default function ImageUploader({
       <div
         className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors duration-150 ${
           dragOver
-            ? 'border-primary-500 bg-primary-50'
-            : 'border-gray-300 hover:border-gray-400'
+            ? 'border-primary bg-primary/10'
+            : 'border-border hover:border-muted-foreground'
         }`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -151,10 +151,10 @@ export default function ImageUploader({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="text-sm text-gray-500 hover:text-primary-500 transition-colors duration-150"
+          className="text-sm text-muted-foreground hover:text-primary transition-colors duration-150"
         >
           <div className="mb-1">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="mx-auto text-gray-400">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="mx-auto text-muted-foreground">
               <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
               <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
               <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2" />
@@ -162,7 +162,7 @@ export default function ImageUploader({
           </div>
           拖拽、粘贴或点击上传图片
         </button>
-        <p className="mt-1 text-xs text-gray-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           支持 JPG/PNG/GIF/WebP，单张 ≤{maxSizeMB}MB，最多 {maxCount} 张
         </p>
       </div>
@@ -174,7 +174,7 @@ export default function ImageUploader({
             <div
               key={item.id}
               className={`flex items-center gap-3 p-2 rounded-md ${
-                item.error ? 'bg-red-50' : 'bg-gray-50'
+                item.error ? 'bg-red-50' : 'bg-muted/30'
               }`}
             >
               {item.error ? (
@@ -183,20 +183,20 @@ export default function ImageUploader({
                   <button
                     type="button"
                     onClick={() => handleRetry(item)}
-                    className="text-xs text-primary-500 hover:text-primary-600"
+                    className="text-xs text-primary hover:text-primary"
                   >
                     移除
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary-500 rounded-full transition-all duration-300"
+                      className="h-full bg-primary rounded-full transition-all duration-300"
                       style={{ width: `${item.progress}%` }}
                     />
                   </div>
-                  <span className="text-xs text-gray-500">{item.progress}%</span>
+                  <span className="text-xs text-muted-foreground">{item.progress}%</span>
                 </>
               )}
             </div>
@@ -208,7 +208,7 @@ export default function ImageUploader({
       {images.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {images.map((url, i) => (
-            <div key={i} className="relative group w-20 h-20 rounded-md overflow-hidden border border-gray-200">
+            <div key={i} className="relative group w-20 h-20 rounded-md overflow-hidden border border-border">
               <img
                 src={url}
                 alt={`已上传图片 ${i + 1}`}

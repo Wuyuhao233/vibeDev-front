@@ -65,15 +65,15 @@ export default function TagSelector({
   return (
     <div ref={containerRef} className="relative">
       <div
-        className={`flex flex-wrap items-center gap-1.5 px-3 py-2 min-h-[40px] border rounded-md bg-white cursor-text transition-colors duration-150 ${
-          error ? 'border-red-500' : open ? 'border-primary-500 ring-2 ring-primary-50' : 'border-gray-200'
+        className={`flex flex-wrap items-center gap-1.5 px-3 py-2 min-h-[40px] border rounded-md bg-card cursor-text transition-colors duration-150 ${
+          error ? 'border-red-500' : open ? 'border-primary ring-2 ring-primary-50' : 'border-border'
         }`}
         onClick={() => setOpen(true)}
       >
         {selectedTags.map((tag) => (
           <span
             key={tag.id}
-            className="tag-chip inline-flex items-center gap-1 rounded px-2 py-px text-xs text-gray-500 bg-gray-100"
+            className="tag-chip inline-flex items-center gap-1 rounded px-2 py-px text-xs text-muted-foreground bg-muted/50"
           >
             {tag.name}
             <button
@@ -82,7 +82,7 @@ export default function TagSelector({
                 e.stopPropagation();
                 handleRemove(tag.id);
               }}
-              className="text-gray-400 hover:text-gray-600 leading-none"
+              className="text-muted-foreground hover:text-foreground/80 leading-none"
               aria-label={`移除标签 ${tag.name}`}
             >
               ×
@@ -97,24 +97,24 @@ export default function TagSelector({
           onKeyDown={handleKeyDown}
           placeholder={selected.length === 0 ? `选择标签（${min}-${max}个）` : selected.length < max ? '继续添加...' : `最多${max}个`}
           disabled={atMax}
-          className="flex-1 min-w-[80px] border-none outline-none text-sm bg-transparent placeholder-gray-400"
+          className="flex-1 min-w-[80px] border-none outline-none text-sm bg-transparent placeholder:text-muted-foreground"
         />
-        {atMax && <span className="text-xs text-gray-400">最多{max}个</span>}
+        {atMax && <span className="text-xs text-muted-foreground">最多{max}个</span>}
       </div>
 
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-modal z-10 max-h-48 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-modal z-10 max-h-48 overflow-y-auto">
           {filteredTags.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-gray-400">无匹配标签</div>
+            <div className="px-3 py-2 text-sm text-muted-foreground">无匹配标签</div>
           ) : (
             filteredTags.map((tag) => (
               <button
                 key={tag.id}
                 type="button"
                 onClick={() => handleSelect(tag.id)}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors duration-150 ${
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-muted/30 transition-colors duration-150 ${
                   atMax ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
                 disabled={atMax}

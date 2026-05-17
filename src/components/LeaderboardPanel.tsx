@@ -50,17 +50,17 @@ export default function LeaderboardPanel() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-card">
+    <div className="bg-card rounded-lg shadow-card">
       {/* Tabs */}
-      <div className="flex items-center border-b border-gray-200 px-6">
+      <div className="flex items-center border-b border-border px-6">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => handlePeriodChange(tab.key)}
             className={`px-4 py-3 text-sm font-medium transition-colors duration-150 border-b-2 -mb-px ${
               period === tab.key
-                ? 'text-primary-500 border-primary-500'
-                : 'text-gray-500 border-transparent hover:text-gray-700'
+                ? 'text-primary border-primary'
+                : 'text-muted-foreground border-transparent hover:text-foreground'
             }`}
           >
             {tab.label}
@@ -70,12 +70,12 @@ export default function LeaderboardPanel() {
 
       {/* Current User Rank */}
       {currentUserRank && currentUser && (
-        <div className="mx-6 mt-4 px-4 py-3 bg-primary-50 border border-primary-100 rounded-lg">
+        <div className="mx-6 mt-4 px-4 py-3 bg-primary/10 border border-primary/20 rounded-lg">
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium text-primary-600">
               我的排名：第 {currentUserRank.rank} 名
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted-foreground">
               {currentUserRank.points} 积分
             </span>
           </div>
@@ -111,15 +111,15 @@ export default function LeaderboardPanel() {
                   <div
                     key={entry.userId}
                     className={`flex items-center gap-4 px-3 py-2.5 rounded-md transition-colors duration-150 ${
-                      isMe ? 'bg-primary-50' : 'hover:bg-gray-50'
+                      isMe ? 'bg-primary/10' : 'hover:bg-muted/50'
                     }`}
                   >
                     {/* Rank */}
                     <span
                       className={`w-8 text-center text-sm font-semibold ${
                         entry.rank <= 3
-                          ? ['text-amber-500', 'text-gray-400', 'text-amber-700'][entry.rank - 1]
-                          : 'text-gray-500'
+                          ? ['text-amber-500', 'text-muted-foreground', 'text-amber-700'][entry.rank - 1]
+                          : 'text-muted-foreground'
                       }`}
                     >
                       {entry.rank <= 3 ? (
@@ -140,13 +140,13 @@ export default function LeaderboardPanel() {
                     </Avatar>
 
                     {/* Username */}
-                    <span className={`flex-1 text-sm truncate ${isMe ? 'font-medium text-primary-600' : 'text-gray-900'}`}>
+                    <span className={`flex-1 text-sm truncate ${isMe ? 'font-medium text-primary-600' : 'text-foreground'}`}>
                       {entry.username}
                       {isMe && <span className="text-xs text-primary-400 ml-1">(我)</span>}
                     </span>
 
                     {/* Points */}
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-foreground">
                       {entry.points} 积分
                     </span>
                   </div>

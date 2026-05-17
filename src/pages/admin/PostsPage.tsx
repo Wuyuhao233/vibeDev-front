@@ -144,7 +144,7 @@ export default function PostsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">帖子管理</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">帖子管理</h1>
 
       <div className="flex items-center gap-3 mb-4 flex-wrap">
         <Input
@@ -160,7 +160,7 @@ export default function PostsPage() {
         <select
           value={boardIdFilter}
           onChange={(e) => { setBoardIdFilter(e.target.value); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部版块</option>
           {boards.map((b) => (
@@ -170,7 +170,7 @@ export default function PostsPage() {
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部状态</option>
           <option value="active">已发布</option>
@@ -182,7 +182,7 @@ export default function PostsPage() {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
-          <span className="ml-3 text-gray-500">加载中...</span>
+          <span className="ml-3 text-muted-foreground">加载中...</span>
         </div>
       ) : error ? (
         <ErrorEmpty description={error} onRetry={fetchPosts} />
@@ -195,46 +195,46 @@ export default function PostsPage() {
                 </Empty>
       ) : (
         <>
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/30 border-b border-border">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-1/4">标题</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">版块</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">状态</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">回复/赞</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">时间</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">操作</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-1/4">标题</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">版块</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">状态</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">回复/赞</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">时间</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {posts.map((p) => {
                   const st = getStatus(p);
                   return (
-                    <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={p.id} className="border-b border-border hover:bg-muted/30">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
                           {p.isPinned && <span className="text-blue-500 text-xs font-medium">[置顶]</span>}
                           {p.isEssence && <span className="text-amber-500 text-xs font-medium">[精]</span>}
-                          <span className="text-sm text-gray-900 truncate block max-w-xs">{p.title}</span>
+                          <span className="text-sm text-foreground truncate block max-w-xs">{p.title}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{p.boardId || '-'}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{p.boardId || '-'}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${st.cls}`}>{st.text}</span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{p.replyCount}/{p.likeCount}</td>
-                      <td className="px-4 py-3 text-sm text-gray-400">
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{p.replyCount}/{p.likeCount}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
                         {new Date(p.createdAt).toLocaleDateString('zh-CN')}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => handleTogglePin(p)} className="text-xs text-primary-500 hover:text-primary-600 mr-2">
+                        <button onClick={() => handleTogglePin(p)} className="text-xs text-primary hover:text-primary mr-2">
                           {p.isPinned ? '取消置顶' : '置顶'}
                         </button>
                         <button onClick={() => handleToggleEssence(p)} className="text-xs text-amber-500 hover:text-amber-600 mr-2">
                           {p.isEssence ? '取消精华' : '加精'}
                         </button>
-                        <button onClick={() => { setMoveTarget(p); setMoveBoardId(''); }} className="text-xs text-primary-500 hover:text-primary-600 mr-2">
+                        <button onClick={() => { setMoveTarget(p); setMoveBoardId(''); }} className="text-xs text-primary hover:text-primary mr-2">
                           移动
                         </button>
                         <button onClick={() => setDeleteTarget(p)} className="text-xs text-red-500 hover:text-red-600">
@@ -260,7 +260,7 @@ export default function PostsPage() {
             <DialogTitle>强制删除帖子</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-sm text-gray-600 mb-2">确定要强制删除帖子「{deleteTarget?.title}」吗？</p>
+            <p className="text-sm text-foreground/80 mb-2">确定要强制删除帖子「{deleteTarget?.title}」吗？</p>
             <p className="text-xs text-red-500">此操作不可撤销。</p>
           </div>
           <DialogFooter>
@@ -279,11 +279,11 @@ export default function PostsPage() {
             <DialogTitle>移动帖子到其他版块</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-sm text-gray-600 mb-3">帖子：{moveTarget?.title}</p>
+            <p className="text-sm text-foreground/80 mb-3">帖子：{moveTarget?.title}</p>
             <select
               value={moveBoardId}
               onChange={(e) => setMoveBoardId(e.target.value)}
-              className="h-9 w-full px-3 border border-gray-200 rounded-md text-sm bg-white"
+              className="h-9 w-full px-3 border border-border rounded-md text-sm bg-card"
             >
               <option value="">选择目标版块</option>
               {boards.map((b) => (

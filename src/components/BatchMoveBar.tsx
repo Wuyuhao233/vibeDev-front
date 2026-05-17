@@ -42,8 +42,8 @@ export default function BatchMoveBar({ selectedCount, onMove, onCancel }: BatchM
   }, []);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-200 shadow-drawer px-6 py-3 flex items-center justify-between">
-      <span className="text-sm font-medium text-gray-700">
+    <div className="fixed bottom-0 left-0 right-0 z-20 bg-card border-t border-border shadow-drawer px-6 py-3 flex items-center justify-between">
+      <span className="text-sm font-medium text-foreground">
         已选 {selectedCount} 项
       </span>
 
@@ -51,11 +51,11 @@ export default function BatchMoveBar({ selectedCount, onMove, onCancel }: BatchM
         <div ref={containerRef} className="relative">
           <button
             onClick={() => setOpen(!open)}
-            className="px-4 py-2 text-sm border border-gray-200 rounded-md hover:bg-gray-50 transition-colors duration-150 flex items-center gap-2"
+            className="px-4 py-2 text-sm border border-border rounded-md hover:bg-muted/30 transition-colors duration-150 flex items-center gap-2"
           >
             <span>{selectedTargetName || '选择收藏夹'}</span>
             <svg
-              className={`w-4 h-4 text-gray-400 transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
+              className={`w-4 h-4 text-muted-foreground transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -65,19 +65,19 @@ export default function BatchMoveBar({ selectedCount, onMove, onCancel }: BatchM
           </button>
 
           {open && (
-            <div className="absolute bottom-full left-0 mb-1 w-56 bg-white rounded-lg shadow-modal border border-gray-200 z-10 py-1">
+            <div className="absolute bottom-full left-0 mb-1 w-56 bg-card rounded-lg shadow-modal border border-border z-10 py-1">
               {folders.map((folder) => (
                 <button
                   key={folder.id}
                   onClick={() => handleSelectFolder(folder.id, folder.name)}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 flex items-center justify-between"
+                  className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted/30 transition-colors duration-150 flex items-center justify-between"
                 >
                   <span>{folder.name}</span>
-                  <span className="text-xs text-gray-400">{folder.itemCount}</span>
+                  <span className="text-xs text-muted-foreground">{folder.itemCount}</span>
                 </button>
               ))}
               {folders.length === 0 && (
-                <p className="px-4 py-3 text-sm text-gray-400">暂无收藏夹</p>
+                <p className="px-4 py-3 text-sm text-muted-foreground">暂无收藏夹</p>
               )}
             </div>
           )}
@@ -86,14 +86,14 @@ export default function BatchMoveBar({ selectedCount, onMove, onCancel }: BatchM
         <button
           onClick={handleConfirm}
           disabled={selectedTargetId === null}
-          className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 disabled:opacity-50 transition-colors duration-150"
+          className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
         >
           确定
         </button>
 
         <button
           onClick={onCancel}
-          className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors duration-150"
+          className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-150"
         >
           取消
         </button>

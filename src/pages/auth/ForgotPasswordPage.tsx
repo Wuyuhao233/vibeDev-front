@@ -42,19 +42,19 @@ export default function ForgotPasswordPage() {
   if (sent) {
     return (
       <div className="max-w-md mx-auto mt-16 text-center">
-        <div className="bg-white rounded-lg shadow-card p-8">
+        <div className="bg-card rounded-lg shadow-card p-8">
           <div className="mb-4 text-4xl">📧</div>
-          <h1 className="text-lg font-semibold text-gray-900 mb-2">邮件已发送</h1>
-          <p className="text-sm text-gray-500 mb-1">
+          <h1 className="text-lg font-semibold text-foreground mb-2">邮件已发送</h1>
+          <p className="text-sm text-muted-foreground mb-1">
             若该邮箱已注册，重置密码邮件已发送至{' '}
-            <span className="font-medium text-gray-700">{email}</span>
+            <span className="font-medium text-foreground">{email}</span>
           </p>
-          <p className="text-sm text-gray-400 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             请检查邮箱（包括垃圾邮件箱），邮件有效期为 30 分钟
           </p>
           <Link
             to="/login"
-            className="inline-block px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+            className="inline-block px-5 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
           >
             返回登录
           </Link>
@@ -65,12 +65,12 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="max-w-md mx-auto mt-16">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">找回密码</h1>
-      <p className="text-sm text-gray-500 mb-8 text-center">
+      <h1 className="text-2xl font-bold text-foreground mb-2 text-center">找回密码</h1>
+      <p className="text-sm text-muted-foreground mb-8 text-center">
         输入注册邮箱，我们会发送重置密码链接
       </p>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-card p-6">
+      <form onSubmit={handleSubmit} className="bg-card rounded-lg shadow-card p-6">
         <div className="flex flex-col gap-4">
           <Input
             label="邮箱"
@@ -91,8 +91,8 @@ export default function ForgotPasswordPage() {
           </Button>
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <Link to="/login" className="text-primary-500 hover:underline">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          <Link to="/login" className="text-primary hover:underline">
             返回登录
           </Link>
         </div>

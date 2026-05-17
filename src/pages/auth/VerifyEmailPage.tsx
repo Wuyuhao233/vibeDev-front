@@ -59,7 +59,7 @@ export default function VerifyEmailPage() {
   if (state === 'verifying') {
     return (
       <div className="max-w-md mx-auto mt-16 text-center">
-        <div className="bg-white rounded-lg shadow-card p-8">
+        <div className="bg-card rounded-lg shadow-card p-8">
           <Spinner className="mb-4" />
         </div>
       </div>
@@ -69,15 +69,15 @@ export default function VerifyEmailPage() {
   if (state === 'success') {
     return (
       <div className="max-w-md mx-auto mt-16 text-center">
-        <div className="bg-white rounded-lg shadow-card p-8">
+        <div className="bg-card rounded-lg shadow-card p-8">
           <div className="mb-4 text-5xl text-emerald-500">✓</div>
-          <h1 className="text-lg font-semibold text-gray-900 mb-2">邮箱验证成功</h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <h1 className="text-lg font-semibold text-foreground mb-2">邮箱验证成功</h1>
+          <p className="text-sm text-muted-foreground mb-6">
             账号已激活，{countdown} 秒后自动跳转登录页
           </p>
           <Link
             to="/login"
-            className="inline-block px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+            className="inline-block px-5 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
           >
             立即登录
           </Link>
@@ -88,10 +88,10 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="max-w-md mx-auto mt-16 text-center">
-      <div className="bg-white rounded-lg shadow-card p-8">
+      <div className="bg-card rounded-lg shadow-card p-8">
         <div className="mb-4 text-5xl text-red-500">✕</div>
-        <h1 className="text-lg font-semibold text-gray-900 mb-2">验证失败</h1>
-        <p className="text-sm text-gray-500 mb-6">{errorMessage}</p>
+        <h1 className="text-lg font-semibold text-foreground mb-2">验证失败</h1>
+        <p className="text-sm text-muted-foreground mb-6">{errorMessage}</p>
         <div className="flex justify-center gap-3">
           <Link to="/register">
             <Button variant="outline">重新注册</Button>

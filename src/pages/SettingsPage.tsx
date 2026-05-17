@@ -48,7 +48,7 @@ export default function SettingsPage() {
     <div className="flex gap-6">
       {/* Sidebar */}
       <nav className="w-48 flex-shrink-0">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">设置</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-6">设置</h1>
         <div className="flex flex-col gap-1">
           {SETTINGS_TABS.map((tab) => (
             <button
@@ -56,8 +56,8 @@ export default function SettingsPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`px-4 py-2.5 text-sm font-medium rounded-md text-left transition-colors duration-150 ${
                 activeTab === tab.key
-                  ? 'bg-primary-50 text-primary-500'
-                  : 'text-gray-500 hover:bg-gray-100'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted/50'
               }`}
             >
               {tab.label}
@@ -160,15 +160,15 @@ function ProfileSection() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-card p-6">
+      <div className="bg-card rounded-lg shadow-card p-6">
         <Skeleton className="h-40 w-full rounded-md" />
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-card p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-6">个人信息</h2>
+    <div className="bg-card rounded-lg shadow-card p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-6">个人信息</h2>
 
       {/* Avatar */}
       <div className="flex items-center gap-4 mb-8">
@@ -176,7 +176,7 @@ function ProfileSection() {
           {profile?.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={profile?.username || ''} />}
           <AvatarFallback>{profile?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
         </Avatar>
-        <label className="px-4 py-2 text-sm font-medium text-primary-500 border border-primary-500 rounded-md hover:bg-primary-50 cursor-pointer transition-colors duration-150">
+        <label className="px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary/10 cursor-pointer transition-colors duration-150">
           更换头像
           <input
             type="file"
@@ -189,7 +189,7 @@ function ProfileSection() {
 
       <div className="flex flex-col gap-4 max-w-md">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="nickname" className="text-sm font-medium text-gray-700">昵称</label>
+          <label htmlFor="nickname" className="text-sm font-medium text-foreground">昵称</label>
           <Input
             id="nickname"
             value={nickname}
@@ -203,7 +203,7 @@ function ProfileSection() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="signature" className="text-sm font-medium text-gray-700">签名</label>
+          <label htmlFor="signature" className="text-sm font-medium text-foreground">签名</label>
           <Input
             id="signature"
             value={signature}
@@ -391,10 +391,10 @@ function SecuritySection() {
 
   if (pwdSuccess) {
     return (
-      <div className="bg-white rounded-lg shadow-card p-6 text-center">
+      <div className="bg-card rounded-lg shadow-card p-6 text-center">
         <div className="mb-4 text-5xl text-emerald-500">✓</div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">密码修改成功</h2>
-        <p className="text-sm text-gray-500 mb-6">
+        <h2 className="text-lg font-semibold text-foreground mb-2">密码修改成功</h2>
+        <p className="text-sm text-muted-foreground mb-6">
           为保障账号安全，请使用新密码重新登录
         </p>
         <Button variant="destructive" onClick={handleReLogin}>
@@ -407,12 +407,12 @@ function SecuritySection() {
   return (
     <div className="flex flex-col gap-6">
       {/* Change Password */}
-      <div className="bg-white rounded-lg shadow-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">修改密码</h2>
+      <div className="bg-card rounded-lg shadow-card p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-6">修改密码</h2>
         <div className="flex flex-col gap-4 max-w-md">
           <div className="relative">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="old-password" className="text-sm font-medium text-gray-700">当前密码</label>
+              <label htmlFor="old-password" className="text-sm font-medium text-foreground">当前密码</label>
               <Input
                 id="old-password"
                 type={showOld ? 'text' : 'password'}
@@ -427,7 +427,7 @@ function SecuritySection() {
             <button
               type="button"
               onClick={() => setShowOld(!showOld)}
-              className="absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 text-sm"
+              className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground/80 text-sm"
               tabIndex={-1}
             >
               {showOld ? '隐藏' : '显示'}
@@ -436,7 +436,7 @@ function SecuritySection() {
 
           <div className="relative">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="new-password" className="text-sm font-medium text-gray-700">新密码</label>
+              <label htmlFor="new-password" className="text-sm font-medium text-foreground">新密码</label>
               <Input
                 id="new-password"
                 type={showNew ? 'text' : 'password'}
@@ -459,7 +459,7 @@ function SecuritySection() {
             <button
               type="button"
               onClick={() => setShowNew(!showNew)}
-              className="absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 text-sm"
+              className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground/80 text-sm"
               tabIndex={-1}
             >
               {showNew ? '隐藏' : '显示'}
@@ -467,7 +467,7 @@ function SecuritySection() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="confirm-password" className="text-sm font-medium text-gray-700">确认新密码</label>
+            <label htmlFor="confirm-password" className="text-sm font-medium text-foreground">确认新密码</label>
             <Input
               id="confirm-password"
               type="password"
@@ -494,23 +494,23 @@ function SecuritySection() {
       </div>
 
       {/* CAS Binding */}
-      <div className="bg-white rounded-lg shadow-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">CAS 账号绑定</h2>
+      <div className="bg-card rounded-lg shadow-card p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-6">CAS 账号绑定</h2>
 
         {casInfo === null && casLoading && (
-          <div className="flex items-center gap-3 text-sm text-gray-500">
-            <span className="inline-block animate-spin-slow w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <span className="inline-block animate-spin-slow w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />
             加载中...
           </div>
         )}
 
         {casInfo?.is_bound && (
           <div>
-            <p className="text-sm text-gray-700 mb-1">
-              已绑定 CAS 账号：<span className="font-medium text-gray-900">{casInfo.cas_username}</span>
+            <p className="text-sm text-foreground mb-1">
+              已绑定 CAS 账号：<span className="font-medium text-foreground">{casInfo.cas_username}</span>
             </p>
             {casInfo.bound_at && (
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 绑定时间：{formatRelativeTime(casInfo.bound_at)}
               </p>
             )}
@@ -525,7 +525,7 @@ function SecuritySection() {
 
         {casInfo && !casInfo.is_bound && (
           <div>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               绑定 CAS 账号后，可使用 CAS 单点登录
             </p>
             <Button variant="outline" onClick={handleCasBind}>
@@ -551,9 +551,9 @@ function SecuritySection() {
       </AlertDialog>
 
       {/* Login History */}
-      <div className="bg-white rounded-lg shadow-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">
-          登录历史 {historyTotal > 0 && <span className="text-sm font-normal text-gray-400">共 {historyTotal} 条</span>}
+      <div className="bg-card rounded-lg shadow-card p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-6">
+          登录历史 {historyTotal > 0 && <span className="text-sm font-normal text-muted-foreground">共 {historyTotal} 条</span>}
         </h2>
 
         {historyLoading ? (
@@ -569,7 +569,7 @@ function SecuritySection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 text-left text-gray-500">
+                  <tr className="border-b border-border text-left text-muted-foreground">
                     <th className="pb-3 font-medium">时间</th>
                     <th className="pb-3 font-medium">登录方式</th>
                     <th className="pb-3 font-medium">IP</th>
@@ -579,11 +579,11 @@ function SecuritySection() {
                 </thead>
                 <tbody>
                   {loginHistory.map((entry, i) => (
-                    <tr key={i} className="border-b border-gray-100">
-                      <td className="py-3 text-gray-700">{entry.createdAt ? formatRelativeTime(entry.createdAt) : '-'}</td>
+                    <tr key={i} className="border-b border-border">
+                      <td className="py-3 text-foreground">{entry.createdAt ? formatRelativeTime(entry.createdAt) : '-'}</td>
                       <td className="py-3">{entry.method === 'cas' ? '🏷 CAS' : '📧 邮箱'}</td>
-                      <td className="py-3 text-gray-500">{entry.ip || '-'}</td>
-                      <td className="py-3 text-gray-500">{entry.userAgent || '-'}</td>
+                      <td className="py-3 text-muted-foreground">{entry.ip || '-'}</td>
+                      <td className="py-3 text-muted-foreground">{entry.userAgent || '-'}</td>
                       <td className="py-3">
                         <span className={`inline-flex items-center gap-1 text-xs ${entry.success !== false ? 'text-emerald-500' : 'text-red-500'}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${entry.success !== false ? 'bg-emerald-500' : 'bg-red-500'}`} />
@@ -656,9 +656,9 @@ function DeactivateSection() {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">账号注销</h2>
-        <p className="text-sm text-gray-500 mb-4">
+      <div className="bg-card rounded-lg shadow-card p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-2">账号注销</h2>
+        <p className="text-sm text-muted-foreground mb-4">
           注销后 30 天内可恢复账号，超过 30 天后数据彻底删除
         </p>
         <button
@@ -677,8 +677,8 @@ function DeactivateSection() {
                 <span className="text-red-500 font-bold">!</span>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900">注销账号</h3>
-                <div className="mt-3 space-y-2 text-sm text-gray-500">
+                <h3 className="text-lg font-semibold text-foreground">注销账号</h3>
+                <div className="mt-3 space-y-2 text-sm text-muted-foreground">
                   <p>注销后，以下操作不可撤销：</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>个人信息将被清除（用户名、邮箱、头像、签名）</li>
@@ -692,9 +692,9 @@ function DeactivateSection() {
                     type="checkbox"
                     checked={understood}
                     onChange={(e) => setUnderstood(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                   />
-                  <span className="text-sm text-gray-600">我已了解注销账号的后果</span>
+                  <span className="text-sm text-foreground/80">我已了解注销账号的后果</span>
                 </label>
               </div>
             </div>
@@ -712,13 +712,13 @@ function DeactivateSection() {
                 <span className="text-red-500 font-bold">!</span>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900">确认注销</h3>
-                <p className="mt-2 text-sm text-gray-500">
+                <h3 className="text-lg font-semibold text-foreground">确认注销</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
                   你确定要注销账号吗？此操作不可撤销（30 天内可恢复）。
                 </p>
                 <div className="mt-4">
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor="deactivate-email" className="text-sm font-medium text-gray-700">请输入你的注册邮箱进行确认</label>
+                    <label htmlFor="deactivate-email" className="text-sm font-medium text-foreground">请输入你的注册邮箱进行确认</label>
                     <Input
                       id="deactivate-email"
                       type="email"
@@ -750,11 +750,11 @@ function DeactivateSection() {
                 <span className="text-red-500">🔐</span>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900">身份验证</h3>
-                <p className="mt-2 text-sm text-gray-500">请输入当前登录密码以确认操作</p>
+                <h3 className="text-lg font-semibold text-foreground">身份验证</h3>
+                <p className="mt-2 text-sm text-muted-foreground">请输入当前登录密码以确认操作</p>
                 <div className="mt-4">
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor="deactivate-password" className="text-sm font-medium text-gray-700">密码</label>
+                    <label htmlFor="deactivate-password" className="text-sm font-medium text-foreground">密码</label>
                     <Input
                       id="deactivate-password"
                       type="password"
@@ -850,21 +850,21 @@ function DataSection() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-card p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-6">数据导出</h2>
+    <div className="bg-card rounded-lg shadow-card p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-6">数据导出</h2>
 
       {status === 'idle' && (
         <div>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             你可以申请导出个人数据，包括帖子、回复、收藏和浏览次数。
             导出格式为 JSON，导出完成后可下载。
           </p>
           <div className="flex items-center gap-4 mb-4">
-            <label className="text-sm text-gray-700">导出范围：</label>
+            <label className="text-sm text-foreground">导出范围：</label>
             <select
               value={scope}
               onChange={(e) => setScope(e.target.value)}
-              className="border border-gray-200 rounded-md px-3 py-1.5 text-sm"
+              className="border border-border rounded-md px-3 py-1.5 text-sm"
             >
               <option value="all">全部数据</option>
               <option value="posts">仅帖子</option>
@@ -881,10 +881,10 @@ function DataSection() {
       {status === 'processing' && (
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <div className="animate-spin-slow w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
-            <span className="text-sm text-gray-700">正在生成导出文件...</span>
+            <div className="animate-spin-slow w-5 h-5 border-2 border-primary border-t-transparent rounded-full" />
+            <span className="text-sm text-foreground">正在生成导出文件...</span>
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             文件准备好后，你将在此页面看到下载按钮。
             你也可以关闭页面，稍后回到此页面查看。
           </p>
@@ -894,9 +894,9 @@ function DataSection() {
       {status === 'ready' && (
         <div>
           <div className="mb-4 text-2xl text-emerald-500">✓</div>
-          <p className="text-sm text-gray-700 mb-2">导出文件已生成</p>
+          <p className="text-sm text-foreground mb-2">导出文件已生成</p>
           {fileInfo && (
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {fileInfo.size && `大小: ${fileInfo.size}`}
               {fileInfo.itemCounts && ` · 包含: 帖子 (${fileInfo.itemCounts.posts}), 回复 (${fileInfo.itemCounts.replies}), 收藏 (${fileInfo.itemCounts.collections})`}
             </p>
@@ -908,8 +908,8 @@ function DataSection() {
       {status === 'expired' && (
         <div>
           <div className="mb-4 text-2xl text-amber-500">⚠</div>
-          <p className="text-sm text-gray-700 mb-2">导出文件已过期</p>
-          <p className="text-sm text-gray-500 mb-4">下载链接已过期，你可以重新申请导出。</p>
+          <p className="text-sm text-foreground mb-2">导出文件已过期</p>
+          <p className="text-sm text-muted-foreground mb-4">下载链接已过期，你可以重新申请导出。</p>
           <Button onClick={() => setStatus('idle')}>重新申请导出</Button>
         </div>
       )}
@@ -917,8 +917,8 @@ function DataSection() {
       {status === 'error' && (
         <div>
           <div className="mb-4 text-2xl text-red-500">✕</div>
-          <p className="text-sm text-gray-700 mb-2">导出失败</p>
-          <p className="text-sm text-gray-500 mb-4">导出过程中发生错误，请稍后重试。</p>
+          <p className="text-sm text-foreground mb-2">导出失败</p>
+          <p className="text-sm text-muted-foreground mb-4">导出过程中发生错误，请稍后重试。</p>
           <Button onClick={() => setStatus('idle')}>重新申请导出</Button>
         </div>
       )}
@@ -980,20 +980,20 @@ function NotificationSection() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-card p-6">
+      <div className="bg-card rounded-lg shadow-card p-6">
         <Skeleton className="h-10 w-full"/>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-card p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-6">通知设置</h2>
+    <div className="bg-card rounded-lg shadow-card p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-6">通知设置</h2>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200 text-left text-gray-500">
+            <tr className="border-b border-border text-left text-muted-foreground">
               <th className="pb-3 font-medium">事件</th>
               {CHANNELS.map((ch) => (
                 <th key={ch.key} className="pb-3 font-medium text-center w-28">
@@ -1008,12 +1008,12 @@ function NotificationSection() {
               return (
                 <tr
                   key={pref.eventType}
-                  className={`border-b border-gray-100 ${isBanned ? 'bg-gray-50 text-gray-400' : ''}`}
+                  className={`border-b border-border ${isBanned ? 'bg-muted/30 text-muted-foreground' : ''}`}
                 >
                   <td className="py-3">
                     <span className="inline-flex items-center gap-2">
                       {isBanned && (
-                        <svg className="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <rect x="3" y="11" rx="2" />
                           <path d="M7 11V7a5 5 0 0110 0v4" />
                         </svg>
@@ -1036,14 +1036,14 @@ function NotificationSection() {
                         <span
                           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ${
                             isBanned
-                              ? 'bg-gray-200'
+                              ? 'bg-muted'
                               : pref[ch.key as keyof typeof pref]
-                                ? 'bg-primary-500'
-                                : 'bg-gray-200'
+                                ? 'bg-primary'
+                                : 'bg-muted'
                           }`}
                         >
                           <span
-                            className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
+                            className={`inline-block h-3.5 w-3.5 rounded-full bg-card shadow-sm transform transition-transform duration-200 ${
                               pref[ch.key as keyof typeof pref] ? 'translate-x-4' : 'translate-x-0.5'
                             }`}
                           />

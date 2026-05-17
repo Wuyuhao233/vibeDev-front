@@ -38,7 +38,7 @@ function highlightMatch(text: string, keyword: string) {
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="bg-primary-50 text-gray-900 rounded-sm">{text.slice(idx, idx + keyword.length)}</mark>
+      <mark className="bg-primary/10 text-foreground rounded-sm">{text.slice(idx, idx + keyword.length)}</mark>
       {text.slice(idx + keyword.length)}
     </>
   );
@@ -154,7 +154,7 @@ export default function SearchInput({
     <div className={`relative ${className}`}>
       <div className="relative">
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"
           viewBox="0 0 24 24"
           fill="none"
         >
@@ -173,23 +173,23 @@ export default function SearchInput({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           autoFocus={autoFocus}
-          className="w-full h-9 pl-9 pr-3 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-50 transition-all duration-150 placeholder:text-gray-400"
+          className="w-full h-9 pl-9 pr-3 text-sm bg-muted/50 border border-border rounded-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-150 placeholder:text-muted-foreground"
         />
       </div>
 
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-modal border border-gray-200 py-1 z-dropdown animate-fade-in"
+          className="absolute left-0 right-0 top-full mt-1 bg-popover rounded-lg shadow-modal border border-border py-1 z-dropdown animate-fade-in"
         >
           <div className="flex items-center justify-between px-3 py-1.5">
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {suggestions && suggestions.length > 0 && value.trim() ? '搜索建议' : '搜索历史'}
             </span>
             {!suggestions && history.length > 0 && (
               <button
                 onClick={handleClearHistory}
-                className="text-xs text-gray-400 hover:text-gray-600 transition-colors duration-150"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors duration-150"
               >
                 清除全部
               </button>
@@ -200,8 +200,8 @@ export default function SearchInput({
               key={item}
               onClick={() => submitQuery(item)}
               onMouseEnter={() => setActiveIndex(i)}
-              className={`w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150 flex items-center justify-between ${
-                i === activeIndex ? 'bg-gray-100' : ''
+              className={`w-full text-left px-3 py-1.5 text-sm text-foreground hover:bg-muted transition-colors duration-150 flex items-center justify-between ${
+                i === activeIndex ? 'bg-muted' : ''`
               }`}
             >
               <span className="truncate">
@@ -212,7 +212,7 @@ export default function SearchInput({
               {!suggestions && (
                 <button
                   onClick={(e) => handleRemoveItem(e, item)}
-                  className="flex-shrink-0 ml-2 text-gray-400 hover:text-gray-600 transition-colors duration-150"
+                  className="flex-shrink-0 ml-2 text-muted-foreground hover:text-foreground transition-colors duration-150"
                   aria-label={`清除 "${item}"`}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">

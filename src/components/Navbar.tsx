@@ -62,7 +62,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => navigate('/post/new')}
-                className="px-3 py-1.5 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
+                className="px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
               >
                 发布帖子
               </button>

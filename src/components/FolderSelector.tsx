@@ -43,18 +43,18 @@ export default function FolderSelector({ open, onSelect, onClose }: FolderSelect
   return (
     <div
       ref={containerRef}
-      className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-modal border border-gray-200 z-10 py-1"
+      className="absolute top-full left-0 mt-1 w-56 bg-card rounded-lg shadow-modal border border-border z-10 py-1"
     >
       {loading ? (
         <div className="flex items-center justify-center py-4">
-          <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin-slow" />
-          <span className="ml-2 text-sm text-gray-400">加载中...</span>
+          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin-slow" />
+          <span className="ml-2 text-sm text-muted-foreground">加载中...</span>
         </div>
       ) : (
         <>
           <button
             onClick={() => onSelect(0, '默认收藏夹')}
-            className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+            className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted/30 transition-colors duration-150"
           >
             <span>默认收藏夹</span>
           </button>
@@ -62,14 +62,14 @@ export default function FolderSelector({ open, onSelect, onClose }: FolderSelect
             <button
               key={folder.id}
               onClick={() => onSelect(folder.id, folder.name)}
-              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 flex items-center justify-between"
+              className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted/30 transition-colors duration-150 flex items-center justify-between"
             >
               <span>{folder.name}</span>
-              <span className="text-xs text-gray-400">{folder.itemCount}</span>
+              <span className="text-xs text-muted-foreground">{folder.itemCount}</span>
             </button>
           ))}
           {!loading && folders.length === 0 && (
-            <p className="px-4 py-3 text-sm text-gray-400">暂无收藏夹，点击"管理收藏夹"创建</p>
+            <p className="px-4 py-3 text-sm text-muted-foreground">暂无收藏夹，点击"管理收藏夹"创建</p>
           )}
         </>
       )}

@@ -88,7 +88,7 @@ export default function ModeratorAssignmentPage() {
     return (
       <div className="flex items-center justify-center py-16">
         <Spinner size="lg" />
-        <span className="ml-3 text-gray-500">加载中...</span>
+        <span className="ml-3 text-muted-foreground">加载中...</span>
       </div>
     );
   }
@@ -101,38 +101,38 @@ export default function ModeratorAssignmentPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">版主分配</h1>
-          <p className="text-sm text-gray-500 mt-1">管理版主及其管辖版块</p>
+          <h1 className="text-2xl font-bold text-foreground">版主分配</h1>
+          <p className="text-sm text-muted-foreground mt-1">管理版主及其管辖版块</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+      <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-muted/30 border-b border-border">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">用户名</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">邮箱</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">等级</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">角色</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">操作</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">用户名</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">邮箱</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">等级</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">角色</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {moderators.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-gray-400">
-                    <p className="text-base font-medium text-gray-500">暂无版主</p>
+                  <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
+                    <p className="text-base font-medium text-muted-foreground">暂无版主</p>
                     <p className="text-sm mt-1">从用户管理中分配版主角色</p>
                   </td>
                 </tr>
               ) : (
                 moderators.map((m) => (
-                  <tr key={m.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{m.username}</td>
-                    <td className="px-4 py-3 text-gray-500">{m.email}</td>
+                  <tr key={m.id} className="hover:bg-muted/30">
+                    <td className="px-4 py-3 font-medium text-foreground">{m.username}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{m.email}</td>
                     <td className="px-4 py-3">
-                      <span className="inline-block px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">
+                      <span className="inline-block px-2 py-0.5 text-xs rounded bg-muted/50 text-foreground/80">
                         Lv.{m.level}
                       </span>
                     </td>
@@ -171,47 +171,47 @@ export default function ModeratorAssignmentPage() {
       {assignModalUser && (
         <div className="fixed inset-0 z-30 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setAssignModalUser(null)} />
-          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6 z-40">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="relative bg-card rounded-lg shadow-xl w-full max-w-md p-6 z-40">
+            <h2 className="text-lg font-semibold text-foreground mb-2">
               分配版块 — {assignModalUser.username}
             </h2>
-            <p className="text-sm text-gray-500 mb-4">选择 {assignModalUser.username} 负责管辖的版块</p>
+            <p className="text-sm text-muted-foreground mb-4">选择 {assignModalUser.username} 负责管辖的版块</p>
 
             <div className="space-y-2 max-h-64 overflow-y-auto mb-4">
               {boards.map((board) => (
                 <label
                   key={board.id}
-                  className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/30 cursor-pointer"
                 >
                   <input
                     type="checkbox"
                     checked={selectedBoardIds.has(board.id)}
                     onChange={() => handleToggleBoard(board.id)}
-                    className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                    className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
                   />
                   <div>
-                    <p className="text-sm font-medium text-gray-700">{board.name}</p>
-                    <p className="text-xs text-gray-400">{board.postCount} 篇帖子</p>
+                    <p className="text-sm font-medium text-foreground">{board.name}</p>
+                    <p className="text-xs text-muted-foreground">{board.postCount} 篇帖子</p>
                   </div>
                 </label>
               ))}
             </div>
 
-            <p className="text-xs text-gray-400 mb-4">
+            <p className="text-xs text-muted-foreground mb-4">
               已选 {selectedBoardIds.size} 个版块
             </p>
 
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setAssignModalUser(null)}
-                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                className="px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
               >
                 取消
               </button>
               <button
                 onClick={handleAssign}
                 disabled={actionLoading}
-                className="px-4 py-2 text-sm bg-primary-500 text-white rounded-md hover:bg-primary-600 disabled:opacity-50 transition-colors"
+                className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
                 {actionLoading ? '保存中...' : '确认分配'}
               </button>

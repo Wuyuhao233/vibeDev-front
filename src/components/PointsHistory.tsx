@@ -73,11 +73,11 @@ export default function PointsHistory({ username }: PointsHistoryProps) {
         {records.map((record) => (
           <div
             key={record.id}
-            className="flex items-center justify-between px-4 py-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors duration-150"
+            className="flex items-center justify-between px-4 py-3 border border-border rounded-lg hover:bg-muted/50 transition-colors duration-150"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-gray-900">{record.reasonLabel}</p>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-sm text-foreground">{record.reasonLabel}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {formatRelativeTime(record.createdAt)}
               </p>
             </div>

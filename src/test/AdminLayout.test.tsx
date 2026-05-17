@@ -66,7 +66,7 @@ describe('AdminLayout', () => {
   it('highlights active nav item', () => {
     renderLayout('admin');
     const dashboardLink = screen.getByText('仪表盘').closest('a');
-    expect(dashboardLink?.className).toContain('bg-primary-50');
-    expect(dashboardLink?.className).toContain('text-primary-500');
+    expect(dashboardLink?.className).toContain('bg-primary/10');
+    expect(dashboardLink?.className).toContain('text-primary');
   });
 });

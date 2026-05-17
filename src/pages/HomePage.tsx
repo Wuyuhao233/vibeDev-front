@@ -131,14 +131,14 @@ export default function HomePage() {
         <div role="status" aria-label="加载中">
           <div className="post-list__skeleton flex flex-col gap-4">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg p-4 shadow-card animate-shimmer">
-                <div className="w-3/5 h-4 bg-gray-200 rounded mb-3" />
-                <div className="w-full h-3.5 bg-gray-200 rounded mb-2" />
-                <div className="w-3/5 h-3.5 bg-gray-200 rounded mb-4" />
+              <div key={i} className="bg-card rounded-lg p-4 shadow-card animate-shimmer">
+                <div className="w-3/5 h-4 bg-muted rounded mb-3" />
+                <div className="w-full h-3.5 bg-muted rounded mb-2" />
+                <div className="w-3/5 h-3.5 bg-muted rounded mb-4" />
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 bg-gray-200 rounded-full" />
-                  <div className="w-[60px] h-3.5 bg-gray-200 rounded" />
-                  <div className="w-[80px] h-3.5 bg-gray-200 rounded" />
+                  <div className="w-7 h-7 bg-muted rounded-full" />
+                  <div className="w-[60px] h-3.5 bg-muted rounded" />
+                  <div className="w-[80px] h-3.5 bg-muted rounded" />
                 </div>
               </div>
             ))}
@@ -168,7 +168,7 @@ export default function HomePage() {
               <EmptyContent>
                 <Link
                   to="/board/1"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
                 >
                   去看看
                 </Link>
@@ -185,7 +185,7 @@ export default function HomePage() {
             <EmptyContent>
               <Link
                 to="/board/1"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
               >
                 去逛逛
               </Link>
@@ -203,7 +203,7 @@ export default function HomePage() {
             <EmptyContent>
               <Link
                 to="/post/new"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
               >
                 发布帖子
               </Link>
@@ -231,23 +231,23 @@ export default function HomePage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">首页</h1>
+      <h1 className="text-3xl font-bold text-foreground mb-6">首页</h1>
 
       {/* Tab Navigation */}
-      <nav className="home-tabs__nav flex border-b border-gray-200 mb-6">
+      <nav className="home-tabs__nav flex border-b border-border mb-6">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => switchTab(tab.key)}
             className={`home-tabs__tab relative px-5 py-2.5 text-sm font-medium transition-colors duration-200 ${
               activeTab === tab.key
-                ? 'home-tabs__tab--active text-primary-500'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'home-tabs__tab--active text-primary'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {tab.label}
             {activeTab === tab.key && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary-500 rounded-full" />
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
             )}
           </button>
         ))}
@@ -261,7 +261,7 @@ export default function HomePage() {
 
       {/* Load more indicator */}
       {loadingMore && (
-        <div className="post-list__loading-more flex items-center justify-center gap-2 py-6 text-sm text-gray-400">
+        <div className="post-list__loading-more flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
           <svg className="w-4 h-4 animate-spin-slow" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -271,7 +271,7 @@ export default function HomePage() {
       )}
 
       {!hasMore && posts.length > 0 && !loading && (
-        <div className="post-list__no-more text-center py-6 text-sm text-gray-400">
+        <div className="post-list__no-more text-center py-6 text-sm text-muted-foreground">
           —— 已经到底了 ——
         </div>
       )}

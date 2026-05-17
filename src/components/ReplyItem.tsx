@@ -80,7 +80,7 @@ export default function ReplyItem({
 
   return (
     <>
-      <div className={`reply-item py-4 border-b border-gray-100 ${isDeleted ? 'opacity-60' : ''} ${className}`}>
+      <div className={`reply-item py-4 border-b border-border ${isDeleted ? 'opacity-60' : ''} ${className}`}>
         <div className="flex gap-3">
         <button
           onClick={() => window.location.hash = ''}
@@ -99,22 +99,22 @@ export default function ReplyItem({
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-sm font-medium text-gray-900">{author.username}</span>
+            <span className="text-sm font-medium text-foreground">{author.username}</span>
             <LevelBadge level={level} />
-            <span className="text-xs text-gray-400">L{depth}</span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">L{depth}</span>
+            <span className="text-xs text-muted-foreground">
               {formatRelativeTime(createdAt)}
             </span>
             {wasEdited && (
-              <span className="text-xs text-gray-400">（已编辑）</span>
+              <span className="text-xs text-muted-foreground">（已编辑）</span>
             )}
           </div>
 
           {/* Content */}
           {isDeleted ? (
-            <p className="text-sm text-gray-400 italic">该回复已被删除</p>
+            <p className="text-sm text-muted-foreground italic">该回复已被删除</p>
           ) : (
-            <div className="prose prose-sm max-w-none prose-p:text-gray-700 prose-a:text-primary-500 prose-code:text-sm prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-blockquote:border-l-primary-500">
+            <div className="prose prose-sm max-w-none prose-p:text-foreground prose-a:text-primary prose-code:text-sm prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-foreground prose-pre:text-background prose-blockquote:border-l-primary">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {contentMarkdown}
               </ReactMarkdown>
@@ -133,7 +133,7 @@ export default function ReplyItem({
               />
               <button
                 onClick={onReply}
-                className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-primary-500 transition-colors duration-150"
+                className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors duration-150"
                 aria-label="回复"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -144,7 +144,7 @@ export default function ReplyItem({
 
               <button
                 onClick={handleShare}
-                className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-primary-500 transition-colors duration-150"
+                className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors duration-150"
                 aria-label={shareCopied ? '已复制' : '分享'}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -156,7 +156,7 @@ export default function ReplyItem({
               {currentUserId && currentUserId !== author.id && (
                 <button
                   onClick={() => setReportOpen(true)}
-                  className="text-sm text-gray-400 hover:text-red-500 transition-colors duration-150"
+                  className="text-sm text-muted-foreground hover:text-red-500 transition-colors duration-150"
                 >
                   举报
                 </button>
@@ -164,7 +164,7 @@ export default function ReplyItem({
               {canEdit && onEdit && (
                 <button
                   onClick={() => onEdit(id)}
-                  className="text-sm text-gray-400 hover:text-primary-500 transition-colors duration-150"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors duration-150"
                 >
                   编辑
                 </button>
@@ -172,7 +172,7 @@ export default function ReplyItem({
               {canDelete && onDelete && (
                 <button
                   onClick={() => onDelete(id)}
-                  className="text-sm text-gray-400 hover:text-red-500 transition-colors duration-150"
+                  className="text-sm text-muted-foreground hover:text-red-500 transition-colors duration-150"
                 >
                   删除
                 </button>

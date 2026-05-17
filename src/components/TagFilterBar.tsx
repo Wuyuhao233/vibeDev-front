@@ -56,8 +56,8 @@ export default function TagFilterBar({ tags, activeTagId, onSelect, followedTagI
             }}
             className={`tag-filter__item group inline-flex items-center gap-1 px-3 py-1 text-sm rounded-full transition-colors duration-150 ${
               isActive
-                ? 'tag-filter__item--active bg-primary-500 text-white'
-                : 'text-gray-500 bg-gray-100 hover:bg-gray-200'
+                ? 'tag-filter__item--active bg-primary text-primary-foreground'
+                : 'text-muted-foreground bg-muted/50 hover:bg-muted'
             }`}
           >
             {tag.name}
@@ -77,7 +77,7 @@ export default function TagFilterBar({ tags, activeTagId, onSelect, followedTagI
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 ) : (
-                  <svg className="w-3.5 h-3.5 hover:text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg className="w-3.5 h-3.5 hover:text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 5v14M5 12h14" />
                   </svg>
                 )}
@@ -89,7 +89,7 @@ export default function TagFilterBar({ tags, activeTagId, onSelect, followedTagI
       {hasMore && !expanded && (
         <button
           onClick={() => setExpanded(true)}
-          className="tag-filter__more-btn text-sm text-primary-500 hover:text-primary-600 transition-colors duration-150 px-2"
+          className="tag-filter__more-btn text-sm text-primary hover:text-primary transition-colors duration-150 px-2"
         >
           更多...
         </button>
@@ -97,7 +97,7 @@ export default function TagFilterBar({ tags, activeTagId, onSelect, followedTagI
       {expanded && hasMore && (
         <button
           onClick={() => setExpanded(false)}
-          className="tag-filter__more-btn text-sm text-primary-500 hover:text-primary-600 transition-colors duration-150 px-2"
+          className="tag-filter__more-btn text-sm text-primary hover:text-primary transition-colors duration-150 px-2"
         >
           收起
         </button>

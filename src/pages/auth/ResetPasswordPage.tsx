@@ -23,17 +23,17 @@ export default function ResetPasswordPage() {
   if (!token || tokenInvalid) {
     return (
       <div className="max-w-md mx-auto mt-16 text-center">
-        <div className="bg-white rounded-lg shadow-card p-8">
+        <div className="bg-card rounded-lg shadow-card p-8">
           <div className="mb-4 text-5xl text-red-500">✕</div>
-          <h1 className="text-lg font-semibold text-gray-900 mb-2">
+          <h1 className="text-lg font-semibold text-foreground mb-2">
             {tokenInvalid ? '链接已过期或无效' : '无效的重置链接'}
           </h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             该重置链接无效或已被使用，请重新发起密码重置
           </p>
           <Link
             to="/forgot-password"
-            className="inline-block px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+            className="inline-block px-5 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
           >
             重新发起
           </Link>
@@ -99,15 +99,15 @@ export default function ResetPasswordPage() {
   if (pageState === 'success') {
     return (
       <div className="max-w-md mx-auto mt-16 text-center">
-        <div className="bg-white rounded-lg shadow-card p-8">
+        <div className="bg-card rounded-lg shadow-card p-8">
           <div className="mb-4 text-5xl text-emerald-500">✓</div>
-          <h1 className="text-lg font-semibold text-gray-900 mb-2">密码重置成功</h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <h1 className="text-lg font-semibold text-foreground mb-2">密码重置成功</h1>
+          <p className="text-sm text-muted-foreground mb-6">
             请使用新密码重新登录
           </p>
           <Link
             to="/login"
-            className="inline-block px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+            className="inline-block px-5 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
           >
             去登录
           </Link>
@@ -118,10 +118,10 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="max-w-md mx-auto mt-16">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">重置密码</h1>
-      <p className="text-sm text-gray-500 mb-8 text-center">请输入你的新密码</p>
+      <h1 className="text-2xl font-bold text-foreground mb-2 text-center">重置密码</h1>
+      <p className="text-sm text-muted-foreground mb-8 text-center">请输入你的新密码</p>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-card p-6">
+      <form onSubmit={handleSubmit} className="bg-card rounded-lg shadow-card p-6">
         {globalError && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600">
             {globalError}
@@ -147,7 +147,7 @@ export default function ResetPasswordPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 text-sm"
+              className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground/80 text-sm"
               tabIndex={-1}
             >
               {showPassword ? '隐藏' : '显示'}
@@ -173,8 +173,8 @@ export default function ResetPasswordPage() {
           </Button>
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <Link to="/login" className="text-primary-500 hover:underline">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          <Link to="/login" className="text-primary hover:underline">
             返回登录
           </Link>
         </div>

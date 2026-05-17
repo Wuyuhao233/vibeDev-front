@@ -135,12 +135,12 @@ export default function NotificationPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">通知中心</h1>
+        <h1 className="text-xl font-bold text-foreground">通知中心</h1>
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
             disabled={markingAll}
-            className="text-sm text-primary-500 hover:text-primary-600 disabled:opacity-50 transition-colors duration-150"
+            className="text-sm text-primary hover:text-primary disabled:opacity-50 transition-colors duration-150"
           >
             {markingAll ? '处理中...' : '全部已读'}
           </button>
@@ -148,15 +148,15 @@ export default function NotificationPage() {
       </div>
 
       {/* Type filter tabs */}
-      <div className="flex items-center gap-1 mb-4 border-b border-gray-200">
+      <div className="flex items-center gap-1 mb-4 border-b border-border">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setTypeFilter(tab.key)}
             className={`px-4 py-2 text-sm font-medium transition-colors duration-150 border-b-2 -mb-[1px] ${
               typeFilter === tab.key
-                ? 'text-primary-500 border-primary-500'
-                : 'text-gray-500 border-transparent hover:text-gray-700'
+                ? 'text-primary border-primary'
+                : 'text-muted-foreground border-transparent hover:text-foreground'
             }`}
           >
             {tab.label}
@@ -166,7 +166,7 @@ export default function NotificationPage() {
 
       {/* Read/unread filter */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-sm text-gray-500">筛选：</span>
+        <span className="text-sm text-muted-foreground">筛选：</span>
         {([
           { key: 'all', label: '全部' },
           { key: 'unread', label: '未读' },
@@ -177,8 +177,8 @@ export default function NotificationPage() {
             onClick={() => setReadFilter(opt.key)}
             className={`px-3 py-1 text-xs rounded-full transition-colors duration-150 ${
               readFilter === opt.key
-                ? 'bg-primary-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted/50 text-foreground/80 hover:bg-muted'
             }`}
           >
             {opt.label}
@@ -192,14 +192,14 @@ export default function NotificationPage() {
           <p className="text-sm text-red-500 mb-4">{error}</p>
           <button
             onClick={fetchNotifications}
-            className="px-4 py-2 text-sm text-primary-500 border border-primary-500 rounded-md hover:bg-primary-50 transition-colors duration-150"
+            className="px-4 py-2 text-sm text-primary border border-primary rounded-md hover:bg-primary/10 transition-colors duration-150"
           >
             重试
           </button>
         </div>
       ) : loading ? (
         <div className="flex items-center justify-center py-16">
-          <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
         <Empty
@@ -207,12 +207,12 @@ export default function NotificationPage() {
           description={notifications.length === 0 ? '你还没有收到任何通知' : '没有符合条件的通知'}
         />
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
           {filtered.map((n) => (
             <div
               key={n.id}
-              className={`flex items-start gap-4 px-5 py-4 border-b border-gray-100 last:border-b-0 transition-colors duration-150 ${
-                !n.isRead ? 'bg-blue-50' : 'hover:bg-gray-50'
+              className={`flex items-start gap-4 px-5 py-4 border-b border-border last:border-b-0 transition-colors duration-150 ${
+                !n.isRead ? 'bg-blue-50' : 'hover:bg-muted/30'
               }`}
             >
               <button
@@ -223,10 +223,10 @@ export default function NotificationPage() {
                   {NOTIFICATION_ICONS[getNotificationCategory(n.eventType)]}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm ${!n.isRead ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${!n.isRead ? 'text-foreground font-medium' : 'text-foreground/80'}`}>
                     {n.body}
                   </p>
-                  <RelativeTime date={n.createdAt} className="text-xs text-gray-400 mt-0.5" />
+                  <RelativeTime date={n.createdAt} className="text-xs text-muted-foreground mt-0.5" />
                 </div>
               </button>
               <div className="flex items-center gap-1 flex-shrink-0">
@@ -236,7 +236,7 @@ export default function NotificationPage() {
                       e.stopPropagation();
                       handleMarkRead(n.id);
                     }}
-                    className="px-2 py-1 text-xs text-primary-500 hover:bg-primary-50 rounded transition-colors duration-150"
+                    className="px-2 py-1 text-xs text-primary hover:bg-primary/10 rounded transition-colors duration-150"
                   >
                     标记已读
                   </button>
@@ -246,7 +246,7 @@ export default function NotificationPage() {
                     e.stopPropagation();
                     handleDelete(n.id);
                   }}
-                  className="px-2 py-1 text-xs text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors duration-150"
+                  className="px-2 py-1 text-xs text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded transition-colors duration-150"
                 >
                   删除
                 </button>

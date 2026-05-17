@@ -38,7 +38,7 @@ describe('LevelProgress', () => {
 
   it('renders progress bar element', () => {
     const { container } = render(<LevelProgress points={50} />);
-    const bar = container.querySelector('.h-2.bg-gray-200');
+    const bar = container.querySelector('.h-2.bg-muted');
     expect(bar).toBeInTheDocument();
   });
 });

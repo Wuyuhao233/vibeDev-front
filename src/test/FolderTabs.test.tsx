@@ -35,7 +35,7 @@ describe('FolderTabs', () => {
       <FolderTabs folders={baseFolders} selectedFolderId={1} onFolderChange={vi.fn()} />,
     );
     const activeTab = screen.getByText('技术文章').closest('button');
-    expect(activeTab?.className).toContain('border-primary-500');
+    expect(activeTab?.className).toContain('border-primary');
   });
 
   it('calls onFolderChange when tab clicked', () => {

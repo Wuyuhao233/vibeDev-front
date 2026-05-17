@@ -4,8 +4,8 @@ interface LevelBadgeProps {
 }
 
 const levelStyles: Record<number, string> = {
-  1: 'bg-gray-400 text-white',
-  2: 'bg-gray-500 text-white',
+  1: 'bg-muted text-muted-foreground',
+  2: 'bg-muted text-foreground',
   3: 'bg-blue-500 text-white',
   4: 'bg-violet-500 text-white',
   5: 'bg-amber-500 text-white',

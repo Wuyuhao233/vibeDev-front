@@ -234,10 +234,10 @@ export default function UserProfilePage() {
   if (profileLoading) {
     return (
       <div>
-        <div className="bg-white rounded-lg shadow-card p-6 mb-6">
+        <div className="bg-card rounded-lg shadow-card p-6 mb-6">
           <Skeleton className="h-40 w-full rounded-md" />
         </div>
-        <div className="bg-white rounded-lg shadow-card">
+        <div className="bg-card rounded-lg shadow-card">
           <Skeleton className="h-4 mb-4" />
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="mb-3" />
@@ -250,7 +250,7 @@ export default function UserProfilePage() {
   // Profile error
   if (profileError) {
     return (
-      <div className="bg-white rounded-lg shadow-card p-6">
+      <div className="bg-card rounded-lg shadow-card p-6">
         <ErrorEmpty
           description={profileError === '加载失败' ? '请检查网络连接后重试' : undefined}
           onRetry={profileError === '加载失败' ? fetchProfile : undefined}
@@ -266,7 +266,7 @@ export default function UserProfilePage() {
   return (
     <div>
       {/* User Info Card */}
-      <div className="bg-white rounded-lg shadow-card p-6 mb-6">
+      <div className="bg-card rounded-lg shadow-card p-6 mb-6">
         <div className="flex items-start gap-6">
           <Avatar size="lg">
             {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={profile.username} />}
@@ -274,13 +274,13 @@ export default function UserProfilePage() {
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold text-gray-900">{profile.username}</h1>
+              <h1 className="text-3xl font-bold text-foreground">{profile.username}</h1>
               <LevelBadge level={(profile.level || 1) as 1 | 2 | 3 | 4 | 5 | 6} />
             </div>
             {profile.signature && (
-              <p className="text-sm text-gray-500 mb-3">{profile.signature}</p>
+              <p className="text-sm text-muted-foreground mb-3">{profile.signature}</p>
             )}
-            <div className="flex items-center gap-6 text-sm text-gray-500">
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <span>积分：{profile.points ?? 0}</span>
               <span>注册于：{formatRelativeTime(profile.createdAt)}</span>
             </div>
@@ -289,7 +289,7 @@ export default function UserProfilePage() {
           {isOwner && (
             <Link
               to="/settings"
-              className="flex-shrink-0 px-4 py-2 text-sm font-medium text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-150"
+              className="flex-shrink-0 px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-md hover:bg-muted/30 transition-colors duration-150"
             >
               编辑资料
             </Link>
@@ -298,16 +298,16 @@ export default function UserProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-card">
-        <div className="flex items-center border-b border-gray-200">
+      <div className="bg-card rounded-lg shadow-card">
+        <div className="flex items-center border-b border-border">
           {visibleTabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
               className={`px-6 py-3 text-sm font-medium transition-colors duration-150 border-b-2 -mb-px ${
                 activeTab === tab.key
-                  ? 'text-primary-500 border-primary-500'
-                  : 'text-gray-500 border-transparent hover:text-gray-700'
+                  ? 'text-primary border-primary'
+                  : 'text-muted-foreground border-transparent hover:text-foreground'
               }`}
             >
               {tab.label}
@@ -316,7 +316,7 @@ export default function UserProfilePage() {
           {isOwner && activeTab === 'collections' && (
             <button
               onClick={() => setManagerOpen(true)}
-              className="ml-auto mr-4 px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded hover:bg-gray-50 transition-colors duration-150"
+              className="ml-auto mr-4 px-3 py-1.5 text-xs text-muted-foreground border border-border rounded hover:bg-muted/30 transition-colors duration-150"
             >
               管理收藏夹
             </button>
@@ -360,7 +360,7 @@ export default function UserProfilePage() {
                 <EmptyContent>
                   <Link
                     to="/"
-                    className="inline-block px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                    className="inline-block px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
                   >
                     去逛逛
                   </Link>
@@ -371,13 +371,13 @@ export default function UserProfilePage() {
             <>
               <div className="flex flex-col gap-3">
                 {items.map((item) => (
-                  <div key={item.id} className="p-4 border border-gray-200 rounded-lg hover:shadow-card-hover transition-all duration-200">
+                  <div key={item.id} className="p-4 border border-border rounded-lg hover:shadow-card-hover transition-all duration-200">
                     {'title' in item ? (
                       <Link to={`/post/${item.id}`} className="block">
-                        <h3 className="text-base font-medium text-gray-900 mb-2 line-clamp-1">
+                        <h3 className="text-base font-medium text-foreground mb-2 line-clamp-1">
                           {item.title}
                         </h3>
-                        <div className="flex items-center gap-4 text-xs text-gray-400">
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
                           {item.boardName && <span>{item.boardName}</span>}
                           {item.replyCount !== undefined && <span>{item.replyCount} 回复</span>}
                           {item.likeCount !== undefined && <span>{item.likeCount} 点赞</span>}
@@ -387,10 +387,10 @@ export default function UserProfilePage() {
                     ) : (
                       <div>
                         <Link to={`/post/${item.postId}`} className="block">
-                          <p className="text-sm text-gray-700 mb-2 line-clamp-2">
+                          <p className="text-sm text-foreground mb-2 line-clamp-2">
                             {(item as ReplyItem).content}
                           </p>
-                          <div className="flex items-center gap-4 text-xs text-gray-400">
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             {'postTitle' in item && (
                               <span>帖子：{item.postTitle}</span>
                             )}

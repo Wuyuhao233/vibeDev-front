@@ -105,14 +105,14 @@ export default function ShareCardModal({ open, onClose, cardData, postUrl }: Sha
           <div className="flex flex-col items-center">
             {stage === 'generating' && (
               <div className="flex flex-col items-center gap-3 py-12">
-                <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin-slow" />
-                <span className="text-sm text-gray-400">生成中...</span>
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin-slow" />
+                <span className="text-sm text-muted-foreground">生成中...</span>
               </div>
             )}
 
             {stage === 'preview' && imageUrl && (
               <>
-                <div className="w-full max-h-[400px] overflow-auto rounded-lg border border-gray-200">
+                <div className="w-full max-h-[400px] overflow-auto rounded-lg border border-border">
                   <img
                     src={imageUrl}
                     alt="分享卡片"
@@ -122,13 +122,13 @@ export default function ShareCardModal({ open, onClose, cardData, postUrl }: Sha
                 <div className="flex items-center justify-center gap-3 mt-6">
                   <button
                     onClick={handleDownload}
-                    className="px-5 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                    className="px-5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
                   >
                     下载图片
                   </button>
                   <button
                     onClick={handleCopyLink}
-                    className="px-5 py-2.5 text-sm font-medium text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-150"
+                    className="px-5 py-2.5 text-sm font-medium text-muted-foreground border border-border rounded-md hover:bg-muted/30 transition-colors duration-150"
                   >
                     复制链接
                   </button>
@@ -138,10 +138,10 @@ export default function ShareCardModal({ open, onClose, cardData, postUrl }: Sha
 
             {stage === 'error' && (
               <div className="flex flex-col items-center gap-3 py-12">
-                <p className="text-sm text-gray-500">生成失败</p>
+                <p className="text-sm text-muted-foreground">生成失败</p>
                 <button
                   onClick={generate}
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                  className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
                 >
                   重试
                 </button>

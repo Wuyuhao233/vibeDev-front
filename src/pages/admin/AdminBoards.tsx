@@ -186,7 +186,7 @@ export default function AdminBoards() {
     return (
       <div className="flex items-center justify-center py-16">
         <Spinner size="lg" />
-        <span className="ml-3 text-gray-500">加载中...</span>
+        <span className="ml-3 text-muted-foreground">加载中...</span>
       </div>
     );
   }
@@ -198,7 +198,7 @@ export default function AdminBoards() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">版块管理</h1>
+        <h1 className="text-2xl font-bold text-foreground">版块管理</h1>
         <Button onClick={openCreateModal}>新建版块</Button>
       </div>
 
@@ -210,17 +210,17 @@ export default function AdminBoards() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="bg-card rounded-lg border border-border shadow-sm">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-muted/30 border-b border-border">
               <tr>
                 <th className="w-8 px-4 py-3" />
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">名称</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">描述</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">帖子数</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">排序</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">状态</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">操作</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">名称</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">描述</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">帖子数</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">排序</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">状态</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -231,26 +231,26 @@ export default function AdminBoards() {
                   onDragStart={() => handleDragStart(idx)}
                   onDragOver={(e) => handleDragOver(e, idx)}
                   onDragEnd={handleDragEnd}
-                  className={`border-b border-gray-100 hover:bg-gray-50 cursor-move ${
+                  className={`border-b border-border hover:bg-muted/30 cursor-move ${
                     dragIdx === idx ? 'opacity-50' : ''
                   }`}
                 >
-                  <td className="px-4 py-3 text-gray-300 text-xs">⠿</td>
-                  <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+                  <td className="px-4 py-3 text-muted-foreground text-xs">⠿</td>
+                  <td className="px-4 py-3 text-sm text-foreground font-medium">
                     {board.icon && <span className="mr-2">{board.icon}</span>}
                     {board.name}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate">
+                  <td className="px-4 py-3 text-sm text-muted-foreground max-w-[200px] truncate">
                     {board.description || '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{board.postCount}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{board.sortOrder}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{board.postCount}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{board.sortOrder}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-block px-2 py-0.5 text-xs rounded-full ${
                         board.status === 'active'
                           ? 'bg-emerald-50 text-emerald-500'
-                          : 'bg-gray-100 text-gray-400'
+                          : 'bg-muted/50 text-muted-foreground'
                       }`}
                     >
                       {board.status === 'active' ? '启用' : '归档'}
@@ -259,13 +259,13 @@ export default function AdminBoards() {
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => openTagModal(board)}
-                      className="text-xs text-primary-500 hover:text-primary-600 mr-3"
+                      className="text-xs text-primary hover:text-primary mr-3"
                     >
                       标签
                     </button>
                     <button
                       onClick={() => openEditModal(board)}
-                      className="text-xs text-primary-500 hover:text-primary-600 mr-3"
+                      className="text-xs text-primary hover:text-primary mr-3"
                     >
                       编辑
                     </button>
@@ -291,7 +291,7 @@ export default function AdminBoards() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">名称</label>
+              <label className="block text-sm text-foreground mb-1">名称</label>
               <Input
                 value={boardForm.name}
                 onChange={(e) => setBoardForm((f) => ({ ...f, name: e.target.value }))}
@@ -299,7 +299,7 @@ export default function AdminBoards() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">描述</label>
+              <label className="block text-sm text-foreground mb-1">描述</label>
               <Input
                 value={boardForm.description}
                 onChange={(e) => setBoardForm((f) => ({ ...f, description: e.target.value }))}
@@ -307,7 +307,7 @@ export default function AdminBoards() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">图标</label>
+              <label className="block text-sm text-foreground mb-1">图标</label>
               <Input
                 value={boardForm.icon}
                 onChange={(e) => setBoardForm((f) => ({ ...f, icon: e.target.value }))}
@@ -332,7 +332,7 @@ export default function AdminBoards() {
           <DialogHeader>
             <DialogTitle>确认删除</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600 py-4">
+          <p className="text-sm text-foreground/80 py-4">
             确定要删除版块「{deleteTarget?.name}」吗？此操作不可撤销。
           </p>
           <DialogFooter>
@@ -411,12 +411,12 @@ function BoardTagModal({
               <Spinner size="sm" />
             </div>
           ) : tags.length === 0 ? (
-            <p className="text-center text-gray-400 text-sm py-4">暂无标签</p>
+            <p className="text-center text-muted-foreground text-sm py-4">暂无标签</p>
           ) : (
             <div className="space-y-1">
               {tags.map((tag) => (
-                <div key={tag.id} className="flex items-center justify-between py-2 px-3 rounded hover:bg-gray-50">
-                  <span className="text-sm text-gray-900">{tag.name}</span>
+                <div key={tag.id} className="flex items-center justify-between py-2 px-3 rounded hover:bg-muted/30">
+                  <span className="text-sm text-foreground">{tag.name}</span>
                   <button
                     onClick={() => onDelete(tag.id)}
                     className="text-xs text-red-500 hover:text-red-600"

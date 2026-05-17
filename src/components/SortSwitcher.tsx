@@ -21,15 +21,15 @@ export default function SortSwitcher({ value, onChange, showTrending }: SortSwit
   const options = showTrending ? ALL_OPTIONS : ALL_OPTIONS.filter((o) => o.value !== 'trending');
 
   return (
-    <div className="sort-switcher inline-flex border border-gray-200 rounded-md overflow-hidden">
+    <div className="sort-switcher inline-flex border border-border rounded-md overflow-hidden">
       {options.map((opt) => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`sort-switcher__item px-4 py-1.5 text-sm font-medium transition-colors duration-150 border-r border-gray-200 last:border-r-0 ${
+          className={`sort-switcher__item px-4 py-1.5 text-sm font-medium transition-colors duration-150 border-r border-border last:border-r-0 ${
             value === opt.value
-              ? 'sort-switcher__item--active bg-primary-500 text-white'
-              : 'text-gray-500 hover:bg-gray-100'
+              ? 'sort-switcher__item--active bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:bg-muted/50'
           }`}
         >
           {opt.label}

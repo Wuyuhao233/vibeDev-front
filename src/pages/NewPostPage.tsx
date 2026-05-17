@@ -203,7 +203,7 @@ export default function NewPostPage() {
   // Title character count color
   const titleCountColor =
     title.length === 0 || (title.length >= 5 && title.length <= 100)
-      ? 'text-gray-400'
+      ? 'text-muted-foreground'
       : 'text-red-500';
 
   // No auth
@@ -211,7 +211,7 @@ export default function NewPostPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center py-16">
-          <p className="text-lg text-gray-500">请先登录后再发帖</p>
+          <p className="text-lg text-muted-foreground">请先登录后再发帖</p>
         </div>
       </div>
     );
@@ -229,7 +229,7 @@ export default function NewPostPage() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="输入文章标题..."
               maxLength={100}
-              className={`w-full text-3xl font-bold border-none outline-none bg-transparent text-gray-900 placeholder-gray-300 py-2 ${
+              className={`w-full text-3xl font-bold border-none outline-none bg-transparent text-foreground placeholder:text-muted-foreground py-2 ${
                 errors.title ? 'text-red-500' : ''
               }`}
             />
@@ -340,15 +340,15 @@ export default function NewPostPage() {
           <div className="space-y-4 py-4">
             {/* Board selector */}
             <div>
-              <label className="block text-sm text-gray-700 mb-1">选择版块</label>
+              <label className="block text-sm text-foreground mb-1">选择版块</label>
               <select
                 value={selectedBoardId || ''}
                 onChange={(e) => {
                   setSelectedBoardId(e.target.value || null);
                   setSelectedTags([]);
                 }}
-                className={`h-9 w-full px-3 border rounded-md text-sm bg-white outline-none ${
-                  errors.board ? 'border-red-500' : 'border-gray-200'
+                className={`h-9 w-full px-3 border rounded-md text-sm bg-card outline-none ${
+                  errors.board ? 'border-red-500' : 'border-border'
                 }`}
               >
                 <option value="">请选择版块</option>
@@ -362,7 +362,7 @@ export default function NewPostPage() {
             {/* Tag selector */}
             {currentBoard && (
               <div>
-                <label className="block text-sm text-gray-700 mb-1">选择标签（1-3个）</label>
+                <label className="block text-sm text-foreground mb-1">选择标签（1-3个）</label>
                 <TagSelector
                   tags={availableTags}
                   selected={selectedTags}
@@ -376,13 +376,13 @@ export default function NewPostPage() {
 
             {/* Cover image URL */}
             <div>
-              <label className="block text-sm text-gray-700 mb-1">封面图 URL（可选）</label>
+              <label className="block text-sm text-foreground mb-1">封面图 URL（可选）</label>
               <input
                 type="text"
                 value={coverImageUrl}
                 onChange={(e) => setCoverImageUrl(e.target.value)}
                 placeholder="https://example.com/image.jpg"
-                className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm outline-none focus:border-primary-500"
+                className="w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-primary"
               />
             </div>
           </div>

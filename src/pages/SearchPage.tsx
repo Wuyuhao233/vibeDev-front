@@ -215,7 +215,7 @@ export default function SearchPage() {
           {/* Trending searches sidebar (V1.2) */}
           {trending.length > 0 && (
             <div className="mt-12">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">热门搜索</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">热门搜索</h3>
               <div className="flex flex-wrap gap-2">
                 {trending.map((keyword) => (
                   <button
@@ -224,7 +224,7 @@ export default function SearchPage() {
                       setInputValue(keyword);
                       handleSubmit(keyword);
                     }}
-                    className="inline-flex items-center px-3 py-1.5 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-150"
+                    className="inline-flex items-center px-3 py-1.5 text-sm text-foreground/80 bg-muted/50 hover:bg-muted rounded-full transition-colors duration-150"
                   >
                     {keyword}
                   </button>
@@ -240,13 +240,13 @@ export default function SearchPage() {
               height="64"
               viewBox="0 0 24 24"
               fill="none"
-              className="text-gray-300 mb-4"
+              className="text-muted-foreground mb-4"
             >
               <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
               <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-            <p className="text-base font-medium text-gray-500">请输入关键词搜索</p>
-            <p className="text-sm text-gray-400 mt-1">搜索帖子标题和内容</p>
+            <p className="text-base font-medium text-muted-foreground">请输入关键词搜索</p>
+            <p className="text-sm text-muted-foreground mt-1">搜索帖子标题和内容</p>
           </div>
         </div>
       </div>
@@ -269,15 +269,15 @@ export default function SearchPage() {
         {/* Filter bar: scope + board dropdown */}
         <div className="flex items-center gap-3 mb-6">
           {/* Scope switcher */}
-          <div className="inline-flex border border-gray-200 rounded-md overflow-hidden">
+          <div className="inline-flex border border-border rounded-md overflow-hidden">
             {SCOPE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => handleScopeChange(opt.value)}
-                className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 border-r border-gray-200 last:border-r-0 ${
+                className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 border-r border-border last:border-r-0 ${
                   scope === opt.value
-                    ? 'bg-primary-500 text-white'
-                    : 'text-gray-500 hover:bg-gray-100'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted/50'
                 }`}
               >
                 {opt.label}
@@ -290,7 +290,7 @@ export default function SearchPage() {
             <div className="relative animate-fade-in" ref={boardDropdownRef}>
               <button
                 onClick={() => setBoardDropdownOpen(!boardDropdownOpen)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors duration-150"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-foreground bg-card border border-border rounded-md hover:bg-muted/30 transition-colors duration-150"
               >
                 <span>{selectedBoard ? selectedBoard.name : '选择版块'}</span>
                 <svg
@@ -298,17 +298,17 @@ export default function SearchPage() {
                   height="12"
                   viewBox="0 0 24 24"
                   fill="none"
-                  className={`text-gray-400 transition-transform duration-200 ${boardDropdownOpen ? 'rotate-180' : ''}`}
+                  className={`text-muted-foreground transition-transform duration-200 ${boardDropdownOpen ? 'rotate-180' : ''}`}
                 >
                   <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
               {boardDropdownOpen && (
-                <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-lg shadow-modal border border-gray-200 py-1 z-dropdown animate-fade-in max-h-60 overflow-y-auto">
+                <div className="absolute left-0 top-full mt-1 w-48 bg-card rounded-lg shadow-modal border border-border py-1 z-dropdown animate-fade-in max-h-60 overflow-y-auto">
                   <button
                     onClick={() => handleBoardChange('')}
-                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 transition-colors duration-150 ${
-                      !boardId ? 'text-primary-500 bg-primary-50' : 'text-gray-700'
+                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors duration-150 ${
+                      !boardId ? 'text-primary bg-primary/10' : 'text-foreground'
                     }`}
                   >
                     全部版块
@@ -317,8 +317,8 @@ export default function SearchPage() {
                     <button
                       key={board.id}
                       onClick={() => handleBoardChange(String(board.id))}
-                      className={`w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 transition-colors duration-150 ${
-                        boardId === board.id ? 'text-primary-500 bg-primary-50' : 'text-gray-700'
+                      className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors duration-150 ${
+                        boardId === board.id ? 'text-primary bg-primary/10' : 'text-foreground'
                       }`}
                     >
                       {board.name}
@@ -343,7 +343,7 @@ export default function SearchPage() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="skeleton bg-gray-200 rounded-lg h-24 animate-shimmer"
+                className="skeleton bg-muted rounded-lg h-24 animate-shimmer"
               />
             ))}
           </div>
@@ -357,10 +357,10 @@ export default function SearchPage() {
               <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
             <p className="text-base font-medium text-red-500 mb-2">搜索失败</p>
-            <p className="text-sm text-gray-500 mb-4">{error}</p>
+            <p className="text-sm text-muted-foreground mb-4">{error}</p>
             <button
               onClick={() => doSearch(query, scope, boardId, page)}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
             >
               重试
             </button>
@@ -371,11 +371,11 @@ export default function SearchPage() {
         {!loading && !error && results.length > 0 && (
           <>
             <div className="flex items-center gap-3 mb-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 共 {total} 条结果
               </div>
-              <span className="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-100 rounded-sm px-2 py-0.5">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted/50 rounded-sm px-2 py-0.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                   <path d="M3 4h2l1 8h10l2-14H7" stroke="currentColor" strokeWidth="2" fill="none" />
                   <circle cx="8.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
                   <circle cx="18.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
@@ -383,7 +383,7 @@ export default function SearchPage() {
                 按相关度排序
               </span>
               {searchTime && (
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   搜索耗时 {searchTime}
                 </span>
               )}
@@ -401,7 +401,7 @@ export default function SearchPage() {
               {trending.length > 0 && (
                 <div className="hidden lg:block w-56 flex-shrink-0">
                   <div className="sticky top-20">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3">热门搜索</h4>
+                    <h4 className="text-sm font-semibold text-foreground mb-3">热门搜索</h4>
                     <div className="space-y-1">
                       {trending.slice(0, 8).map((keyword, i) => (
                         <button
@@ -410,9 +410,9 @@ export default function SearchPage() {
                             setInputValue(keyword);
                             handleSubmit(keyword);
                           }}
-                          className="w-full text-left px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded transition-colors duration-150 flex items-center gap-2"
+                          className="w-full text-left px-2 py-1.5 text-sm text-foreground/80 hover:bg-muted/50 rounded transition-colors duration-150 flex items-center gap-2"
                         >
-                          <span className={`flex-shrink-0 w-4 text-xs font-medium ${i < 3 ? 'text-primary-500' : 'text-gray-400'}`}>
+                          <span className={`flex-shrink-0 w-4 text-xs font-medium ${i < 3 ? 'text-primary' : 'text-muted-foreground'}`}>
                             {i + 1}
                           </span>
                           <span className="truncate">{keyword}</span>
@@ -426,8 +426,8 @@ export default function SearchPage() {
 
             {/* Trending on mobile (below results) */}
             {trending.length > 0 && (
-              <div className="lg:hidden mt-8 pt-6 border-t border-gray-200">
-                <h4 className="text-sm font-semibold text-gray-900 mb-3">热门搜索</h4>
+              <div className="lg:hidden mt-8 pt-6 border-t border-border">
+                <h4 className="text-sm font-semibold text-foreground mb-3">热门搜索</h4>
                 <div className="flex flex-wrap gap-2">
                   {trending.map((keyword) => (
                     <button
@@ -436,7 +436,7 @@ export default function SearchPage() {
                         setInputValue(keyword);
                         handleSubmit(keyword);
                       }}
-                      className="inline-flex items-center px-3 py-1.5 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-150"
+                      className="inline-flex items-center px-3 py-1.5 text-sm text-foreground/80 bg-muted/50 hover:bg-muted rounded-full transition-colors duration-150"
                     >
                       {keyword}
                     </button>
@@ -451,21 +451,21 @@ export default function SearchPage() {
                 <button
                   onClick={() => handlePageChange(page - 1)}
                   disabled={page <= 1}
-                  className="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+                  className="px-3 py-1.5 text-sm text-foreground/80 bg-card border border-border rounded-md hover:bg-muted/30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
                 >
                   上一页
                 </button>
                 {generatePages(page, totalPages).map((p, i) =>
                   p === '...' ? (
-                    <span key={`dots-${i}`} className="px-2 text-sm text-gray-400">...</span>
+                    <span key={`dots-${i}`} className="px-2 text-sm text-muted-foreground">...</span>
                   ) : (
                     <button
                       key={p}
                       onClick={() => handlePageChange(p as number)}
                       className={`w-8 h-8 text-sm rounded-md transition-colors duration-150 ${
                         page === p
-                          ? 'bg-primary-500 text-white'
-                          : 'text-gray-600 bg-white border border-gray-200 hover:bg-gray-50'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-foreground/80 bg-card border border-border hover:bg-muted/30'
                       }`}
                     >
                       {p}
@@ -475,11 +475,11 @@ export default function SearchPage() {
                 <button
                   onClick={() => handlePageChange(page + 1)}
                   disabled={page >= totalPages}
-                  className="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+                  className="px-3 py-1.5 text-sm text-foreground/80 bg-card border border-border rounded-md hover:bg-muted/30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
                 >
                   下一页
                 </button>
-                <span className="ml-4 text-sm text-gray-400">
+                <span className="ml-4 text-sm text-muted-foreground">
                   共 {total} 条 / {totalPages} 页
                 </span>
               </div>
@@ -490,12 +490,12 @@ export default function SearchPage() {
         {/* Empty results */}
         {!loading && !error && results.length === 0 && query.trim() && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300 mb-4">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-muted-foreground mb-4">
               <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
               <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-            <p className="text-base font-medium text-gray-500 mb-1">未找到相关内容</p>
-            <p className="text-sm text-gray-400">换个关键词试试</p>
+            <p className="text-base font-medium text-muted-foreground mb-1">未找到相关内容</p>
+            <p className="text-sm text-muted-foreground">换个关键词试试</p>
           </div>
         )}
       </div>
@@ -517,7 +517,7 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
 
   return (
     <article
-      className="post-card bg-white rounded-lg p-4 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+      className="post-card bg-card rounded-lg p-4 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
       onClick={() => {
         window.location.href = `/post/${item.id}`;
       }}
@@ -541,14 +541,14 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
                 精
               </span>
             )}
-            <h3 className="text-lg font-medium text-gray-900 truncate hover:text-primary-500 transition-colors duration-150">
+            <h3 className="text-lg font-medium text-foreground truncate hover:text-primary transition-colors duration-150">
               {titleContent}
             </h3>
           </div>
 
           {/* Excerpt */}
           {excerptContent && (
-            <p className="text-sm text-gray-500 line-clamp-2 mb-2 search-highlight">
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-2 search-highlight">
               {excerptContent}
             </p>
           )}
@@ -559,13 +559,13 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
               {item.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag.id}
-                  className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-gray-500 bg-gray-100"
+                  className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-muted-foreground bg-muted/50"
                 >
                   {tag.name}
                 </span>
               ))}
               {item.tags.length > 3 && (
-                <span className="text-xs text-gray-400">+{item.tags.length - 3}</span>
+                <span className="text-xs text-muted-foreground">+{item.tags.length - 3}</span>
               )}
             </div>
           )}
@@ -577,28 +577,28 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
                 {item.author.avatarUrl && <AvatarImage src={item.author.avatarUrl} alt={item.author.username} />}
                 <AvatarFallback>{item.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
               </Avatar>
-              <span className="text-sm text-gray-500">{item.author.username}</span>
+              <span className="text-sm text-muted-foreground">{item.author.username}</span>
               <LevelBadge level={Math.min(Math.max(item.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6} />
             </div>
-            <RelativeTime date={item.createdAt} className="text-xs text-gray-400" />
+            <RelativeTime date={item.createdAt} className="text-xs text-muted-foreground" />
             {item.boardName && (
-              <span className="text-xs text-gray-400">{item.boardName}</span>
+              <span className="text-xs text-muted-foreground">{item.boardName}</span>
             )}
             <div className="flex items-center gap-3 ml-auto">
-              <span className="inline-flex items-center gap-1 text-xs text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                   <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" fill="none" />
                 </svg>
                 {formatCount(item.likeCount)}
               </span>
-              <span className="inline-flex items-center gap-1 text-xs text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                   <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="2" fill="none" />
                 </svg>
                 {formatCount(item.replyCount)}
               </span>
-              <span className="inline-flex items-center gap-1 text-xs text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" fill="none" />
                 </svg>
                 {formatCount(item.bookmarkCount)}

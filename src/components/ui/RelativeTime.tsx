@@ -24,7 +24,7 @@ export default function RelativeTime({ date, className = '' }: RelativeTimeProps
   }, [date]);
 
   return (
-    <time className={`text-sm text-gray-500 ${className}`} dateTime={typeof date === 'string' ? date : date.toISOString()}>
+    <time className={`text-sm text-muted-foreground ${className}`} dateTime={typeof date === 'string' ? date : date.toISOString()}>
       {text}
     </time>
   );

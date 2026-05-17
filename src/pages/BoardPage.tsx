@@ -160,7 +160,7 @@ export default function BoardPage() {
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                 <path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
@@ -171,7 +171,7 @@ export default function BoardPage() {
           <EmptyContent>
             <Link
               to="/"
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
             >
               返回首页
             </Link>
@@ -196,18 +196,18 @@ export default function BoardPage() {
   if (boardLoading) {
     return (
       <div className="animate-shimmer space-y-4">
-        <div className="h-8 w-48 bg-gray-200 rounded mb-2" />
-        <div className="h-5 w-96 bg-gray-200 rounded mb-6" />
+        <div className="h-8 w-48 bg-muted rounded mb-2" />
+        <div className="h-5 w-96 bg-muted rounded mb-6" />
         <div className="flex flex-col gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg p-4 shadow-card">
-              <div className="w-3/5 h-4 bg-gray-200 rounded mb-3" />
-              <div className="w-full h-3.5 bg-gray-200 rounded mb-2" />
-              <div className="w-3/5 h-3.5 bg-gray-200 rounded mb-4" />
+            <div key={i} className="bg-card rounded-lg p-4 shadow-card">
+              <div className="w-3/5 h-4 bg-muted rounded mb-3" />
+              <div className="w-full h-3.5 bg-muted rounded mb-2" />
+              <div className="w-3/5 h-3.5 bg-muted rounded mb-4" />
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 bg-gray-200 rounded-full" />
-                <div className="w-[60px] h-3.5 bg-gray-200 rounded" />
-                <div className="w-[80px] h-3.5 bg-gray-200 rounded" />
+                <div className="w-7 h-7 bg-muted rounded-full" />
+                <div className="w-[60px] h-3.5 bg-muted rounded" />
+                <div className="w-[80px] h-3.5 bg-muted rounded" />
               </div>
             </div>
           ))}
@@ -220,19 +220,19 @@ export default function BoardPage() {
     <div className="board-content">
       {/* Header */}
       <div className="board-content__header mb-6">
-        <h1 className="board-content__title text-3xl font-bold text-gray-900 mb-1">
+        <h1 className="board-content__title text-3xl font-bold text-foreground mb-1">
           {board?.name || '加载中...'}
         </h1>
         {board?.description && (
-          <p className="text-sm text-gray-500 mb-3">{board.description}</p>
+          <p className="text-sm text-muted-foreground mb-3">{board.description}</p>
         )}
         <div className="board-content__actions flex items-center justify-between">
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-muted-foreground">
             共 {total} 个帖子
           </span>
           <Link
             to="/post/new"
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
           >
             发布新帖
           </Link>
@@ -263,14 +263,14 @@ export default function BoardPage() {
       {postsLoading ? (
         <div className="post-list__skeleton flex flex-col gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg p-4 shadow-card animate-shimmer">
-              <div className="w-3/5 h-4 bg-gray-200 rounded mb-3" />
-              <div className="w-full h-3.5 bg-gray-200 rounded mb-2" />
-              <div className="w-3/5 h-3.5 bg-gray-200 rounded mb-4" />
+            <div key={i} className="bg-card rounded-lg p-4 shadow-card animate-shimmer">
+              <div className="w-3/5 h-4 bg-muted rounded mb-3" />
+              <div className="w-full h-3.5 bg-muted rounded mb-2" />
+              <div className="w-3/5 h-3.5 bg-muted rounded mb-4" />
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 bg-gray-200 rounded-full" />
-                <div className="w-[60px] h-3.5 bg-gray-200 rounded" />
-                <div className="w-[80px] h-3.5 bg-gray-200 rounded" />
+                <div className="w-7 h-7 bg-muted rounded-full" />
+                <div className="w-[60px] h-3.5 bg-muted rounded" />
+                <div className="w-[80px] h-3.5 bg-muted rounded" />
               </div>
             </div>
           ))}
@@ -286,7 +286,7 @@ export default function BoardPage() {
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
-                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="text-gray-300">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="text-muted-foreground">
                   <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" strokeWidth="2" />
                   <path d="M20 28h24M20 36h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
@@ -296,7 +296,7 @@ export default function BoardPage() {
             <EmptyContent>
               <button
                 onClick={() => handleTagChange(null)}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-500 bg-white border border-primary-500 rounded-md hover:bg-primary-50 transition-colors duration-150"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary bg-card border border-primary rounded-md hover:bg-primary/10 transition-colors duration-150"
               >
                 返回全部
               </button>
@@ -310,7 +310,7 @@ export default function BoardPage() {
             <EmptyContent>
               <Link
                 to="/post/new"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-colors duration-150"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
               >
                 发布第一个帖子
               </Link>

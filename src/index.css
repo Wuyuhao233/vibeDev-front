@@ -567,10 +567,14 @@ body {
 /* Search keyword highlighting */
 .search-highlight mark,
 mark.search-highlight {
-  background: #FFF3CD;
-  color: #333;
+  background: oklch(0.9 0.08 95);
+  color: var(--foreground);
   border-radius: 2px;
   padding: 0 1px;
+}
+.dark .search-highlight mark,
+.dark mark.search-highlight {
+  background: oklch(0.35 0.08 95);
 }
 
 /* New Post editor page: full-height ByteMD */

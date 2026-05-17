@@ -16,13 +16,13 @@ export default function FolderTabs({
   onNewFolder,
 }: FolderTabsProps) {
   return (
-    <div className="flex gap-2 mb-6 border-b border-gray-200 pb-0 overflow-x-auto items-center">
+    <div className="flex gap-2 mb-6 border-b border-border pb-0 overflow-x-auto items-center">
       <button
         onClick={() => onFolderChange(null)}
         className={`pb-2.5 px-1 text-sm font-medium border-b-2 transition-colors duration-150 whitespace-nowrap ${
           selectedFolderId === null
-            ? 'border-primary-500 text-primary-500'
-            : 'border-transparent text-gray-500 hover:text-gray-700'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
         }`}
       >
         全部收藏
@@ -33,18 +33,18 @@ export default function FolderTabs({
           onClick={() => onFolderChange(folder.id)}
           className={`pb-2.5 px-1 text-sm font-medium border-b-2 transition-colors duration-150 whitespace-nowrap ${
             selectedFolderId === folder.id
-              ? 'border-primary-500 text-primary-500'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           {folder.name}
-          <span className="ml-1 text-xs text-gray-400">({folder.itemCount})</span>
+          <span className="ml-1 text-xs text-muted-foreground">({folder.itemCount})</span>
         </button>
       ))}
       {showNewButton && (
         <button
           onClick={onNewFolder}
-          className="pb-2.5 px-2 text-sm text-primary-500 hover:text-primary-600 transition-colors duration-150 whitespace-nowrap"
+          className="pb-2.5 px-2 text-sm text-primary hover:text-primary transition-colors duration-150 whitespace-nowrap"
         >
           + 新建
         </button>

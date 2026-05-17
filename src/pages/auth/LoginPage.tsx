@@ -149,7 +149,7 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-md mx-auto mt-16">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8 text-center">登录</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-8 text-center">登录</h1>
 
       {lockedUntil ? (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center">
@@ -162,22 +162,22 @@ export default function LoginPage() {
             剩余解锁时间：{formatTime(cooldown)}
           </p>
           <div className="flex justify-center gap-3">
-            <Link to="/forgot-password" className="text-sm text-primary-500 hover:underline">
+            <Link to="/forgot-password" className="text-sm text-primary hover:underline">
               忘记密码？
             </Link>
-            <Link to="/" className="text-sm text-gray-500 hover:underline">
+            <Link to="/" className="text-sm text-muted-foreground hover:underline">
               返回首页
             </Link>
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-card p-6">
+        <form onSubmit={handleSubmit} className="bg-card rounded-lg shadow-card p-6">
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600">
               {error}
               {error.includes('未激活') && (
                 <div className="mt-2">
-                  <Link to="/register" className="text-primary-500 hover:underline text-sm">
+                  <Link to="/register" className="text-primary hover:underline text-sm">
                     重新注册
                   </Link>
                 </div>
@@ -209,7 +209,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 text-sm"
+                className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground/80 text-sm"
                 tabIndex={-1}
               >
                 {showPassword ? '隐藏' : '显示'}
@@ -222,13 +222,13 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                 />
-                <span className="text-sm text-gray-600">记住我</span>
+                <span className="text-sm text-foreground/80">记住我</span>
               </label>
               <Link
                 to="/forgot-password"
-                className="text-sm text-primary-500 hover:underline"
+                className="text-sm text-primary hover:underline"
               >
                 忘记密码？
               </Link>
@@ -244,23 +244,23 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
             还没有账号？
-            <Link to="/register" className="text-primary-500 hover:underline ml-1">
+            <Link to="/register" className="text-primary hover:underline ml-1">
               注册
             </Link>
           </div>
 
           <div className="mt-4 flex items-center gap-3">
-            <div className="flex-1 border-t border-gray-200" />
-            <span className="text-xs text-gray-400">或</span>
-            <div className="flex-1 border-t border-gray-200" />
+            <div className="flex-1 border-t border-border" />
+            <span className="text-xs text-muted-foreground">或</span>
+            <div className="flex-1 border-t border-border" />
           </div>
 
           <div className="mt-4">
             {casLoading ? (
-              <div className="text-center text-sm text-gray-500">
-                <span className="inline-block animate-spin-slow w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full mr-2 align-middle" />
+              <div className="text-center text-sm text-muted-foreground">
+                <span className="inline-block animate-spin-slow w-4 h-4 border-2 border-primary border-t-transparent rounded-full mr-2 align-middle" />
                 CAS 登录中...
               </div>
             ) : (

@@ -145,7 +145,7 @@ export default function AdminSensitiveWords() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">敏感词库</h1>
+        <h1 className="text-2xl font-bold text-foreground">敏感词库</h1>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => fileRef.current?.click()} disabled={importing}>
             {importing ? '导入中...' : '批量导入'}
@@ -159,7 +159,7 @@ export default function AdminSensitiveWords() {
         <select
           value={enabledFilter === '' ? '' : String(enabledFilter)}
           onChange={(e) => { setEnabledFilter(e.target.value === '' ? '' : e.target.value === 'true'); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部状态</option>
           <option value="true">已启用</option>
@@ -168,7 +168,7 @@ export default function AdminSensitiveWords() {
         <select
           value={categoryFilter}
           onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部分类</option>
           <option value="通用">通用</option>
@@ -182,7 +182,7 @@ export default function AdminSensitiveWords() {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
-          <span className="ml-3 text-gray-500">加载中...</span>
+          <span className="ml-3 text-muted-foreground">加载中...</span>
         </div>
       ) : error ? (
         <ErrorEmpty description={error} onRetry={fetchWords} />
@@ -195,21 +195,21 @@ export default function AdminSensitiveWords() {
                 </Empty>
       ) : (
         <>
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/30 border-b border-border">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">敏感词</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">分类</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">状态</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">操作</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">敏感词</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">分类</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">状态</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {words.map((w) => (
-                  <tr key={w.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-900 font-medium">{w.word}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{w.category}</td>
+                  <tr key={w.id} className="border-b border-border hover:bg-muted/30">
+                    <td className="px-4 py-3 text-sm text-foreground font-medium">{w.word}</td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">{w.category}</td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => handleToggle(w)}
@@ -217,13 +217,13 @@ export default function AdminSensitiveWords() {
                         style={{ backgroundColor: w.enabled ? '#3b82f6' : '#d1d5db' }}
                       >
                         <span
-                          className="inline-block w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform duration-150"
+                          className="inline-block w-3.5 h-3.5 rounded-full bg-card shadow-sm transition-transform duration-150"
                           style={{ transform: w.enabled ? 'translateX(18px)' : 'translateX(4px)' }}
                         />
                       </button>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button onClick={() => openEdit(w)} className="text-xs text-primary-500 hover:text-primary-600 mr-3">
+                      <button onClick={() => openEdit(w)} className="text-xs text-primary hover:text-primary mr-3">
                         编辑
                       </button>
                       <button onClick={() => handleDelete(w)} className="text-xs text-red-500 hover:text-red-600">
@@ -248,7 +248,7 @@ export default function AdminSensitiveWords() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">敏感词</label>
+              <label className="block text-sm text-foreground mb-1">敏感词</label>
               <Input
                 value={wordForm.word}
                 onChange={(e) => setWordForm((f) => ({ ...f, word: e.target.value }))}
@@ -256,11 +256,11 @@ export default function AdminSensitiveWords() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">分类</label>
+              <label className="block text-sm text-foreground mb-1">分类</label>
               <select
                 value={wordForm.category}
                 onChange={(e) => setWordForm((f) => ({ ...f, category: e.target.value }))}
-                className="h-9 w-full px-3 border border-gray-200 rounded-md text-sm bg-white"
+                className="h-9 w-full px-3 border border-border rounded-md text-sm bg-card"
               >
                 <option value="通用">通用</option>
                 <option value="政治">政治</option>

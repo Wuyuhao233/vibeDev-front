@@ -43,8 +43,8 @@ export default function CollectionList({
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin-slow" />
-          <span className="ml-2 text-sm text-gray-400">加载中...</span>
+          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin-slow" />
+          <span className="ml-2 text-sm text-muted-foreground">加载中...</span>
         </div>
       ) : error ? (
         <ErrorEmpty description={error} onRetry={onRetry} />
@@ -56,7 +56,7 @@ export default function CollectionList({
           </EmptyHeader>
         </Empty>
       ) : (
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border">
           {items.map((item) => {
             const isSelected = selectedIds?.has(item.postId) ?? false;
             return (
@@ -67,21 +67,21 @@ export default function CollectionList({
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => onToggleSelect?.(item.postId)}
-                      className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                      className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
                     />
                   </label>
                 )}
                 <div className="flex-1 min-w-0">
                   <a
                     href={`/post/${item.postId}`}
-                    className="text-sm text-gray-900 hover:text-primary-500 transition-colors duration-150"
+                    className="text-sm text-foreground hover:text-primary transition-colors duration-150"
                   >
                     {item.postTitle}
                   </a>
                   {item.boardName && (
-                    <span className="ml-2 text-xs text-gray-400">{item.boardName}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">{item.boardName}</span>
                   )}
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-muted-foreground mt-1">
                     {new Date(item.collectedAt).toLocaleDateString('zh-CN')}
                   </div>
                 </div>

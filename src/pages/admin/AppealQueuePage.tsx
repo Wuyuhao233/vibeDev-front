@@ -72,7 +72,7 @@ export default function AppealQueuePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">申诉复审</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">申诉复审</h1>
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-4">
@@ -86,8 +86,8 @@ export default function AppealQueuePage() {
             onClick={() => { setStatusFilter(tab.value); setPage(1); }}
             className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
               statusFilter === tab.value
-                ? 'bg-primary-50 text-primary-500 font-medium'
-                : 'text-gray-500 hover:bg-gray-100'
+                ? 'bg-primary/10 text-primary font-medium'
+                : 'text-muted-foreground hover:bg-muted/50'
             }`}
           >
             {tab.label}
@@ -98,47 +98,47 @@ export default function AppealQueuePage() {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
-          <span className="ml-3 text-gray-500">加载中...</span>
+          <span className="ml-3 text-muted-foreground">加载中...</span>
         </div>
       ) : error ? (
         <ErrorEmpty description={error} onRetry={fetchData} />
       ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-          <p className="text-base font-medium text-gray-500">暂无申诉记录</p>
+        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+          <p className="text-base font-medium text-muted-foreground">暂无申诉记录</p>
           <p className="text-sm mt-1">
             {statusFilter === 'pending' ? '当前没有待处理的申诉' : `当前没有${statusFilter === 'approved' ? '已通过' : '已驳回'}的申诉`}
           </p>
         </div>
       ) : (
         <>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+          <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-muted/30 border-b border-border">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">申诉原因</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-24">关联举报</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-20">状态</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-32">提交时间</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">申诉原因</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-24">关联举报</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-20">状态</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-32">提交时间</th>
                     {statusFilter === 'pending' && (
-                      <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-40">操作</th>
+                      <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-40">操作</th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-border">
                   {items.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
+                    <tr key={item.id} className="hover:bg-muted/30">
                       <td className="px-4 py-3">
-                        <p className="text-gray-900 truncate max-w-md">{item.reason}</p>
+                        <p className="text-foreground truncate max-w-md">{item.reason}</p>
                         {item.handlerNote && (
-                          <p className="text-gray-400 text-xs mt-0.5">处理备注: {item.handlerNote}</p>
+                          <p className="text-muted-foreground text-xs mt-0.5">处理备注: {item.handlerNote}</p>
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-gray-500 font-mono text-xs">{item.reportId}</span>
+                        <span className="text-muted-foreground font-mono text-xs">{item.reportId}</span>
                       </td>
                       <td className="px-4 py-3">{statusBadge(item.status)}</td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">
+                      <td className="px-4 py-3 text-muted-foreground text-xs">
                         {item.createdAt
                           ? new Date(item.createdAt).toLocaleString('zh-CN', {
                               month: '2-digit',
@@ -192,24 +192,24 @@ export default function AppealQueuePage() {
       {rejectId && (
         <div className="fixed inset-0 z-30 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setRejectId(null)} />
-          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6 z-40">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">驳回申诉</h2>
-            <label className="block text-sm text-gray-600 mb-2">
+          <div className="relative bg-card rounded-lg shadow-xl w-full max-w-md p-6 z-40">
+            <h2 className="text-lg font-semibold text-foreground mb-4">驳回申诉</h2>
+            <label className="block text-sm text-foreground/80 mb-2">
               驳回说明 <span className="text-red-500">*</span>
             </label>
             <textarea
               value={rejectNote}
               onChange={(e) => setRejectNote(e.target.value)}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+              className="w-full border border-border rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               rows={3}
               placeholder="请输入驳回说明（至少 5 个字符）"
               maxLength={500}
             />
-            <p className="text-xs text-gray-400 mt-1 text-right">{rejectNote.length}/500</p>
+            <p className="text-xs text-muted-foreground mt-1 text-right">{rejectNote.length}/500</p>
             <div className="flex justify-end gap-3 mt-4">
               <button
                 onClick={() => { setRejectId(null); setRejectNote(''); }}
-                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                className="px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
               >
                 取消
               </button>

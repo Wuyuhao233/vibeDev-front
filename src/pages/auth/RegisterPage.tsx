@@ -224,9 +224,9 @@ export default function RegisterPage() {
 
   return (
     <div className="max-w-md mx-auto mt-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8 text-center">注册</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-8 text-center">注册</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-card p-6">
+      <form onSubmit={handleSubmit} className="bg-card rounded-lg shadow-card p-6">
         {globalError && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600">
             {globalError}
@@ -299,7 +299,7 @@ export default function RegisterPage() {
               autoComplete="username"
             />
             {checkingUsername && (
-              <p className="text-xs text-gray-400 mt-1">检查中...</p>
+              <p className="text-xs text-muted-foreground mt-1">检查中...</p>
             )}
             {!checkingUsername && usernameAvailable && !usernameError && (
               <p className="text-xs text-emerald-500 mt-1">用户名可用</p>
@@ -325,7 +325,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 text-sm"
+                className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground/80 text-sm"
                 tabIndex={-1}
               >
                 {showPassword ? '隐藏' : '显示'}
@@ -334,9 +334,9 @@ export default function RegisterPage() {
             {password && !passwordError && (
               <div className="mt-2">
                 <div className="flex gap-1 mb-1">
-                  <div className={`h-1 flex-1 rounded ${strength.level >= 1 ? strength.color : 'bg-gray-200'}`} />
-                  <div className={`h-1 flex-1 rounded ${strength.level >= 2 ? strength.color : 'bg-gray-200'}`} />
-                  <div className={`h-1 flex-1 rounded ${strength.level >= 3 ? strength.color : 'bg-gray-200'}`} />
+                  <div className={`h-1 flex-1 rounded ${strength.level >= 1 ? strength.color : 'bg-muted'}`} />
+                  <div className={`h-1 flex-1 rounded ${strength.level >= 2 ? strength.color : 'bg-muted'}`} />
+                  <div className={`h-1 flex-1 rounded ${strength.level >= 3 ? strength.color : 'bg-muted'}`} />
                 </div>
                 <p className={`text-xs ${strength.level >= 3 ? 'text-emerald-500' : strength.level === 2 ? 'text-amber-500' : 'text-red-500'}`}>
                   密码强度：{strength.label}
@@ -364,9 +364,9 @@ export default function RegisterPage() {
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+              className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
             />
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-foreground/80">
               我已阅读并同意用户协议和隐私政策
             </span>
           </label>
@@ -381,9 +381,9 @@ export default function RegisterPage() {
           </Button>
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
           已有账号？
-          <Link to="/login" className="text-primary-500 hover:underline ml-1">
+          <Link to="/login" className="text-primary hover:underline ml-1">
             登录
           </Link>
         </div>

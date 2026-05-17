@@ -97,13 +97,13 @@ export default function ReportsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">举报管理</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">举报管理</h1>
 
       <div className="flex items-center gap-3 mb-4">
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部状态</option>
           <option value="pending">待处理</option>
@@ -112,7 +112,7 @@ export default function ReportsPage() {
         <select
           value={typeFilter}
           onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部类型</option>
           <option value="post">帖子</option>
@@ -121,7 +121,7 @@ export default function ReportsPage() {
         <select
           value={boardIdFilter}
           onChange={(e) => { setBoardIdFilter(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部版块</option>
           {boards.map((b) => (
@@ -133,7 +133,7 @@ export default function ReportsPage() {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
-          <span className="ml-3 text-gray-500">加载中...</span>
+          <span className="ml-3 text-muted-foreground">加载中...</span>
         </div>
       ) : error ? (
         <ErrorEmpty description={error} onRetry={fetchReports} />
@@ -146,22 +146,22 @@ export default function ReportsPage() {
                 </Empty>
       ) : (
         <>
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/30 border-b border-border">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">类型</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">原因</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">举报人</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">版块</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">状态</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">时间</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">操作</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">类型</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">原因</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">举报人</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">版块</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">状态</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">时间</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {reports.map((r) => (
-                  <tr key={r.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <tr key={r.id} className="border-b border-border hover:bg-muted/30">
                     <td className="px-4 py-3">
                       <span className={`text-xs px-1.5 py-0.5 rounded ${
                         r.type === 'post' ? 'bg-blue-50 text-blue-500' : 'bg-purple-50 text-purple-500'
@@ -169,33 +169,33 @@ export default function ReportsPage() {
                         {r.type === 'post' ? '帖子' : '回复'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">{r.reason}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{r.reporter.username}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{r.boardName || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-foreground max-w-xs truncate">{r.reason}</td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">{r.reporter.username}</td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">{r.boardName || '-'}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${
                         r.status === 'pending'
                           ? 'bg-amber-50 text-amber-600'
-                          : 'bg-gray-100 text-gray-400'
+                          : 'bg-muted/50 text-muted-foreground'
                       }`}>
                         {r.status === 'pending' ? '待处理' : '已处理'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-400">
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
                       {new Date(r.createdAt).toLocaleDateString('zh-CN')}
                     </td>
                     <td className="px-4 py-3 text-right">
                       {r.status === 'pending' && (
                         <button
                           onClick={() => setQuickTarget(r)}
-                          className="text-xs text-primary-500 hover:text-primary-600 mr-2"
+                          className="text-xs text-primary hover:text-primary mr-2"
                         >
                           处理
                         </button>
                       )}
                       <button
                         onClick={() => openDetail(r.id)}
-                        className="text-xs text-gray-500 hover:text-gray-700"
+                        className="text-xs text-muted-foreground hover:text-foreground"
                       >
                         详情
                       </button>
@@ -219,11 +219,11 @@ export default function ReportsPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">处理方式</label>
+              <label className="block text-sm text-foreground mb-1">处理方式</label>
               <select
                 value={quickAction}
                 onChange={(e) => setQuickAction(e.target.value as any)}
-                className="h-9 w-full px-3 border border-gray-200 rounded-md text-sm bg-white"
+                className="h-9 w-full px-3 border border-border rounded-md text-sm bg-card"
               >
                 <option value="ignore">忽略</option>
                 <option value="warn">警告</option>
@@ -232,11 +232,11 @@ export default function ReportsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">处理说明 <span className="text-red-500">*</span></label>
+              <label className="block text-sm text-foreground mb-1">处理说明 <span className="text-red-500">*</span></label>
               <textarea
                 value={quickNote}
                 onChange={(e) => setQuickNote(e.target.value)}
-                className="w-full h-24 px-3 py-2 border border-gray-200 rounded-md text-sm resize-none focus:outline-none focus:border-primary-500"
+                className="w-full h-24 px-3 py-2 border border-border rounded-md text-sm resize-none focus:outline-none focus:border-primary"
                 placeholder="请填写处理说明..."
               />
             </div>

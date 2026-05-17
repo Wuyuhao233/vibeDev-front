@@ -86,9 +86,9 @@ export default function ReviewQueuePage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">AI 审核队列</h1>
+        <h1 className="text-2xl font-bold text-foreground">AI 审核队列</h1>
         {stats && (
-          <div className="flex gap-4 text-xs text-gray-500">
+          <div className="flex gap-4 text-xs text-muted-foreground">
             <span>待处理: <strong className="text-amber-500">{stats.pendingCount}</strong></span>
             <span>今日放行: <strong className="text-emerald-500">{stats.todayApproved}</strong></span>
             <span>今日驳回: <strong className="text-red-500">{stats.todayRejected}</strong></span>
@@ -108,8 +108,8 @@ export default function ReviewQueuePage() {
             onClick={() => { setStatusFilter(tab.value); setPage(1); }}
             className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
               statusFilter === tab.value
-                ? 'bg-primary-50 text-primary-500 font-medium'
-                : 'text-gray-500 hover:bg-gray-100'
+                ? 'bg-primary/10 text-primary font-medium'
+                : 'text-muted-foreground hover:bg-muted/50'
             }`}
           >
             {tab.label}
@@ -120,38 +120,38 @@ export default function ReviewQueuePage() {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
-          <span className="ml-3 text-gray-500">加载中...</span>
+          <span className="ml-3 text-muted-foreground">加载中...</span>
         </div>
       ) : error ? (
         <ErrorEmpty description={error} onRetry={fetchData} />
       ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-          <p className="text-base font-medium text-gray-500">暂无审核内容</p>
+        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+          <p className="text-base font-medium text-muted-foreground">暂无审核内容</p>
           <p className="text-sm mt-1">当前没有需要人工复审的内容</p>
         </div>
       ) : (
         <>
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+          <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-muted/30 border-b border-border">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">内容</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-20">作者</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-20">AI 评分</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-20">类别</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-32">提交时间</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 w-40">操作</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">内容</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-20">作者</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-20">AI 评分</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-20">类别</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-32">提交时间</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-40">操作</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-border">
                   {items.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
+                    <tr key={item.id} className="hover:bg-muted/30">
                       <td className="px-4 py-3">
-                        <p className="text-gray-900 font-medium truncate max-w-xs">{item.targetTitle}</p>
-                        <p className="text-gray-400 text-xs mt-0.5 truncate max-w-xs">{item.contentExcerpt}</p>
+                        <p className="text-foreground font-medium truncate max-w-xs">{item.targetTitle}</p>
+                        <p className="text-muted-foreground text-xs mt-0.5 truncate max-w-xs">{item.contentExcerpt}</p>
                         {item.boardName && (
-                          <span className="inline-block mt-1 text-xs text-gray-400 bg-gray-100 rounded px-1.5 py-0.5">
+                          <span className="inline-block mt-1 text-xs text-muted-foreground bg-muted/50 rounded px-1.5 py-0.5">
                             {item.boardName}
                           </span>
                         )}
@@ -161,16 +161,16 @@ export default function ReviewQueuePage() {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{item.author.username}</td>
+                      <td className="px-4 py-3 text-foreground/80">{item.author.username}</td>
                       <td className="px-4 py-3">
                         <span className={`font-semibold ${getScoreColor(item.aiScore)}`}>
                           {item.aiScore}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-gray-600">{getCategoryLabel(item.aiCategory)}</span>
+                        <span className="text-foreground/80">{getCategoryLabel(item.aiCategory)}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">
+                      <td className="px-4 py-3 text-muted-foreground text-xs">
                         {item.createdAt ? new Date(item.createdAt).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-'}
                       </td>
                       <td className="px-4 py-3">
@@ -221,24 +221,24 @@ export default function ReviewQueuePage() {
       {rejectId && (
         <div className="fixed inset-0 z-30 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setRejectId(null)} />
-          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6 z-40">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">驳回审核</h2>
-            <label className="block text-sm text-gray-600 mb-2">
+          <div className="relative bg-card rounded-lg shadow-xl w-full max-w-md p-6 z-40">
+            <h2 className="text-lg font-semibold text-foreground mb-4">驳回审核</h2>
+            <label className="block text-sm text-foreground/80 mb-2">
               驳回原因 <span className="text-red-500">*</span>
             </label>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+              className="w-full border border-border rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               rows={3}
               placeholder="请输入驳回原因（至少 5 个字符）"
               maxLength={500}
             />
-            <p className="text-xs text-gray-400 mt-1 text-right">{rejectReason.length}/500</p>
+            <p className="text-xs text-muted-foreground mt-1 text-right">{rejectReason.length}/500</p>
             <div className="flex justify-end gap-3 mt-4">
               <button
                 onClick={() => { setRejectId(null); setRejectReason(''); }}
-                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                className="px-4 py-2 text-sm text-foreground/80 hover:bg-muted/50 rounded-md transition-colors"
               >
                 取消
               </button>

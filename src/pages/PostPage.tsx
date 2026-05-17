@@ -251,7 +251,7 @@ export default function PostPage() {
     return (
       <Empty>
         <EmptyHeader>
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
             <path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
@@ -260,7 +260,7 @@ export default function PostPage() {
         <EmptyContent>
           <Link
             to="/"
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-md hover:bg-primary-600"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90"
           >
             返回首页
           </Link>
@@ -315,9 +315,9 @@ export default function PostPage() {
       )}
 
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
         {post.boardName && (
-          <Link to={`/board/${post.boardId}`} className="hover:text-primary-500">
+          <Link to={`/board/${post.boardId}`} className="hover:text-primary">
             {post.boardName}
           </Link>
         )}
@@ -344,11 +344,11 @@ export default function PostPage() {
           </Avatar>
         </Link>
         <div>
-          <Link to={`/u/${post.author.username}`} className="text-base font-medium text-gray-900 hover:text-primary-500">
+          <Link to={`/u/${post.author.username}`} className="text-base font-medium text-foreground hover:text-primary">
             {post.author.username}
           </Link>
           <LevelBadge level={level} className="ml-2" />
-          <div className="text-sm text-gray-400 mt-0.5">
+          <div className="text-sm text-muted-foreground mt-0.5">
             发布于 {formatRelativeTime(post.createdAt)}
             {post.lastEditedAt && (
               <span> · 最后编辑于 {formatRelativeTime(post.lastEditedAt)}</span>
@@ -359,7 +359,7 @@ export default function PostPage() {
 
       {/* Title + Badges */}
       <div className="flex items-center gap-2 mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">{post.title}</h1>
+        <h1 className="text-3xl font-bold text-foreground">{post.title}</h1>
         {post.isPinned && (
           <span className="inline-flex items-center rounded-sm px-1.5 py-px text-[11px] font-medium text-blue-500 bg-blue-50 flex-shrink-0">
             置顶
@@ -384,10 +384,10 @@ export default function PostPage() {
 
       {/* Content */}
       <div
-        className={`prose max-w-none mb-6 prose-headings:text-gray-900 prose-a:text-primary-500 prose-code:text-sm prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-lg prose-img:max-w-full prose-blockquote:border-l-primary-500 prose-blockquote:text-gray-500 prose-table:border prose-th:bg-gray-50 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 ${
+        className={`prose max-w-none mb-6 prose-headings:text-foreground prose-a:text-primary prose-code:text-sm prose-code:bg-muted/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-foreground prose-pre:text-background prose-img:rounded-lg prose-img:max-w-full prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-table:border prose-th:bg-muted/30 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 ${
           post.auditStatus === 'REJECTED'
-            ? 'text-gray-400 line-through prose-p:text-gray-400'
-            : 'prose-p:text-gray-700 prose-p:leading-relaxed'
+            ? 'text-muted-foreground line-through prose-p:text-muted-foreground'
+            : 'prose-p:text-foreground prose-p:leading-relaxed'
         }`}
       >
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -398,12 +398,12 @@ export default function PostPage() {
       {/* Tags */}
       {post.tags.length > 0 && (
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-sm text-gray-400">标签：</span>
+          <span className="text-sm text-muted-foreground">标签：</span>
           {post.tags.map((tag) => (
             <Link
               key={tag.id}
               to={`/board/${post.boardId}?tag=${tag.id}`}
-              className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors duration-150"
+              className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-muted-foreground bg-muted/50 hover:bg-muted transition-colors duration-150"
             >
               {tag.name}
             </Link>
@@ -412,7 +412,7 @@ export default function PostPage() {
       )}
 
       {/* Action bar */}
-      <div className="flex items-center gap-6 py-4 border-t border-gray-100">
+      <div className="flex items-center gap-6 py-4 border-t border-border">
         {isAuthenticated ? (
           <>
             <LikeButton
@@ -445,13 +445,13 @@ export default function PostPage() {
           </>
         ) : (
           <>
-            <span className="inline-flex items-center gap-1 text-sm text-gray-400">
+            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" />
               </svg>
               {post.likeCount}
             </span>
-            <span className="inline-flex items-center gap-1 text-sm text-gray-400">
+            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" />
               </svg>
@@ -466,25 +466,25 @@ export default function PostPage() {
         {isAuthenticated && !isAuthor && (
           <button
             onClick={() => setReportOpen(true)}
-            className="text-sm text-gray-400 hover:text-red-500 transition-colors duration-150"
+            className="text-sm text-muted-foreground hover:text-red-500 transition-colors duration-150"
           >
             举报
           </button>
         )}
 
         {/* Stats */}
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-muted-foreground">
           {post.shareCount} 次分享 · {post.replyCount} 条回复
         </span>
       </div>
 
       {/* Mod/Admin action bar */}
       {canManage && (
-        <div className="flex items-center gap-3 py-3 border-t border-gray-100">
+        <div className="flex items-center gap-3 py-3 border-t border-border">
           {isAuthor && (
             <button
               onClick={() => setEditing(true)}
-              className="text-sm text-gray-500 hover:text-primary-500 transition-colors duration-150"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors duration-150"
             >
               编辑
             </button>
@@ -497,7 +497,7 @@ export default function PostPage() {
                 className={`text-sm transition-colors duration-150 ${
                   post.isEssence
                     ? 'text-essence font-medium'
-                    : 'text-gray-500 hover:text-essence'
+                    : 'text-muted-foreground hover:text-essence'
                 }`}
               >
                 {essenceLoading ? '处理中...' : post.isEssence ? '已加精' : '加精'}
@@ -506,14 +506,14 @@ export default function PostPage() {
                 onClick={() => setPinOpen(!pinOpen)}
                 disabled={pinLoading}
                 className={`text-sm transition-colors duration-150 ${
-                  post.isPinned ? 'text-blue-500 font-medium' : 'text-gray-500 hover:text-blue-500'
+                  post.isPinned ? 'text-blue-500 font-medium' : 'text-muted-foreground hover:text-blue-500'
                 }`}
               >
                 {pinLoading ? '处理中...' : post.isPinned ? '已置顶' : '置顶'}
               </button>
               <button
                 onClick={() => setDeleteOpen(true)}
-                className="text-sm text-gray-500 hover:text-red-500 transition-colors duration-150"
+                className="text-sm text-muted-foreground hover:text-red-500 transition-colors duration-150"
               >
                 删除
               </button>
@@ -540,7 +540,7 @@ export default function PostPage() {
           </button>
           <button
             onClick={() => setPinOpen(false)}
-            className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700"
+            className="px-3 py-1 text-sm text-muted-foreground hover:text-foreground"
           >
             取消
           </button>
@@ -548,7 +548,7 @@ export default function PostPage() {
       )}
 
       {/* Replies section */}
-      <div className="mt-8 pt-6 border-t border-gray-200">
+      <div className="mt-8 pt-6 border-t border-border">
         <ReplyTree
           replies={replies}
           total={repliesTotal}
@@ -568,8 +568,8 @@ export default function PostPage() {
 
         {/* Quick reply — disabled for PENDING, hidden for REJECTED */}
         {post.auditStatus === 'PENDING' && isAuthor ? (
-          <div className="border-t border-gray-100 pt-4 mt-4">
-            <p className="text-sm text-gray-400 text-center py-4 bg-gray-50 rounded-lg">
+          <div className="border-t border-border pt-4 mt-4">
+            <p className="text-sm text-muted-foreground text-center py-4 bg-muted/30 rounded-lg">
               审核中的内容暂不支持回复
             </p>
           </div>
@@ -592,13 +592,13 @@ export default function PostPage() {
             <QuickReply onSubmit={handleReplySubmit} />
           </div>
         ) : (
-          <div className="border-t border-gray-100 pt-4 mt-4">
-            <div className="flex items-center justify-center gap-2 py-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
-              <Link to="/login" className="text-primary-500 hover:text-primary-600 font-medium">
+          <div className="border-t border-border pt-4 mt-4">
+            <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground bg-muted/30 rounded-lg">
+              <Link to="/login" className="text-primary hover:text-primary font-medium">
                 登录
               </Link>
               <span>后参与讨论</span>
-              <Link to="/register" className="text-primary-500 hover:text-primary-600 font-medium">
+              <Link to="/register" className="text-primary hover:text-primary font-medium">
                 注册
               </Link>
             </div>

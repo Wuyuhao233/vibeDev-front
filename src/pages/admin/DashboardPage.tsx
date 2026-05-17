@@ -40,7 +40,7 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center py-16">
         <Spinner size="lg" />
-        <span className="ml-3 text-gray-500">加载中...</span>
+        <span className="ml-3 text-muted-foreground">加载中...</span>
       </div>
     );
   }
@@ -51,12 +51,12 @@ export default function DashboardPage() {
 
   const cards = stats
     ? [
-        { label: '今日新增用户', value: stats.todayUsers, color: 'text-primary-500' },
+        { label: '今日新增用户', value: stats.todayUsers, color: 'text-primary' },
         { label: '今日新增帖子', value: stats.todayPosts, color: 'text-emerald-500' },
         { label: '当前在线', value: stats.onlineUsers, color: 'text-amber-500' },
-        { label: '用户总数', value: stats.totalUsers, color: 'text-gray-700' },
-        { label: '帖子总数', value: stats.totalPosts, color: 'text-gray-700' },
-        { label: '回复总数', value: stats.totalReplies, color: 'text-gray-700' },
+        { label: '用户总数', value: stats.totalUsers, color: 'text-foreground' },
+        { label: '帖子总数', value: stats.totalPosts, color: 'text-foreground' },
+        { label: '回复总数', value: stats.totalReplies, color: 'text-foreground' },
         { label: '待审核', value: stats.pendingAudits, color: 'text-orange-500' },
         { label: '待处理举报', value: stats.pendingReports, color: 'text-red-500' },
       ]
@@ -67,8 +67,8 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">仪表盘</h1>
-        <span className="text-xs text-gray-400">每 60 秒自动刷新</span>
+        <h1 className="text-2xl font-bold text-foreground">仪表盘</h1>
+        <span className="text-xs text-muted-foreground">每 60 秒自动刷新</span>
       </div>
 
       {/* Stats cards */}
@@ -76,21 +76,21 @@ export default function DashboardPage() {
         {cards.map((card) => (
           <div
             key={card.label}
-            className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
+            className="bg-card rounded-lg border border-border p-4 shadow-sm"
           >
-            <p className="text-xs text-gray-500 mb-1">{card.label}</p>
+            <p className="text-xs text-muted-foreground mb-1">{card.label}</p>
             <p className={`text-2xl font-bold ${card.color}`}>{card.value.toLocaleString()}</p>
           </div>
         ))}
       </div>
 
       {/* Trend chart */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">发帖趋势（近 7 天）</h2>
+      <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
+        <h2 className="text-base font-semibold text-foreground mb-4">发帖趋势（近 7 天）</h2>
         {trendData.length > 0 ? (
           <TrendChart data={trendData} />
         ) : (
-          <p className="text-center text-gray-400 py-8 text-sm">暂无趋势数据</p>
+          <p className="text-center text-muted-foreground py-8 text-sm">暂无趋势数据</p>
         )}
       </div>
     </div>

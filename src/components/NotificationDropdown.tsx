@@ -91,7 +91,7 @@ export default function NotificationDropdown() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-1.5 text-gray-500 hover:text-primary-500 hover:bg-gray-100 rounded-md transition-colors duration-150"
+        className="relative p-1.5 text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors duration-150"
         aria-label="通知"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -110,12 +110,12 @@ export default function NotificationDropdown() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-80 bg-white rounded-lg shadow-modal border border-gray-200 z-dropdown animate-fade-in">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <span className="text-sm font-semibold text-gray-900">通知</span>
+        <div className="absolute right-0 top-full mt-1 w-80 bg-card rounded-lg shadow-modal border border-border z-dropdown animate-fade-in">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <span className="text-sm font-semibold text-foreground">通知</span>
             <button
               onClick={handleViewAll}
-              className="text-xs text-primary-500 hover:text-primary-600 transition-colors duration-150"
+              className="text-xs text-primary hover:text-primary transition-colors duration-150"
             >
               查看全部
             </button>
@@ -124,21 +124,21 @@ export default function NotificationDropdown() {
           <div className="max-h-80 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
             ) : notifications.length === 0 ? (
-              <div className="py-8 text-center text-sm text-gray-400">暂无通知</div>
+              <div className="py-8 text-center text-sm text-muted-foreground">暂无通知</div>
             ) : (
               Object.entries(grouped).map(([cat, items]) => (
                 <div key={cat}>
-                  <div className="px-4 py-2 text-xs text-gray-400 bg-gray-50 font-medium">
+                  <div className="px-4 py-2 text-xs text-muted-foreground bg-muted/30 font-medium">
                     {TYPE_CONFIG[cat]?.label || cat}
                   </div>
                   {items.map((n) => (
                     <button
                       key={n.id}
                       onClick={() => handleClickNotification(n)}
-                      className={`w-full text-left px-4 py-2.5 flex items-start gap-3 hover:bg-gray-50 transition-colors duration-150 ${
+                      className={`w-full text-left px-4 py-2.5 flex items-start gap-3 hover:bg-muted/30 transition-colors duration-150 ${
                         !n.isRead ? 'bg-blue-50' : ''
                       }`}
                     >
@@ -146,13 +146,13 @@ export default function NotificationDropdown() {
                         {NOTIFICATION_ICONS[getNotificationCategory(n.eventType)]}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm ${!n.isRead ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
+                        <p className={`text-sm ${!n.isRead ? 'text-foreground font-medium' : 'text-foreground/80'}`}>
                           {n.body}
                         </p>
-                        <RelativeTime date={n.createdAt} className="text-xs text-gray-400" />
+                        <RelativeTime date={n.createdAt} className="text-xs text-muted-foreground" />
                       </div>
                       {!n.isRead && (
-                        <span className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1.5" />
+                        <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1.5" />
                       )}
                     </button>
                   ))}

@@ -129,13 +129,13 @@ export default function UsersPage() {
 
   function userStatus(u: AdminUser) {
     if (u.isBanned) return { text: '封禁', cls: 'bg-red-50 text-red-500' };
-    if (!u.isActivated) return { text: '未激活', cls: 'bg-gray-100 text-gray-400' };
+    if (!u.isActivated) return { text: '未激活', cls: 'bg-muted/50 text-muted-foreground' };
     return { text: '正常', cls: 'bg-emerald-50 text-emerald-500' };
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">用户管理</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">用户管理</h1>
 
       {/* Filters */}
       <div className="flex items-center gap-3 mb-4">
@@ -152,7 +152,7 @@ export default function UsersPage() {
         <select
           value={roleFilter}
           onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部角色</option>
           <option value="admin">管理员</option>
@@ -162,7 +162,7 @@ export default function UsersPage() {
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="h-9 px-3 border border-gray-200 rounded-md text-sm bg-white text-gray-600"
+          className="h-9 px-3 border border-border rounded-md text-sm bg-card text-foreground/80"
         >
           <option value="">全部状态</option>
           <option value="active">正常</option>
@@ -173,7 +173,7 @@ export default function UsersPage() {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
-          <span className="ml-3 text-gray-500">加载中...</span>
+          <span className="ml-3 text-muted-foreground">加载中...</span>
         </div>
       ) : error ? (
         <ErrorEmpty description={error} onRetry={fetchUsers} />
@@ -186,37 +186,37 @@ export default function UsersPage() {
                 </Empty>
       ) : (
         <>
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
+          <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/30 border-b border-border">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">用户</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">邮箱</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">角色</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">等级</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">积分</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500">状态</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500">操作</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">用户</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">邮箱</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">角色</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">等级</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">积分</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">状态</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((u) => {
                   const st = userStatus(u);
                   return (
-                    <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={u.id} className="border-b border-border hover:bg-muted/30">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <Avatar size="sm">
                                               {u.avatarUrl && <AvatarImage src={u.avatarUrl} alt={u.username} />}
                                               <AvatarFallback>{u.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
                                             </Avatar>
-                          <span className="text-sm text-gray-900">{u.username}</span>
+                          <span className="text-sm text-foreground">{u.username}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{u.email}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{roleLabels[u.role] || u.role}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">Lv.{u.level}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{u.points}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{u.email}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{roleLabels[u.role] || u.role}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">Lv.{u.level}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{u.points}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${st.cls}`}>
                           {st.text}
@@ -225,7 +225,7 @@ export default function UsersPage() {
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={() => openEditModal(u)}
-                          className="text-xs text-primary-500 hover:text-primary-600 mr-3"
+                          className="text-xs text-primary hover:text-primary mr-3"
                         >
                           编辑
                         </button>
@@ -265,11 +265,11 @@ export default function UsersPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">角色</label>
+              <label className="block text-sm text-foreground mb-1">角色</label>
               <select
                 value={editRole}
                 onChange={(e) => setEditRole(e.target.value)}
-                className="h-9 w-full px-3 border border-gray-200 rounded-md text-sm bg-white"
+                className="h-9 w-full px-3 border border-border rounded-md text-sm bg-card"
               >
                 <option value="admin">管理员</option>
                 <option value="moderator">版主</option>
@@ -277,7 +277,7 @@ export default function UsersPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">等级</label>
+              <label className="block text-sm text-foreground mb-1">等级</label>
               <Input
                 type="number"
                 min={1}
@@ -306,11 +306,11 @@ export default function UsersPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">禁言时长</label>
+              <label className="block text-sm text-foreground mb-1">禁言时长</label>
               <select
                 value={banDuration}
                 onChange={(e) => setBanDuration(e.target.value)}
-                className="h-9 w-full px-3 border border-gray-200 rounded-md text-sm bg-white"
+                className="h-9 w-full px-3 border border-border rounded-md text-sm bg-card"
               >
                 <option value="1h">1 小时</option>
                 <option value="1d">1 天</option>
@@ -320,7 +320,7 @@ export default function UsersPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">原因</label>
+              <label className="block text-sm text-foreground mb-1">原因</label>
               <Input
                 value={banReason}
                 onChange={(e) => setBanReason(e.target.value)}

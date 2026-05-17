@@ -101,8 +101,8 @@ export default function QuickReply({
   const charCount = content.length;
 
   return (
-    <div className="quick-reply border-t border-gray-100 pt-4">
-      <h4 className="text-base font-medium text-gray-900 mb-3">发表回复</h4>
+    <div className="quick-reply border-t border-border pt-4">
+      <h4 className="text-base font-medium text-foreground mb-3">发表回复</h4>
 
       {/* Mini toolbar */}
       <div className="flex items-center gap-1 mb-2">
@@ -111,7 +111,7 @@ export default function QuickReply({
             key={tool.label}
             type="button"
             onClick={() => insertTool(tool)}
-            className="w-7 h-7 flex items-center justify-center text-xs font-mono text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors duration-150"
+            className="w-7 h-7 flex items-center justify-center text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded transition-colors duration-150"
             title={tool.label}
           >
             {tool.label}
@@ -128,20 +128,20 @@ export default function QuickReply({
         placeholder={placeholder}
         rows={4}
         disabled={disabled}
-        className="w-full border border-gray-200 rounded-md p-3 text-sm resize-y outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-50 transition-colors duration-150 placeholder-gray-400 min-h-[100px]"
+        className="w-full border border-border rounded-md p-3 text-sm resize-y outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors duration-150 placeholder:text-muted-foreground min-h-[100px]"
       />
 
       {/* Bottom bar */}
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-3">
-          <span className={`text-xs ${charCount > 2000 ? 'text-red-500' : 'text-gray-400'}`}>
+          <span className={`text-xs ${charCount > 2000 ? 'text-red-500' : 'text-muted-foreground'}`}>
             {charCount}/2000
           </span>
-          <span className="text-xs text-gray-400">Ctrl+Enter 发送</span>
+          <span className="text-xs text-muted-foreground">Ctrl+Enter 发送</span>
         </div>
 
         {cooldown > 0 ? (
-          <span className="inline-flex items-center px-4 py-2 text-sm text-gray-400 bg-gray-100 rounded-md">
+          <span className="inline-flex items-center px-4 py-2 text-sm text-muted-foreground bg-muted/50 rounded-md">
             请等待 {cooldown} 秒后回复
           </span>
         ) : (

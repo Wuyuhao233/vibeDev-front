@@ -50,7 +50,7 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
 
   return (
     <article
-      className="post-card bg-white rounded-lg p-4 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+      className="post-card bg-card rounded-lg p-4 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -70,14 +70,14 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
                 精
               </span>
             )}
-            <h3 className="post-card__title-text text-lg font-medium text-gray-900 truncate hover:text-primary-500 transition-colors duration-150">
+            <h3 className="post-card__title-text text-lg font-medium text-foreground truncate hover:text-primary transition-colors duration-150">
               {post.title}
             </h3>
           </div>
 
           {/* Summary */}
           {post.contentSummary || post.content ? (
-            <p className="post-card__summary text-sm text-gray-500 line-clamp-2 mb-2">
+            <p className="post-card__summary text-sm text-muted-foreground line-clamp-2 mb-2">
               {stripMarkdown(post.contentSummary || post.content)}
             </p>
           ) : null}
@@ -88,14 +88,14 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
               {visibleTags.map((tag) => (
                 <button
                   key={tag.id}
-                  className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors duration-150"
+                  className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-muted-foreground bg-muted hover:bg-muted/80 transition-colors duration-150"
                   onClick={(e) => handleTagClick(e, tag)}
                 >
                   {tag.name}
                 </button>
               ))}
               {overflowCount > 0 && (
-                <span className="text-xs text-gray-400">+{overflowCount}</span>
+                <span className="text-xs text-muted-foreground">+{overflowCount}</span>
               )}
             </div>
           )}
@@ -116,35 +116,35 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
                 {post.author.avatarUrl && <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />}
                 <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
               </Avatar>
-              <span className="post-card__author-name text-sm text-gray-500 max-w-[80px] truncate">
+              <span className="post-card__author-name text-sm text-muted-foreground max-w-[80px] truncate">
                 {post.author.username}
               </span>
               <LevelBadge level={Math.min(Math.max(post.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6} />
             </div>
 
-            <RelativeTime date={post.createdAt} className="text-xs text-gray-400" />
+            <RelativeTime date={post.createdAt} className="text-xs text-muted-foreground" />
 
             {showBoard && post.boardName && (
-              <span className="post-card__board text-xs text-gray-400">
+              <span className="post-card__board text-xs text-muted-foreground">
                 {post.boardName}
               </span>
             )}
 
             <div className="post-card__stats flex items-center gap-3 ml-auto">
-              <span className="post-card__stat--like inline-flex items-center gap-1 text-xs text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+              <span className="post-card__stat--like inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                   <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" fill="none" />
                 </svg>
                 {formatCount(post.likeCount)}
               </span>
-              <span className="post-card__stat--reply inline-flex items-center gap-1 text-xs text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+              <span className="post-card__stat--reply inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                   <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="2" fill="none" />
                 </svg>
                 {formatCount(post.replyCount)}
               </span>
-              <span className="post-card__stat--collect inline-flex items-center gap-1 text-xs text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+              <span className="post-card__stat--collect inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" fill="none" />
                 </svg>
                 {formatCount(post.collectCount)}

@@ -134,7 +134,7 @@ describe('NotificationDropdown', () => {
     renderDropdown();
     fireEvent.click(screen.getByLabelText('通知'));
     await waitFor(() => {
-      const dot = document.querySelector('.bg-primary-500.rounded-full');
+      const dot = document.querySelector('.bg-primary.rounded-full');
       expect(dot).toBeTruthy();
     });
   });

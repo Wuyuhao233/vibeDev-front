@@ -108,12 +108,12 @@ export default function CollectionFolderManager({ open, onClose }: CollectionFol
               onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
               placeholder="新收藏夹名称"
               maxLength={FOLDER_NAME_MAX}
-              className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-50 outline-none transition-all duration-150"
+              className="flex-1 border border-border rounded px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-150"
             />
             <button
               onClick={handleCreate}
               disabled={creating || !newName.trim()}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded hover:bg-primary-600 disabled:opacity-50 transition-colors duration-150"
+              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded hover:bg-primary/90 disabled:opacity-50 transition-colors duration-150"
             >
               {creating ? '创建中...' : '创建'}
             </button>
@@ -122,15 +122,15 @@ export default function CollectionFolderManager({ open, onClose }: CollectionFol
           {/* List */}
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin-slow" />
-              <span className="ml-2 text-sm text-gray-400">加载中...</span>
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin-slow" />
+              <span className="ml-2 text-sm text-muted-foreground">加载中...</span>
             </div>
           ) : error ? (
-            <div className="py-8 text-center text-sm text-gray-400">{error}</div>
+            <div className="py-8 text-center text-sm text-muted-foreground">{error}</div>
           ) : folders.length === 0 ? (
-            <div className="py-8 text-center text-sm text-gray-400">暂无收藏夹</div>
+            <div className="py-8 text-center text-sm text-muted-foreground">暂无收藏夹</div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border">
               {folders.map((folder) => (
                 <div key={folder.id} className="flex items-center justify-between py-3">
                   {editingId === folder.id ? (
@@ -145,36 +145,36 @@ export default function CollectionFolderManager({ open, onClose }: CollectionFol
                         }}
                         maxLength={FOLDER_NAME_MAX}
                         autoFocus
-                        className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-50 outline-none transition-all duration-150"
+                        className="flex-1 border border-border rounded px-2 py-1 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-150"
                       />
                       <button
                         onClick={() => handleSaveRename(folder.id)}
                         disabled={saving || !editName.trim()}
-                        className="text-xs text-primary-500 hover:text-primary-600 disabled:opacity-50"
+                        className="text-xs text-primary hover:text-primary disabled:opacity-50"
                       >
                         保存
                       </button>
-                      <button onClick={cancelEdit} className="text-xs text-gray-400 hover:text-gray-600">
+                      <button onClick={cancelEdit} className="text-xs text-muted-foreground hover:text-foreground/80">
                         取消
                       </button>
                     </div>
                   ) : (
                     <>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-700">{folder.name}</span>
-                        <span className="text-xs text-gray-400">{folder.itemCount} 项</span>
+                        <span className="text-sm text-foreground">{folder.name}</span>
+                        <span className="text-xs text-muted-foreground">{folder.itemCount} 项</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => handleStartRename(folder)}
-                          className="text-xs text-gray-400 hover:text-primary-500 transition-colors duration-150"
+                          className="text-xs text-muted-foreground hover:text-primary transition-colors duration-150"
                         >
                           重命名
                         </button>
                         <button
                           onClick={() => handleDelete(folder.id)}
                           disabled={saving}
-                          className="text-xs text-gray-400 hover:text-red-500 transition-colors duration-150"
+                          className="text-xs text-muted-foreground hover:text-red-500 transition-colors duration-150"
                         >
                           删除
                         </button>

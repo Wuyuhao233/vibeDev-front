@@ -84,7 +84,7 @@ export default function LikeButton({
         className={`inline-flex items-center gap-1 text-sm transition-colors duration-150 ${
           liked
             ? 'text-like'
-            : 'text-gray-400 hover:text-like'
+            : 'text-muted-foreground hover:text-like'
         } ${className}`}
       >
         <svg
