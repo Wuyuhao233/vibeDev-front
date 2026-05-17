@@ -201,7 +201,7 @@ export default function SearchInput({
               onClick={() => submitQuery(item)}
               onMouseEnter={() => setActiveIndex(i)}
               className={`w-full text-left px-3 py-1.5 text-sm text-foreground hover:bg-muted transition-colors duration-150 flex items-center justify-between ${
-                i === activeIndex ? 'bg-muted' : ''`
+                i === activeIndex ? "bg-muted" : ''
               }`}
             >
               <span className="truncate">
@@ -213,7 +213,7 @@ export default function SearchInput({
                 <button
                   onClick={(e) => handleRemoveItem(e, item)}
                   className="flex-shrink-0 ml-2 text-muted-foreground hover:text-foreground transition-colors duration-150"
-                  aria-label={`清除 "${item}"`}
+                  aria-label={`清除 '${item}'`}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                     <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />

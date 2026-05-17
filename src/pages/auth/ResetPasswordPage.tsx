@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import * as authApi from '../../api/auth';
 import { ApiError } from '../../utils/error';
 import { PASSWORD_PATTERN } from '../../utils/patterns';
@@ -129,44 +130,48 @@ export default function ResetPasswordPage() {
         )}
 
         <div className="flex flex-col gap-4">
-          <div className="relative">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">新密码</label>
+            <div className="relative">
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  validatePassword(e.target.value);
+                  if (confirmPassword) validateConfirm(confirmPassword, e.target.value);
+                }}
+                placeholder="至少 8 位，包含大小写字母和数字"
+                disabled={loading}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground/80"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {passwordError && <p className="text-xs text-red-500 mt-1">{passwordError}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">确认新密码</label>
             <Input
-              label="新密码"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
+              type="password"
+              value={confirmPassword}
               onChange={(e) => {
-                setPassword(e.target.value);
-                validatePassword(e.target.value);
-                if (confirmPassword) validateConfirm(confirmPassword, e.target.value);
+                setConfirmPassword(e.target.value);
+                validateConfirm(e.target.value, password);
               }}
-              placeholder="至少 8 位，包含大小写字母和数字"
-              error={passwordError}
+              placeholder="请再次输入新密码"
               disabled={loading}
               autoComplete="new-password"
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground/80 text-sm"
-              tabIndex={-1}
-            >
-              {showPassword ? '隐藏' : '显示'}
-            </button>
+            {confirmError && <p className="text-xs text-red-500 mt-1">{confirmError}</p>}
           </div>
-
-          <Input
-            label="确认新密码"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              validateConfirm(e.target.value, password);
-            }}
-            placeholder="请再次输入新密码"
-            error={confirmError}
-            disabled={loading}
-            autoComplete="new-password"
-          />
 
           <Button type="submit" disabled={loading} size="lg" className="w-full mt-2">
             {loading ? '重置中...' : '重置密码'}

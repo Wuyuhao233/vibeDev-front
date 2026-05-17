@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import * as authApi from '../../api/auth';
 import { ApiError } from '../../utils/error';
@@ -186,34 +187,38 @@ export default function LoginPage() {
           )}
 
           <div className="flex flex-col gap-4">
-            <Input
-              label="用户名 / 邮箱"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="请输入用户名或邮箱"
-              disabled={loading || cooldown > 0}
-              autoComplete="username"
-            />
-
-            <div className="relative">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">用户名 / 邮箱</label>
               <Input
-                label="密码"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="请输入密码"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="请输入用户名或邮箱"
                 disabled={loading || cooldown > 0}
-                autoComplete="current-password"
+                autoComplete="username"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground/80 text-sm"
-                tabIndex={-1}
-              >
-                {showPassword ? '隐藏' : '显示'}
-              </button>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">密码</label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="请输入密码"
+                  disabled={loading || cooldown > 0}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground/80"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between">

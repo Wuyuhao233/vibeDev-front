@@ -72,19 +72,21 @@ export default function ForgotPasswordPage() {
 
       <form onSubmit={handleSubmit} className="bg-card rounded-lg shadow-card p-6">
         <div className="flex flex-col gap-4">
-          <Input
-            label="邮箱"
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setError('');
-            }}
-            placeholder="example@email.com"
-            error={error}
-            disabled={loading}
-            autoComplete="email"
-          />
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">邮箱</label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError('');
+              }}
+              placeholder="example@email.com"
+              disabled={loading}
+              autoComplete="email"
+            />
+            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+          </div>
 
           <Button type="submit" disabled={loading} size="lg" className="w-full">
             {loading ? '发送中...' : '发送重置邮件'}

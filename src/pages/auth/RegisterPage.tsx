@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import * as authApi from '../../api/auth';
 import { ApiError } from '../../utils/error';
 import { USERNAME_PATTERN, EMAIL_PATTERN, PASSWORD_PATTERN } from '../../utils/patterns';
@@ -236,10 +237,10 @@ export default function RegisterPage() {
         <div className="flex flex-col gap-4">
           {/* Email with send code button */}
           <div>
+            <label className="block text-sm font-medium text-foreground mb-1">邮箱</label>
             <div className="flex gap-2">
               <div className="flex-1">
                 <Input
-                  label="邮箱"
                   type="email"
                   value={email}
                   onChange={(e) => {
@@ -247,57 +248,57 @@ export default function RegisterPage() {
                     validateEmail(e.target.value);
                   }}
                   placeholder="example@email.com"
-                  error={emailError}
                   disabled={loading}
                   autoComplete="email"
                 />
               </div>
-              <div className="pt-7">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={sendingCode || codeCountdown > 0 || !!emailError || !email}
-                  onClick={handleSendCode}
-                  className="whitespace-nowrap h-9"
-                >
-                  {sendingCode
-                    ? '发送中...'
-                    : codeCountdown > 0
-                      ? `${codeCountdown}s`
-                      : '发送验证码'}
-                </Button>
-              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={sendingCode || codeCountdown > 0 || !!emailError || !email}
+                onClick={handleSendCode}
+                className="whitespace-nowrap h-8 shrink-0"
+              >
+                {sendingCode
+                  ? '发送中...'
+                  : codeCountdown > 0
+                    ? `${codeCountdown}s`
+                    : '获取验证码'}
+              </Button>
             </div>
+            {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
           </div>
 
-          <Input
-            label="验证码"
-            type="text"
-            value={code}
-            onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, '').slice(0, 6);
-              setCode(val);
-              validateCode(val);
-            }}
-            placeholder="请输入6位数字验证码"
-            error={codeError}
-            disabled={loading}
-            autoComplete="one-time-code"
-            maxLength={6}
-          />
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">验证码</label>
+            <Input
+              type="text"
+              value={code}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                setCode(val);
+                validateCode(val);
+              }}
+              placeholder="请输入6位数字验证码"
+              disabled={loading}
+              autoComplete="one-time-code"
+              maxLength={6}
+            />
+            {codeError && <p className="text-xs text-red-500 mt-1">{codeError}</p>}
+          </div>
 
           <div>
+            <label className="block text-sm font-medium text-foreground mb-1">用户名</label>
             <Input
-              label="用户名"
               type="text"
               value={username}
               onChange={(e) => handleUsernameChange(e.target.value)}
               placeholder="3-20 个字符，英文、数字和下划线"
-              error={usernameError}
               disabled={loading}
               autoComplete="username"
             />
+            {usernameError && <p className="text-xs text-red-500 mt-1">{usernameError}</p>}
             {checkingUsername && (
               <p className="text-xs text-muted-foreground mt-1">检查中...</p>
             )}
@@ -307,9 +308,9 @@ export default function RegisterPage() {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-foreground mb-1">密码</label>
             <div className="relative">
               <Input
-                label="密码"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => {
@@ -318,19 +319,19 @@ export default function RegisterPage() {
                   if (confirmPassword) validateConfirmPassword(confirmPassword, e.target.value);
                 }}
                 placeholder="至少 8 位，包含大小写字母和数字"
-                error={passwordError}
                 disabled={loading}
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground/80 text-sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground/80"
                 tabIndex={-1}
               >
-                {showPassword ? '隐藏' : '显示'}
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
+            {passwordError && <p className="text-xs text-red-500 mt-1">{passwordError}</p>}
             {password && !passwordError && (
               <div className="mt-2">
                 <div className="flex gap-1 mb-1">
@@ -345,19 +346,21 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <Input
-            label="确认密码"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              validateConfirmPassword(e.target.value, password);
-            }}
-            placeholder="请再次输入密码"
-            error={confirmError}
-            disabled={loading}
-            autoComplete="new-password"
-          />
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">确认密码</label>
+            <Input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                validateConfirmPassword(e.target.value, password);
+              }}
+              placeholder="请再次输入密码"
+              disabled={loading}
+              autoComplete="new-password"
+            />
+            {confirmError && <p className="text-xs text-red-500 mt-1">{confirmError}</p>}
+          </div>
 
           <label className="flex items-center gap-2 cursor-pointer">
             <input
