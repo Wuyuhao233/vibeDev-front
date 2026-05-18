@@ -61,11 +61,17 @@ client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// Response interceptor: snake_case → camelCase + handle errors
+// Response interceptor: snake_case → camelCase + handle errors + business error rejection
 client.interceptors.response.use(
   (response) => {
     if (response.data) {
       response.data = transformKeys(response.data, toCamelCase);
+    }
+    // Reject business errors returned with HTTP 200 but non-zero code
+    if (response.data && typeof response.data.code === 'number' && response.data.code !== 0) {
+      const errorCode = String(response.data.code);
+      const message = response.data.message || '请求失败';
+      return Promise.reject(new ApiError(errorCode, message));
     }
     return response;
   },

@@ -58,6 +58,42 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
     >
       <div className="post-card__main flex gap-4">
         <div className="flex-1 min-w-0">
+          {/* Author + Time row */}
+          <div className="post-card__author-row flex items-center gap-2 mb-2">
+            <div
+              className="post-card__author flex items-center gap-1.5 cursor-pointer"
+              onClick={handleAuthorClick}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleAuthorClick(e as any); }}
+            >
+              <Avatar
+                size="sm"
+                className="post-card__author-avatar"
+              >
+                {post.author.avatarUrl && <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />}
+                <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+              </Avatar>
+              <span className="post-card__author-name text-sm text-foreground font-medium max-w-[80px] truncate">
+                {post.author.nickname || post.author.username}
+              </span>
+              <LevelBadge level={Math.min(Math.max(post.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6} />
+            </div>
+
+            <span className="text-muted-foreground/40">·</span>
+
+            <RelativeTime date={post.createdAt} className="text-xs text-muted-foreground" />
+
+            {showBoard && post.boardName && (
+              <>
+                <span className="text-muted-foreground/40">·</span>
+                <span className="post-card__board text-xs text-muted-foreground">
+                  {post.boardName}
+                </span>
+              </>
+            )}
+          </div>
+
           {/* Title + Badges */}
           <div className="post-card__title flex items-center gap-2 mb-1.5">
             {post.isPinned && (
@@ -74,13 +110,6 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
               {post.title}
             </h3>
           </div>
-
-          {/* Summary */}
-          {post.contentSummary || post.content ? (
-            <p className="post-card__summary text-sm text-muted-foreground line-clamp-2 mb-2">
-              {stripMarkdown(post.contentSummary || post.content)}
-            </p>
-          ) : null}
 
           {/* Tags */}
           {post.tags.length > 0 && (
@@ -100,56 +129,33 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
             </div>
           )}
 
-          {/* Meta row */}
-          <div className="post-card__meta flex items-center gap-3">
-            <div
-              className="post-card__author flex items-center gap-1.5 cursor-pointer"
-              onClick={handleAuthorClick}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleAuthorClick(e as any); }}
-            >
-              <Avatar
-                size="sm"
-                className="post-card__author-avatar"
-              >
-                {post.author.avatarUrl && <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />}
-                <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
-              </Avatar>
-              <span className="post-card__author-name text-sm text-muted-foreground max-w-[80px] truncate">
-                {post.author.username}
-              </span>
-              <LevelBadge level={Math.min(Math.max(post.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6} />
-            </div>
+          {/* Summary */}
+          {post.contentSummary || post.content ? (
+            <p className="post-card__summary text-sm text-muted-foreground line-clamp-3 leading-relaxed pl-3 border-l-2 border-border mb-3">
+              {stripMarkdown(post.contentSummary || post.content)}
+            </p>
+          ) : null}
 
-            <RelativeTime date={post.createdAt} className="text-xs text-muted-foreground" />
-
-            {showBoard && post.boardName && (
-              <span className="post-card__board text-xs text-muted-foreground">
-                {post.boardName}
-              </span>
-            )}
-
-            <div className="post-card__stats flex items-center gap-3 ml-auto">
-              <span className="post-card__stat--like inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
-                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" fill="none" />
-                </svg>
-                {formatCount(post.likeCount)}
-              </span>
-              <span className="post-card__stat--reply inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
-                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="2" fill="none" />
-                </svg>
-                {formatCount(post.replyCount)}
-              </span>
-              <span className="post-card__stat--collect inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" fill="none" />
-                </svg>
-                {formatCount(post.collectCount)}
-              </span>
-            </div>
+          {/* Stats row */}
+          <div className="post-card__stats flex items-center gap-4">
+            <span className="post-card__stat--like inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+              {formatCount(post.likeCount)}
+            </span>
+            <span className="post-card__stat--reply inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+              {formatCount(post.replyCount)}
+            </span>
+            <span className="post-card__stat--collect inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+              {formatCount(post.collectCount)}
+            </span>
           </div>
         </div>
 

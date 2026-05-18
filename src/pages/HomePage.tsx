@@ -4,6 +4,8 @@ import { useAuthStore } from '../store/authStore';
 import { getHomeFeed, type FeedItem } from '../api/feed';
 import { getFollowedTags } from '../api/tag';
 import PostCard from '../components/PostCard';
+import PostGridCard from '../components/PostGridCard';
+import HotListSidebar from '../components/HotListSidebar';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '../components/ui';
 import { ErrorEmpty } from '../components/shared';
 import { toast } from '../components/ui';
@@ -221,58 +223,76 @@ export default function HomePage() {
     }
 
     return (
-      <div className="post-list flex flex-col gap-4">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} showBoard />
-        ))}
+      <div className="post-list">
+        {/* Featured first post */}
+        {posts[0] && (
+          <div className="mb-6">
+            <PostCard post={posts[0]} showBoard />
+          </div>
+        )}
+
+        {/* Grid for remaining posts */}
+        {posts.length > 1 && (
+          <div className="grid grid-cols-2 gap-4">
+            {posts.slice(1).map((post) => (
+              <PostGridCard key={post.id} post={post} showBoard />
+            ))}
+          </div>
+        )}
       </div>
     );
   };
 
   return (
-    <div>
-      {/* Tab Navigation */}
-      <nav className="home-tabs__nav flex border-b border-border mb-6">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => switchTab(tab.key)}
-            className={`home-tabs__tab relative px-5 py-2.5 text-sm font-medium transition-colors duration-200 ${
-              activeTab === tab.key
-                ? 'home-tabs__tab--active text-primary'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {tab.label}
-            {activeTab === tab.key && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
-            )}
-          </button>
-        ))}
-      </nav>
+    <div className="flex gap-6">
+      {/* Main content area */}
+      <div className="flex-1 min-w-0">
+        {/* Tab Navigation */}
+        <nav className="home-tabs__nav flex border-b border-border mb-6">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => switchTab(tab.key)}
+              className={`home-tabs__tab relative px-5 py-2.5 text-sm font-medium transition-colors duration-200 ${
+                activeTab === tab.key
+                  ? 'home-tabs__tab--active text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {tab.label}
+              {activeTab === tab.key && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
+              )}
+            </button>
+          ))}
+        </nav>
 
-      {/* Content */}
-      {renderContent()}
+        {/* Content */}
+        {renderContent()}
 
-      {/* Scroll sentinel for infinite loading */}
-      <div ref={sentinelRef} className="post-list__sentinel h-1" />
+        {/* Scroll sentinel for infinite loading */}
+        <div ref={sentinelRef} className="post-list__sentinel h-1" />
 
-      {/* Load more indicator */}
-      {loadingMore && (
-        <div className="post-list__loading-more flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
-          <svg className="w-4 h-4 animate-spin-slow" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          加载中...
-        </div>
-      )}
+        {/* Load more indicator */}
+        {loadingMore && (
+          <div className="post-list__loading-more flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+            <svg className="w-4 h-4 animate-spin-slow" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            加载中...
+          </div>
+        )}
 
-      {!hasMore && posts.length > 0 && !loading && (
-        <div className="post-list__no-more text-center py-6 text-sm text-muted-foreground">
-          —— 已经到底了 ——
-        </div>
-      )}
+        {!hasMore && posts.length > 0 && !loading && (
+          <div className="post-list__no-more text-center py-6 text-sm text-muted-foreground">
+            —— 已经到底了 ——
+          </div>
+        )}
+      </div>
+
+      {/* Right sidebar - Hot list */}
+      <HotListSidebar />
     </div>
   );
 }

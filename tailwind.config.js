@@ -82,7 +82,7 @@ export default {
       },
       spacing: {
         'sidebar': '240px',
-        'content': '1200px',
+        'content': '1280px',
       },
       borderRadius: {
         sm: '2px',
