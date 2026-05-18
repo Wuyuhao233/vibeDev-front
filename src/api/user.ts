@@ -39,7 +39,7 @@ export async function updateProfile(data: { nickname?: string; signature?: strin
 export async function uploadAvatar(file: File) {
   const form = new FormData();
   form.append('file', file);
-  const res = await client.post<{ data: { url: string } }>('/users/me/avatar', form, {
+  const res = await client.post<{ data: { avatarUrl: string } }>('/users/me/avatar', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return res.data.data;

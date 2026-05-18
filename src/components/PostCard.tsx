@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import LevelBadge from './ui/LevelBadge';
 import RelativeTime from './ui/RelativeTime';
 import { formatCount } from '../utils/formatCount';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import type { PostCardData } from '../types/board';
 
 interface PostCardProps {
@@ -71,7 +72,7 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
                 size="sm"
                 className="post-card__author-avatar"
               >
-                {post.author.avatarUrl && <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />}
+                {post.author.avatarUrl && <AvatarImage src={normalizeImageUrl(post.author.avatarUrl)} alt={post.author.username} />}
                 <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
               </Avatar>
               <span className="post-card__author-name text-sm text-foreground font-medium max-w-[80px] truncate">

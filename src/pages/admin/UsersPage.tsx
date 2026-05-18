@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { getUsers, updateUser, banUser, unbanUser } from '../../api/admin';
 import type { AdminUser } from '../../types/admin';
+import { normalizeImageUrl } from '../../utils/imageUrl';
 import {
   Button,
   Input,
@@ -207,7 +208,7 @@ export default function UsersPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <Avatar size="sm">
-                                              {u.avatarUrl && <AvatarImage src={u.avatarUrl} alt={u.username} />}
+                                              {u.avatarUrl && <AvatarImage src={normalizeImageUrl(u.avatarUrl)} alt={u.username} />}
                                               <AvatarFallback>{u.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
                                             </Avatar>
                           <span className="text-sm text-foreground">{u.username}</span>

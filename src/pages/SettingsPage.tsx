@@ -15,6 +15,7 @@ import { Skeleton } from '../components/ui';
 import { Spinner } from '../components/ui';
 import { toast } from '../components/ui';
 import { formatRelativeTime } from '../utils/relativeTime';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import * as notificationApi from '../api/notification';
 
 type SettingsTab = 'profile' | 'security' | 'notifications' | 'data';
@@ -96,8 +97,8 @@ function ProfileSection() {
       try {
         const data = await userApi.getMyProfile();
         setProfile(data);
-        setNickname(data.username || '');
-        setSignature(data.bio || '');
+        setNickname(data.nickname || '');
+        setSignature(data.signature || '');
       } catch {
         toast.error('加载个人资料失败');
       } finally {
@@ -120,10 +121,10 @@ function ProfileSection() {
     }
 
     try {
-      const { url } = await userApi.uploadAvatar(file);
-      await userApi.updateProfile({ avatar: url, bio: undefined } as any);
-      if (profile) setProfile({ ...profile, avatar: url });
-      if (user) login({ ...user, avatarUrl: url }, useAuthStore.getState().accessToken!, useAuthStore.getState().refreshToken!);
+      const { avatarUrl } = await userApi.uploadAvatar(file);
+      await userApi.updateProfile({ avatarUrl });
+      if (profile) setProfile({ ...profile, avatarUrl });
+      if (user) login({ ...user, avatarUrl }, useAuthStore.getState().accessToken!, useAuthStore.getState().refreshToken!);
       toast.success('头像更新成功');
     } catch {
       toast.error('上传失败，请稍后重试');
@@ -145,7 +146,7 @@ function ProfileSection() {
 
     setSaving(true);
     try {
-      await userApi.updateProfile({ bio: signature } as any);
+      await userApi.updateProfile({ nickname, signature });
       toast.success('个人信息已更新');
     } catch (err) {
       if (err instanceof ApiError) {
@@ -173,7 +174,7 @@ function ProfileSection() {
       {/* Avatar */}
       <div className="flex items-center gap-4 mb-8">
         <Avatar className="size-8">
-          {profile?.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={profile?.username || ''} />}
+          {profile?.avatarUrl && <AvatarImage src={normalizeImageUrl(profile.avatarUrl)} alt={profile?.username || ''} />}
           <AvatarFallback>{profile?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
         </Avatar>
         <label className="px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary/10 cursor-pointer transition-colors duration-150">

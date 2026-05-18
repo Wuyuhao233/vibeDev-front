@@ -6,6 +6,7 @@ import { useAuthStore } from '../store/authStore';
 import { useBoardStore } from '../store/boardStore';
 import MarkdownSplitEditor from '../components/MarkdownSplitEditor';
 import TagSelector from '../components/TagSelector';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import {
   Button,
   toast,
@@ -252,7 +253,7 @@ export default function NewPostPage() {
                 className="flex items-center gap-2 p-1 rounded-md hover:bg-muted transition-colors duration-150"
               >
                 <Avatar size="sm">
-                  {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user?.username || ''} />}
+                  {user?.avatarUrl && <AvatarImage src={normalizeImageUrl(user.avatarUrl)} alt={user?.username || ''} />}
                   <AvatarFallback>{user?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
                 </Avatar>
                 <svg

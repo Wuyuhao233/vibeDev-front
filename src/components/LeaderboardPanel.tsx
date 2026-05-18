@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import { Skeleton } from './ui';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from './ui';
 import { ErrorEmpty } from './shared';
+import { normalizeImageUrl } from '../utils/imageUrl';
 
 type Period = 'week' | 'month' | 'all';
 
@@ -135,7 +136,7 @@ export default function LeaderboardPanel() {
                     <Avatar
                       size="sm"
                     >
-                      {entry.avatarUrl && <AvatarImage src={entry.avatarUrl} alt={entry.username} />}
+                      {entry.avatarUrl && <AvatarImage src={normalizeImageUrl(entry.avatarUrl)} alt={entry.username} />}
                       <AvatarFallback>{entry.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
                     </Avatar>
 

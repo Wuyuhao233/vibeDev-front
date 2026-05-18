@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import RelativeTime from './ui/RelativeTime';
 import { formatCount } from '../utils/formatCount';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import type { PostCardData } from '../types/board';
 
 interface PostGridCardProps {
@@ -96,7 +97,7 @@ export default function PostGridCard({ post, showBoard = false }: PostGridCardPr
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1 cursor-pointer" onClick={handleAuthorClick}>
               <Avatar size="sm">
-                {post.author.avatarUrl && <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />}
+                {post.author.avatarUrl && <AvatarImage src={normalizeImageUrl(post.author.avatarUrl)} alt={post.author.username} />}
                 <AvatarFallback className="text-[10px]">
                   {post.author.username?.[0]?.toUpperCase() || '?'}
                 </AvatarFallback>

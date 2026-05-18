@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getHomeFeed, type FeedItem } from '../api/feed';
 import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import { formatCount } from '../utils/formatCount';
+import { normalizeImageUrl } from '../utils/imageUrl';
 
 export default function HotListSidebar() {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ export default function HotListSidebar() {
                   <div className="flex items-center gap-2 mt-1.5">
                     <div className="flex items-center gap-1">
                       <Avatar size="sm">
-                        {item.author.avatarUrl && <AvatarImage src={item.author.avatarUrl} alt="" />}
+                        {item.author.avatarUrl && <AvatarImage src={normalizeImageUrl(item.author.avatarUrl)} alt="" />}
                         <AvatarFallback className="text-[10px]">
                           {item.author.username?.[0]?.toUpperCase() || '?'}
                         </AvatarFallback>

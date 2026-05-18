@@ -7,6 +7,7 @@ import LikeButton from './LikeButton';
 import ReportDialog from './ReportDialog';
 import { toast } from './ui';
 import { formatRelativeTime } from '../utils/relativeTime';
+import { normalizeImageUrl } from '../utils/imageUrl';
 
 interface ReplyItemProps {
   id: string;
@@ -91,7 +92,7 @@ export default function ReplyItem({
             size="sm"
             className="reply-item__avatar"
           >
-            {author.avatarUrl && <AvatarImage src={author.avatarUrl} alt={author.username} />}
+            {author.avatarUrl && <AvatarImage src={normalizeImageUrl(author.avatarUrl)} alt={author.username} />}
             <AvatarFallback>{author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
           </Avatar>
         </button>

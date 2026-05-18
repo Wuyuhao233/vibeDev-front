@@ -8,6 +8,7 @@ import 'github-markdown-css/github-markdown.css';
 import { getPost, deletePost, recordPostView, pinPost, unpinPost, toggleEssence, type PostDetail } from '../api/post';
 import { getReplies, createReply, deleteReply, type Reply } from '../api/reply';
 import { useAuthStore } from '../store/authStore';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import { Avatar, AvatarFallback, AvatarImage, LevelBadge, Badge, Empty, EmptyHeader, EmptyTitle, EmptyContent, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui';
 import { ErrorEmpty } from '../components/shared';
 import { toast } from '../components/ui';
@@ -342,7 +343,7 @@ export default function PostPage() {
       <div className="flex items-center gap-3 mb-4">
         <Link to={`/u/${post.author.username}`}>
           <Avatar size="default">
-            {post.author.avatarUrl && <AvatarImage src={post.author.avatarUrl} alt={post.author.username} />}
+            {post.author.avatarUrl && <AvatarImage src={normalizeImageUrl(post.author.avatarUrl)} alt={post.author.username} />}
             <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
           </Avatar>
         </Link>

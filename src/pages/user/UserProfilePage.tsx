@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import * as userApi from '../../api/user';
 import type { UserProfile } from '../../api/user';
+import { normalizeImageUrl } from '../../utils/imageUrl';
 import {
   getFolders,
   getFolderItems,
@@ -269,7 +270,7 @@ export default function UserProfilePage() {
       <div className="bg-card rounded-lg shadow-card p-6 mb-6">
         <div className="flex items-start gap-6">
           <Avatar size="lg">
-            {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={profile.username} />}
+            {profile.avatarUrl && <AvatarImage src={normalizeImageUrl(profile.avatarUrl)} alt={profile.username} />}
             <AvatarFallback>{profile.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">

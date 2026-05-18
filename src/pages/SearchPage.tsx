@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../components/ui';
 import LevelBadge from '../components/ui/LevelBadge';
 import RelativeTime from '../components/ui/RelativeTime';
 import { formatCount } from '../utils/formatCount';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import { search, getSearchSuggestions, getTrendingSearches } from '../api/search';
 import type { SearchScope, SearchResultItem } from '../api/search';
 import { getBoards } from '../api/board';
@@ -574,7 +575,7 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <Avatar size="sm">
-                {item.author.avatarUrl && <AvatarImage src={item.author.avatarUrl} alt={item.author.username} />}
+                {item.author.avatarUrl && <AvatarImage src={normalizeImageUrl(item.author.avatarUrl)} alt={item.author.username} />}
                 <AvatarFallback>{item.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
               </Avatar>
               <span className="text-sm text-muted-foreground">{item.author.username}</span>
