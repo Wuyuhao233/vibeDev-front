@@ -59,9 +59,8 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
 
   return (
     <article
-      className="post-card bg-card rounded-lg p-4 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+      className="post-card bg-card rounded-lg p-4 shadow-card transition-all duration-200"
       onClick={handleCardClick}
-      role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter') handleCardClick(); }}
     >
@@ -81,7 +80,7 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
                 onClick={handleAvatarClick}
               />
               <span
-                className="post-card__author-name text-sm text-foreground font-semibold max-w-[80px] truncate hover:text-primary cursor-pointer transition-colors duration-150"
+                className="post-card__author-name text-sm text-foreground font-semibold max-w-[80px] truncate hover:text-primary transition-colors duration-150"
                 onClick={handleAuthorClick}
               >
                 {post.author.nickname || post.author.username}
@@ -196,7 +195,6 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
           <InlineReplies
             postId={post.id}
             postAuthorId={post.author?.id}
-            onClose={() => setShowReplies(false)}
           />
         </div>
       )}

@@ -38,6 +38,7 @@
   --color-border-light: #f3f4f6;
 
   /* === 组件专属色 === */
+  --color-reply-bg: rgb(247, 248, 250);
   --color-like: #ef4444;
   --color-like-inactive: #9ca3af;
   --color-collect: #f59e0b;
@@ -149,6 +150,7 @@
   --color-border: #30363d;
   --color-border-light: #21262d;
 
+  --color-reply-bg: #1c2128;
   --color-like: #f85149;
   --color-like-inactive: #484f58;
   --color-collect: #d2991d;
@@ -292,6 +294,7 @@ body {
   --color-border: #e6dfd8;
   --color-border-light: #f0ebe4;
 
+  --color-reply-bg: #efe9de;
   --color-like: #e0554a;
   --color-like-inactive: #b0aba4;
   --color-collect: #e8a55a;
@@ -362,8 +365,8 @@ body {
   --color-border: #3d3a35;
   --color-border-light: #2d2a26;
 
+  --color-reply-bg: #1f1e1b;
   --color-like: #f85149;
-  --color-like-inactive: #5c5852;
   --color-collect: #e8a55a;
   --color-collect-inactive: #5c5852;
   --color-essence: #e8a55a;
@@ -432,6 +435,7 @@ body {
   --color-border: #e0e0e0;
   --color-border-light: #f0f0f0;
 
+  --color-reply-bg: #f5f5f7;
   --color-like: #ff3b30;
   --color-like-inactive: #b0b0b0;
   --color-collect: #ff9500;
@@ -505,8 +509,8 @@ body {
   --color-border: #3a3a3c;
   --color-border-light: #2a2a2c;
 
+  --color-reply-bg: #2a2a2c;
   --color-like: #ff453a;
-  --color-like-inactive: #636366;
   --color-collect: #ff9f0a;
   --color-collect-inactive: #636366;
   --color-essence: #ff9f0a;

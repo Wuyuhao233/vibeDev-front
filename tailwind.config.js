@@ -57,6 +57,7 @@ export default {
         like: '#ef4444',
         collect: '#f59e0b',
         essence: '#f59e0b',
+        'reply-bg': 'var(--color-reply-bg)',
       },
       fontFamily: {
         sans: ['"Inter"', '"Noto Sans SC"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"',

@@ -46,9 +46,8 @@ export default function PostGridCard({ post, showBoard = false }: PostGridCardPr
 
   return (
     <article
-      className="post-grid-card bg-card rounded-lg shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 cursor-pointer overflow-hidden border border-border"
+      className="post-grid-card bg-card rounded-lg shadow-card transition-all duration-200 overflow-hidden border border-border"
       onClick={handleClick}
-      role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter') handleClick(); }}
     >
@@ -113,7 +112,7 @@ export default function PostGridCard({ post, showBoard = false }: PostGridCardPr
               onClick={handleAvatarClick}
             />
             <span
-              className="text-xs text-foreground font-semibold truncate max-w-[60px] hover:text-primary cursor-pointer transition-colors duration-150"
+              className="text-xs text-foreground font-semibold truncate max-w-[60px] hover:text-primary transition-colors duration-150"
               onClick={handleAuthorClick}
             >
               {post.author.nickname || post.author.username}
@@ -153,7 +152,6 @@ export default function PostGridCard({ post, showBoard = false }: PostGridCardPr
           <InlineReplies
             postId={post.id}
             postAuthorId={post.author?.id}
-            onClose={() => setShowReplies(false)}
           />
         </div>
       )}

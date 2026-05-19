@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import { addLike, removeLike } from '../api/like';
 import type { Reply } from '../api/reply';
 import ReportDialog from './ReportDialog';
+import ViewRepliesDialog from './ViewRepliesDialog';
 import { toast } from './ui';
 import { formatRelativeTime } from '../utils/relativeTime';
 import { normalizeImageUrl } from '../utils/imageUrl';
@@ -136,11 +137,20 @@ export default function ReplyItem({
 
             {/* Row 3: Child replies in gray area */}
             {!isDeleted && childReplies && childReplies.length > 0 && (
-              <div className="mt-2 bg-muted/40 rounded-lg p-2.5 space-y-2">
+              <div className="mt-2 bg-reply-bg rounded-lg p-2.5 space-y-2">
                 {childReplies.map((child) => (
                   <ChildReplyItem
                     key={child.id}
                     reply={child}
+                    parentReply={{
+                      id,
+                      contentMarkdown,
+                      author,
+                      createdAt,
+                      isDeleted,
+                      likeCount: likeCountState,
+                    }}
+                    allChildReplies={childReplies}
                     postId={postId}
                     currentUserId={currentUserId}
                     postAuthorId={postAuthorId}
@@ -241,9 +251,22 @@ export default function ReplyItem({
   );
 }
 
-/** Compact child reply — nickname only (no avatar), displayed in gray area */
+/** Count total replies recursively */
+function countChildReplies(replies?: Reply[]): number {
+  if (!replies) return 0;
+  let count = 0;
+  for (const r of replies) {
+    count += 1;
+    if (r.childReplies?.length) count += countChildReplies(r.childReplies);
+  }
+  return count;
+}
+
+/** Compact child reply — nickname only (no avatar), click to view sub-replies */
 function ChildReplyItem({
   reply,
+  parentReply,
+  allChildReplies,
   postId,
   currentUserId,
   postAuthorId,
@@ -254,6 +277,15 @@ function ChildReplyItem({
   onDelete,
 }: {
   reply: Reply;
+  parentReply: {
+    id: string;
+    contentMarkdown: string;
+    author: Reply['author'];
+    createdAt: string;
+    isDeleted?: boolean;
+    likeCount?: number;
+  };
+  allChildReplies: Reply[];
   postId: string;
   currentUserId?: string | null;
   postAuthorId?: string | null;
@@ -263,39 +295,9 @@ function ChildReplyItem({
   onEdit?: (replyId: string) => void;
   onDelete?: (replyId: string) => void;
 }) {
-  const canEdit = currentUserId === reply.author.id;
-  const canDelete = currentUserId === reply.author.id || isModerator || isAdmin;
   const isPostAuthor = postAuthorId === reply.author.id;
-  const [reportOpen, setReportOpen] = useState(false);
-
-  // Inline like state
-  const [liked, setLiked] = useState(reply.isLikedByCurrentUser);
-  const [likeCountState, setLikeCountState] = useState(reply.likeCount);
-  const [likeLoading, setLikeLoading] = useState(false);
-
-  const handleLikeToggle = useCallback(async () => {
-    if (likeLoading) return;
-    setLikeLoading(true);
-    const prevLiked = liked;
-    const prevCount = likeCountState;
-    const newLiked = !liked;
-    const newCount = liked ? likeCountState - 1 : likeCountState + 1;
-    setLiked(newLiked);
-    setLikeCountState(newCount);
-    try {
-      if (newLiked) {
-        await addLike('reply', reply.id);
-      } else {
-        await removeLike('reply', reply.id);
-      }
-    } catch {
-      setLiked(prevLiked);
-      setLikeCountState(prevCount);
-      toast.error('操作失败，请重试');
-    } finally {
-      setLikeLoading(false);
-    }
-  }, [likeLoading, liked, likeCountState, reply.id]);
+  const [viewRepliesOpen, setViewRepliesOpen] = useState(false);
+  const hasChildReplies = reply.childReplies && reply.childReplies.length > 0;
 
   if (reply.isDeleted) {
     return (
@@ -305,7 +307,10 @@ function ChildReplyItem({
 
   return (
     <>
-      <div className="group/child-reply py-1.5">
+      <div
+        className="py-1.5 cursor-pointer"
+        onClick={() => setViewRepliesOpen(true)}
+      >
         {/* Nickname + author badge + time */}
         <div className="flex items-center gap-1.5 mb-0.5">
           <span className="text-xs font-semibold text-foreground">
@@ -319,91 +324,32 @@ function ChildReplyItem({
           <span className="text-[11px] text-muted-foreground">
             {formatRelativeTime(reply.createdAt)}
           </span>
+          {hasChildReplies && (
+            <span className="text-[11px] text-primary font-medium ml-1">
+              查看回复({countChildReplies(reply.childReplies)})
+            </span>
+          )}
         </div>
 
         {/* Content */}
         <div className="text-xs text-foreground leading-relaxed whitespace-pre-wrap break-words">
           {reply.contentMarkdown}
         </div>
-
-        {/* Actions: reply + like + report (hover) */}
-        <div className="flex items-center gap-2.5 mt-1 text-[11px] text-muted-foreground">
-          <button
-            onClick={onReply}
-            className="inline-flex items-center gap-0.5 hover:text-primary transition-colors duration-150"
-            aria-label="回复"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            回复
-          </button>
-
-          <button
-            onClick={handleLikeToggle}
-            disabled={likeLoading}
-            className={`inline-flex items-center gap-0.5 transition-colors duration-150 ${
-              liked ? 'text-like' : 'hover:text-like'
-            }`}
-            aria-label={liked ? '取消点赞' : '点赞'}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-            {likeCountState}
-          </button>
-
-          {/* Report — hover only */}
-          {currentUserId && currentUserId !== reply.author.id && (
-            <button
-              onClick={() => setReportOpen(true)}
-              className="inline-flex items-center gap-0.5 opacity-0 group-hover/child-reply:opacity-100 hover:text-foreground transition-all duration-150"
-              aria-label="举报"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-                <line x1="4" y1="22" x2="4" y2="15" />
-              </svg>
-              举报
-            </button>
-          )}
-
-          {/* Edit/Delete — hover only */}
-          {(canEdit || canDelete) && (
-            <div className="inline-flex opacity-0 group-hover/child-reply:opacity-100 transition-all duration-150">
-              {canEdit && onEdit && (
-                <button
-                  onClick={() => onEdit(reply.id)}
-                  className="hover:text-primary transition-colors duration-150 mr-2"
-                  aria-label="编辑"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                </button>
-              )}
-              {canDelete && onDelete && (
-                <button
-                  onClick={() => onDelete(reply.id)}
-                  className="hover:text-red-500 transition-colors duration-150"
-                  aria-label="删除"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          )}
-        </div>
       </div>
-      <ReportDialog
-        open={reportOpen}
-        targetType="reply"
-        targetId={reply.id}
-        onClose={() => setReportOpen(false)}
+      <ViewRepliesDialog
+        open={viewRepliesOpen}
+        onClose={() => setViewRepliesOpen(false)}
+        parentReply={parentReply}
+        currentReply={reply}
+        allChildReplies={allChildReplies}
+        postId={postId}
+        currentUserId={currentUserId}
+        postAuthorId={postAuthorId}
+        isModerator={isModerator}
+        isAdmin={isAdmin}
+        onReply={onReply}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />
     </>
   );

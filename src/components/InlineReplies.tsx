@@ -12,10 +12,9 @@ interface InlineRepliesProps {
   postId: string;
   /** Post author's user ID, for "作者" badge */
   postAuthorId?: string | null;
-  onClose?: () => void;
 }
 
-export default function InlineReplies({ postId, postAuthorId, onClose }: InlineRepliesProps) {
+export default function InlineReplies({ postId, postAuthorId }: InlineRepliesProps) {
   const { user, isAuthenticated } = useAuthStore();
 
   const [replies, setReplies] = useState<Reply[]>([]);
@@ -104,22 +103,6 @@ export default function InlineReplies({ postId, postAuthorId, onClose }: InlineR
 
   return (
     <div className="mt-3 pt-3 border-t border-border" onClick={(e) => e.stopPropagation()}>
-      {/* Header with close button */}
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-foreground">
-          回复 {repliesTotal > 0 && `(${repliesTotal})`}
-        </h4>
-        <button
-          onClick={onClose}
-          className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors duration-150"
-          aria-label="收起回复"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
       {/* Reply tree */}
       <ReplyTree
         replies={replies}
