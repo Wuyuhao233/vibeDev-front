@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import RelativeTime from './ui/RelativeTime';
+import AvatarHoverCard from './AvatarHoverCard';
+import InlineReplies from './InlineReplies';
 import { formatCount } from '../utils/formatCount';
-import { normalizeImageUrl } from '../utils/imageUrl';
 import type { PostCardData } from '../types/board';
 
 interface PostGridCardProps {
@@ -28,10 +29,18 @@ function stripMarkdown(md: string, maxLen = 80): string {
 
 export default function PostGridCard({ post, showBoard = false }: PostGridCardProps) {
   const navigate = useNavigate();
+  const [showReplies, setShowReplies] = useState(false);
 
-  const handleClick = () => navigate(`/post/${post.id}`);
+  const handleClick = () => {
+    if (!showReplies) {
+      navigate(`/post/${post.id}`);
+    }
+  };
   const handleAuthorClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    navigate(`/u/${post.author.username}`);
+  };
+  const handleAvatarClick = () => {
     navigate(`/u/${post.author.username}`);
   };
 
@@ -95,39 +104,59 @@ export default function PostGridCard({ post, showBoard = false }: PostGridCardPr
         {/* Meta row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <div className="flex items-center gap-1 cursor-pointer" onClick={handleAuthorClick}>
-              <Avatar size="sm">
-                {post.author.avatarUrl && <AvatarImage src={normalizeImageUrl(post.author.avatarUrl)} alt={post.author.username} />}
-                <AvatarFallback className="text-[10px]">
-                  {post.author.username?.[0]?.toUpperCase() || '?'}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-xs text-muted-foreground truncate max-w-[60px]">
-                {post.author.nickname || post.author.username}
-              </span>
-            </div>
+            <AvatarHoverCard
+              username={post.author.username}
+              avatarUrl={post.author.avatarUrl}
+              nickname={post.author.nickname}
+              level={post.author.level}
+              size="sm"
+              onClick={handleAvatarClick}
+            />
+            <span
+              className="text-xs text-foreground font-semibold truncate max-w-[60px] hover:text-primary cursor-pointer transition-colors duration-150"
+              onClick={handleAuthorClick}
+            >
+              {post.author.nickname || post.author.username}
+            </span>
             <RelativeTime date={post.createdAt} className="text-xs text-muted-foreground" />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             {showBoard && post.boardName && (
               <span className="text-xs text-muted-foreground">{post.boardName}</span>
             )}
-            <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
+            <span className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-red-500 transition-colors duration-150">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
               </svg>
               {formatCount(post.likeCount)}
             </span>
-            <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <button
+              className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-blue-500 transition-colors duration-150"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowReplies((prev) => !prev);
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={showReplies ? 'text-blue-500' : ''}>
                 <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
               </svg>
               {formatCount(post.replyCount)}
-            </span>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Inline replies panel */}
+      {showReplies && (
+        <div id={`post-${post.id}`} className="px-3.5 pb-3">
+          <InlineReplies
+            postId={post.id}
+            postAuthorId={post.author?.id}
+            onClose={() => setShowReplies(false)}
+          />
+        </div>
+      )}
     </article>
   );
 }

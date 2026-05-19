@@ -6,6 +6,7 @@ import CheckInButton from './CheckInButton';
 import SearchInput from './SearchInput';
 import ThemeToggle from './ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from './ui';
+import { normalizeImageUrl } from '../utils/imageUrl';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -75,6 +76,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 p-1 rounded-md hover:bg-muted transition-colors duration-150"
                 >
                   <Avatar size="sm">
+                    {user?.avatarUrl && <AvatarImage src={normalizeImageUrl(user.avatarUrl)} alt={user?.username || ''} />}
                     <AvatarFallback>{user?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
                   </Avatar>
                   <span className="text-sm text-foreground max-w-[100px] truncate">{user?.username}</span>

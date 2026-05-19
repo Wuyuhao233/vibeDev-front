@@ -1,9 +1,10 @@
 import { /*Link,*/ useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from './ui';
+import { useState } from 'react';
 import LevelBadge from './ui/LevelBadge';
 import RelativeTime from './ui/RelativeTime';
+import AvatarHoverCard from './AvatarHoverCard';
+import InlineReplies from './InlineReplies';
 import { formatCount } from '../utils/formatCount';
-import { normalizeImageUrl } from '../utils/imageUrl';
 import type { PostCardData } from '../types/board';
 
 interface PostCardProps {
@@ -29,13 +30,20 @@ function stripMarkdown(md: string, maxLen = 200): string {
 
 export default function PostCard({ post, showBoard = false }: PostCardProps) {
   const navigate = useNavigate();
+  const [showReplies, setShowReplies] = useState(false);
 
   const handleCardClick = () => {
-    navigate(`/post/${post.id}`);
+    if (!showReplies) {
+      navigate(`/post/${post.id}`);
+    }
   };
 
   const handleAuthorClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    navigate(`/u/${post.author.username}`);
+  };
+
+  const handleAvatarClick = () => {
     navigate(`/u/${post.author.username}`);
   };
 
@@ -62,20 +70,20 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
           {/* Author + Time row */}
           <div className="post-card__author-row flex items-center gap-2 mb-2">
             <div
-              className="post-card__author flex items-center gap-1.5 cursor-pointer"
-              onClick={handleAuthorClick}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleAuthorClick(e as any); }}
+              className="post-card__author flex items-center gap-1.5"
             >
-              <Avatar
+              <AvatarHoverCard
+                username={post.author.username}
+                avatarUrl={post.author.avatarUrl}
+                nickname={post.author.nickname}
+                level={post.author.level}
                 size="sm"
-                className="post-card__author-avatar"
+                onClick={handleAvatarClick}
+              />
+              <span
+                className="post-card__author-name text-sm text-foreground font-semibold max-w-[80px] truncate hover:text-primary cursor-pointer transition-colors duration-150"
+                onClick={handleAuthorClick}
               >
-                {post.author.avatarUrl && <AvatarImage src={normalizeImageUrl(post.author.avatarUrl)} alt={post.author.username} />}
-                <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
-              </Avatar>
-              <span className="post-card__author-name text-sm text-foreground font-medium max-w-[80px] truncate">
                 {post.author.nickname || post.author.username}
               </span>
               <LevelBadge level={Math.min(Math.max(post.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6} />
@@ -138,20 +146,26 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
           ) : null}
 
           {/* Stats row */}
-          <div className="post-card__stats flex items-center gap-4">
-            <span className="post-card__stat--like inline-flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="post-card__stats flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+            <span className="post-card__stat--like inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-red-500 transition-colors duration-150">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                 <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" fill="none" />
               </svg>
               {formatCount(post.likeCount)}
             </span>
-            <span className="post-card__stat--reply inline-flex items-center gap-1 text-xs text-muted-foreground">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
+            <button
+              className="post-card__stat--reply inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-500 transition-colors duration-150"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowReplies((prev) => !prev);
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className={showReplies ? 'text-blue-500' : 'text-muted-foreground'}>
                 <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="2" fill="none" />
               </svg>
               {formatCount(post.replyCount)}
-            </span>
-            <span className="post-card__stat--collect inline-flex items-center gap-1 text-xs text-muted-foreground">
+            </button>
+            <span className="post-card__stat--collect inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-amber-500 transition-colors duration-150">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" fill="none" />
               </svg>
@@ -175,6 +189,17 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
           </div>
         )}
       </div>
+
+      {/* Inline replies panel */}
+      {showReplies && (
+        <div id={`post-${post.id}`}>
+          <InlineReplies
+            postId={post.id}
+            postAuthorId={post.author?.id}
+            onClose={() => setShowReplies(false)}
+          />
+        </div>
+      )}
     </article>
   );
 }

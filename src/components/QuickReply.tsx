@@ -1,29 +1,42 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Button } from './ui';
+import { Avatar, AvatarFallback, AvatarImage, Button } from './ui';
+import EmojiPicker from './EmojiPicker';
+import { normalizeImageUrl } from '../utils/imageUrl';
 
 interface QuickReplyProps {
   onSubmit: (content: string) => Promise<void>;
   placeholder?: string;
   cooldownSeconds?: number;
   disabled?: boolean;
+  /** Current user info for avatar display */
+  currentUser?: {
+    username: string;
+    avatarUrl: string | null;
+  } | null;
+  /** Who the user is replying to — null means replying to the post itself */
+  replyToUsername?: string | null;
+  /** Callback to cancel replying to a specific user */
+  onCancelReplyTo?: () => void;
+  /** Whether to force top-level reply (ignore parentReplyId) */
+  replyToPostOnly?: boolean;
+  onReplyToPostOnlyChange?: (value: boolean) => void;
 }
-
-const miniTools = [
-  { label: 'B', prefix: '**', suffix: '**' },
-  { label: 'I', prefix: '*', suffix: '*' },
-  { label: '>', prefix: '> ', suffix: '', block: true },
-  { label: '`', prefix: '`', suffix: '`' },
-];
 
 export default function QuickReply({
   onSubmit,
-  placeholder = '写下你的回复，支持 Markdown 语法',
+  placeholder = '写下你的回复…',
   cooldownSeconds = 10,
   disabled = false,
+  currentUser,
+  replyToUsername,
+  onCancelReplyTo,
+  replyToPostOnly = false,
+  onReplyToPostOnlyChange,
 }: QuickReplyProps) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [showEmoji, setShowEmoji] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -55,39 +68,6 @@ export default function QuickReply({
     }
   }, [content, loading, cooldown, disabled, cooldownSeconds, onSubmit]);
 
-  const insertTool = useCallback(
-    (tool: typeof miniTools[0]) => {
-      const textarea = textareaRef.current;
-      if (!textarea) return;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const selected = content.substring(start, end);
-      const before = content.substring(0, start);
-      const after = content.substring(end);
-      let newValue: string;
-      let cursor: number;
-
-      if (tool.block) {
-        const lineStart = before.lastIndexOf('\n', start - 1) + 1;
-        newValue = before.substring(0, lineStart) + tool.prefix + before.substring(lineStart, start) + selected + after;
-        cursor = start + tool.prefix.length;
-      } else if (selected) {
-        newValue = before + tool.prefix + selected + tool.suffix + after;
-        cursor = start + tool.prefix.length + selected.length + tool.suffix.length;
-      } else {
-        newValue = before + tool.prefix + tool.suffix + after;
-        cursor = start + tool.prefix.length;
-      }
-
-      setContent(newValue);
-      requestAnimationFrame(() => {
-        textarea.focus();
-        textarea.setSelectionRange(cursor, cursor);
-      });
-    },
-    [content],
-  );
-
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -98,60 +78,154 @@ export default function QuickReply({
     [handleSubmit],
   );
 
-  const charCount = content.length;
+  const handleEmojiSelect = useCallback((emoji: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setContent((prev) => prev + emoji);
+      return;
+    }
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = content.substring(0, start);
+    const after = content.substring(end);
+    const newValue = before + emoji + after;
+    setContent(newValue);
+    const cursor = start + emoji.length;
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(cursor, cursor);
+    });
+    setShowEmoji(false);
+  }, [content]);
+
+  // Auto-resize textarea
+  const handleInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+    const ta = e.target;
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
+  }, []);
 
   return (
-    <div className="quick-reply border-t border-border pt-4">
-      <h4 className="text-base font-medium text-foreground mb-3">发表回复</h4>
+    <div className="quick-reply">
+      {/* Main input area: avatar + textarea */}
+      <div className="flex gap-3">
+        {/* Left avatar — static display only, no hover */}
+        {currentUser && (
+          <Avatar size="default" className="flex-shrink-0 mt-0.5">
+            {currentUser.avatarUrl && (
+              <AvatarImage src={normalizeImageUrl(currentUser.avatarUrl)} alt={currentUser.username} />
+            )}
+            <AvatarFallback>{currentUser.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+          </Avatar>
+        )}
 
-      {/* Mini toolbar */}
-      <div className="flex items-center gap-1 mb-2">
-        {miniTools.map((tool) => (
-          <button
-            key={tool.label}
-            type="button"
-            onClick={() => insertTool(tool)}
-            className="w-7 h-7 flex items-center justify-center text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded transition-colors duration-150"
-            title={tool.label}
-          >
-            {tool.label}
-          </button>
-        ))}
+        {/* Right: reply hint + textarea */}
+        <div className="flex-1 min-w-0">
+          {/* Reply-to hint (gray, dismissible) */}
+          {replyToUsername && (
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="text-xs text-muted-foreground">
+                回复 <span className="font-medium">@{replyToUsername}</span>
+              </span>
+              {onCancelReplyTo && (
+                <button
+                  onClick={onCancelReplyTo}
+                  className="text-muted-foreground/60 hover:text-foreground text-xs transition-colors duration-150"
+                  aria-label="取消回复"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Textarea */}
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={handleInput}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            rows={3}
+            disabled={disabled}
+            className="w-full border border-border rounded-lg p-3 text-sm resize-none outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors duration-150 placeholder:text-muted-foreground min-h-[80px] bg-muted/30"
+          />
+        </div>
       </div>
 
-      {/* Textarea */}
-      <textarea
-        ref={textareaRef}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        rows={4}
-        disabled={disabled}
-        className="w-full border border-border rounded-md p-3 text-sm resize-y outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors duration-150 placeholder:text-muted-foreground min-h-[100px]"
-      />
+      {/* Bottom toolbar */}
+      <div className="flex items-center justify-between mt-2 pl-11">
+        {/* Left: emoji + other tools */}
+        <div className="flex items-center gap-1">
+          {/* Emoji button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowEmoji(!showEmoji)}
+              className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors duration-150 ${
+                showEmoji
+                  ? 'text-primary bg-primary/10'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              }`}
+              aria-label="表情"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                <line x1="9" y1="9" x2="9.01" y2="9" strokeWidth="2" />
+                <line x1="15" y1="9" x2="15.01" y2="9" strokeWidth="2" />
+              </svg>
+            </button>
+            {showEmoji && (
+              <EmojiPicker
+                onSelect={handleEmojiSelect}
+                onClose={() => setShowEmoji(false)}
+              />
+            )}
+          </div>
 
-      {/* Bottom bar */}
-      <div className="flex items-center justify-between mt-2">
-        <div className="flex items-center gap-3">
-          <span className={`text-xs ${charCount > 2000 ? 'text-red-500' : 'text-muted-foreground'}`}>
-            {charCount}/2000
-          </span>
-          <span className="text-xs text-muted-foreground">Ctrl+Enter 发送</span>
+          {/* Image upload placeholder */}
+          <button
+            className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors duration-150"
+            aria-label="图片"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+          </button>
+
+          {/* Reply-to-post-only checkbox */}
+          {onReplyToPostOnlyChange && (
+            <label className="flex items-center gap-1.5 ml-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={replyToPostOnly}
+                onChange={(e) => onReplyToPostOnlyChange(e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary/20 accent-primary"
+              />
+              <span className="text-xs text-muted-foreground">仅在正文下讨论</span>
+            </label>
+          )}
         </div>
 
+        {/* Right: submit button */}
         {cooldown > 0 ? (
-          <span className="inline-flex items-center px-4 py-2 text-sm text-muted-foreground bg-muted/50 rounded-md">
-            请等待 {cooldown} 秒后回复
+          <span className="inline-flex items-center px-4 py-1.5 text-sm text-muted-foreground bg-muted/50 rounded-md">
+            {cooldown}s
           </span>
         ) : (
           <Button
             variant="default"
-            size="default"
+            size="sm"
             disabled={loading || !content.trim() || disabled}
             onClick={handleSubmit}
+            className="px-5"
           >
-            {loading ? '提交中...' : '发布回复'}
+            {loading ? '发布中...' : '发布'}
           </Button>
         )}
       </div>

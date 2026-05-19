@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import SearchInput from '../components/SearchInput';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui';
 import LevelBadge from '../components/ui/LevelBadge';
 import RelativeTime from '../components/ui/RelativeTime';
+import AvatarHoverCard from '../components/AvatarHoverCard';
 import { formatCount } from '../utils/formatCount';
-import { normalizeImageUrl } from '../utils/imageUrl';
 import { search, getSearchSuggestions, getTrendingSearches } from '../api/search';
 import type { SearchScope, SearchResultItem } from '../api/search';
 import { getBoards } from '../api/board';
@@ -574,11 +573,15 @@ function SearchResultCard({ item, query }: { item: SearchResultItem; query: stri
           {/* Meta row */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
-              <Avatar size="sm">
-                {item.author.avatarUrl && <AvatarImage src={normalizeImageUrl(item.author.avatarUrl)} alt={item.author.username} />}
-                <AvatarFallback>{item.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
-              </Avatar>
-              <span className="text-sm text-muted-foreground">{item.author.username}</span>
+              <AvatarHoverCard
+                username={item.author.username}
+                avatarUrl={item.author.avatarUrl}
+                nickname={item.author.nickname}
+                level={item.author.level}
+                size="sm"
+                onClick={() => navigate(`/u/${item.author.username}`)}
+              />
+              <span className="text-sm text-foreground font-semibold hover:text-primary cursor-pointer transition-colors duration-150" onClick={() => navigate(`/u/${item.author.username}`)}>{item.author.nickname || item.author.username}</span>
               <LevelBadge level={Math.min(Math.max(item.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6} />
             </div>
             <RelativeTime date={item.createdAt} className="text-xs text-muted-foreground" />

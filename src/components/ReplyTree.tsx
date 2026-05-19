@@ -3,125 +3,6 @@ import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from './ui';
 import { ErrorEmpty, PaginationComponent } from './shared';
 import type { Reply } from '../api/reply';
 
-const DEPTH_COLORS = [
-  'border-l-blue-400',
-  'border-l-emerald-400',
-  'border-l-purple-400',
-  'border-l-amber-400',
-  'border-l-pink-400',
-  'border-l-cyan-400',
-];
-
-function buildTree(replies: Reply[]): { roots: Reply[]; childrenMap: Map<string, Reply[]> } {
-  const childrenMap = new Map<string, Reply[]>();
-  const roots: Reply[] = [];
-
-  for (const reply of replies) {
-    const parentId = reply.parentReplyId;
-    if (parentId === null) {
-      roots.push(reply);
-    } else {
-      const existing = childrenMap.get(parentId);
-      if (existing) {
-        existing.push(reply);
-      } else {
-        childrenMap.set(parentId, [reply]);
-      }
-    }
-  }
-
-  return { roots, childrenMap };
-}
-
-interface ReplyTreeNodeProps {
-  reply: Reply;
-  depth: number;
-  childrenMap: Map<string, Reply[]>;
-  postId: string;
-  currentUserId?: string | null;
-  isModerator?: boolean;
-  isAdmin?: boolean;
-  onReply: (replyId: string) => void;
-  onShare?: (replyId: string) => void;
-  onEdit: (replyId: string) => void;
-  onDelete: (replyId: string) => void;
-  highlightedReplyId: string | null;
-}
-
-function ReplyTreeNode({
-  reply,
-  depth,
-  childrenMap,
-  postId,
-  currentUserId,
-  isModerator,
-  isAdmin,
-  onReply,
-  onShare,
-  onEdit,
-  onDelete,
-  highlightedReplyId,
-}: ReplyTreeNodeProps) {
-  const children = childrenMap.get(reply.id) || [];
-  const colorClass = DEPTH_COLORS[depth % DEPTH_COLORS.length];
-  const isHighlighted = highlightedReplyId === reply.id;
-
-  return (
-    <div id={`reply-${reply.id}`}>
-      <div
-        className={`relative transition-colors duration-300 rounded-md ${
-          isHighlighted ? 'bg-yellow-100' : ''
-        }`}
-      >
-        {depth > 0 && (
-          <div
-            className={`absolute top-0 bottom-0 left-0 border-l-2 ${colorClass}`}
-            style={{ marginLeft: `${(depth - 1) * 24 + 16}px` }}
-          />
-        )}
-        <div style={{ paddingLeft: `${depth * 24}px` }}>
-          <ReplyItem
-            id={reply.id}
-            postId={postId}
-            contentMarkdown={reply.contentMarkdown}
-            author={reply.author}
-            depth={reply.depth}
-            likeCount={reply.likeCount}
-            isLikedByCurrentUser={reply.isLikedByCurrentUser}
-            isDeleted={reply.isDeleted}
-            createdAt={reply.createdAt}
-            updatedAt={reply.updatedAt}
-            currentUserId={currentUserId}
-            isModerator={isModerator}
-            isAdmin={isAdmin}
-            onReply={() => onReply(reply.id)}
-            onShare={onShare}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        </div>
-      </div>
-      {children.map((child) => (
-        <ReplyTreeNode
-          key={child.id}
-          reply={child}
-          depth={depth + 1}
-          childrenMap={childrenMap}
-          postId={postId}
-          currentUserId={currentUserId}
-          isModerator={isModerator}
-          isAdmin={isAdmin}
-          onReply={onReply}
-          onShare={onShare}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          highlightedReplyId={highlightedReplyId}
-        />
-      ))}
-    </div>
-  );
-}
-
 interface ReplyTreeProps {
   replies: Reply[];
   total: number;
@@ -135,11 +16,12 @@ interface ReplyTreeProps {
   isAdmin?: boolean;
   onPageChange: (page: number) => void;
   onReply: (replyId: string) => void;
-  onShare?: (replyId: string) => void;
   onEdit: (replyId: string) => void;
   onDelete: (replyId: string) => void;
   onRetry: () => void;
   highlightedReplyId?: string | null;
+  /** Post author's user ID, for "作者" badge */
+  postAuthorId?: string | null;
 }
 
 export default function ReplyTree({
@@ -155,11 +37,11 @@ export default function ReplyTree({
   isAdmin,
   onPageChange,
   onReply,
-  onShare,
   onEdit,
   onDelete,
   onRetry,
   highlightedReplyId = null,
+  postAuthorId,
 }: ReplyTreeProps) {
   if (loading && replies.length === 0) {
     return (
@@ -200,9 +82,8 @@ export default function ReplyTree({
     );
   }
 
-  const { roots, childrenMap } = buildTree(replies);
-
   return (
+
     <div className="reply-tree">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-lg font-semibold text-foreground">
@@ -211,23 +92,39 @@ export default function ReplyTree({
       </div>
 
       <div className="reply-tree__items">
-        {roots.map((reply) => (
-          <ReplyTreeNode
-            key={reply.id}
-            reply={reply}
-            depth={0}
-            childrenMap={childrenMap}
-            postId={postId}
-            currentUserId={currentUserId}
-            isModerator={isModerator}
-            isAdmin={isAdmin}
-            onReply={onReply}
-            onShare={onShare}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            highlightedReplyId={highlightedReplyId}
-          />
-        ))}
+        {replies.map((reply) => {
+          const isHighlighted = highlightedReplyId === reply.id;
+          return (
+            <div
+              key={reply.id}
+              id={`reply-${reply.id}`}
+              className={`transition-colors duration-300 rounded-md border-b border-border/30 ${
+                isHighlighted ? 'bg-yellow-100' : ''
+              }`}
+            >
+              <ReplyItem
+                id={reply.id}
+                postId={postId}
+                contentMarkdown={reply.contentMarkdown}
+                author={reply.author}
+                likeCount={reply.likeCount}
+                isLikedByCurrentUser={reply.isLikedByCurrentUser}
+                isDeleted={reply.isDeleted}
+                createdAt={reply.createdAt}
+                updatedAt={reply.updatedAt}
+                currentUserId={currentUserId}
+                isModerator={isModerator}
+                isAdmin={isAdmin}
+                postAuthorId={postAuthorId}
+                childReplies={reply.childReplies}
+                onReply={() => onReply(reply.id)}
+                onReplyToChild={onReply}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            </div>
+          );
+        })}
       </div>
 
       <PaginationComponent

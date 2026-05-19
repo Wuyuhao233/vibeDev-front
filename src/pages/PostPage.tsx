@@ -8,8 +8,8 @@ import 'github-markdown-css/github-markdown.css';
 import { getPost, deletePost, recordPostView, pinPost, unpinPost, toggleEssence, type PostDetail } from '../api/post';
 import { getReplies, createReply, deleteReply, type Reply } from '../api/reply';
 import { useAuthStore } from '../store/authStore';
-import { normalizeImageUrl } from '../utils/imageUrl';
-import { Avatar, AvatarFallback, AvatarImage, LevelBadge, Badge, Empty, EmptyHeader, EmptyTitle, EmptyContent, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui';
+import AvatarHoverCard from '../components/AvatarHoverCard';
+import { LevelBadge, Badge, Empty, EmptyHeader, EmptyTitle, EmptyContent, AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui';
 import { ErrorEmpty } from '../components/shared';
 import { toast } from '../components/ui';
 import PostDetailSkeleton from '../components/PostDetailSkeleton';
@@ -186,16 +186,19 @@ export default function PostPage() {
     }
   }, [postId]);
 
+  const [replyToPostOnly, setReplyToPostOnly] = useState(false);
+
   // Reply actions
   const handleReplySubmit = useCallback(
     async (content: string) => {
-      await createReply(postId, { content, parentReplyId: replyToId ?? undefined, idempotencyKey: `reply-${Date.now()}-${Math.random().toString(36).slice(2, 9)}` });
+      await createReply(postId, { content, parentReplyId: replyToPostOnly ? undefined : (replyToId ?? undefined), idempotencyKey: `reply-${Date.now()}-${Math.random().toString(36).slice(2, 9)}` });
       toast.success('回复已发布');
       setReplyToId(null);
       setReplyToUsername(null);
+      setReplyToPostOnly(false);
       fetchReplies(repliesPage);
     },
-    [postId, replyToId, repliesPage, fetchReplies],
+    [postId, replyToId, replyToPostOnly, repliesPage, fetchReplies],
   );
 
   const handleReplyDelete = useCallback(
@@ -341,15 +344,17 @@ export default function PostPage() {
 
       {/* Author header */}
       <div className="flex items-center gap-3 mb-4">
-        <Link to={`/u/${post.author.username}`}>
-          <Avatar size="default">
-            {post.author.avatarUrl && <AvatarImage src={normalizeImageUrl(post.author.avatarUrl)} alt={post.author.username} />}
-            <AvatarFallback>{post.author.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
-          </Avatar>
-        </Link>
+        <AvatarHoverCard
+          username={post.author.username}
+          avatarUrl={post.author.avatarUrl}
+          nickname={post.author.nickname}
+          level={post.author.level}
+          size="default"
+          onClick={() => navigate(`/u/${post.author.username}`)}
+        />
         <div>
-          <Link to={`/u/${post.author.username}`} className="text-base font-medium text-foreground hover:text-primary">
-            {post.author.username}
+          <Link to={`/u/${post.author.username}`} className="text-base font-semibold text-foreground hover:text-primary">
+            {post.author.nickname || post.author.username}
           </Link>
           <LevelBadge level={level} className="ml-2" />
           <div className="text-sm text-muted-foreground mt-0.5">
@@ -566,6 +571,7 @@ export default function PostPage() {
           onDelete={handleReplyDelete}
           onRetry={() => fetchReplies(repliesPage)}
           highlightedReplyId={highlightedReplyId}
+          postAuthorId={post.author?.id}
         />
 
         {/* Quick reply — disabled for PENDING, hidden for REJECTED */}
@@ -578,20 +584,14 @@ export default function PostPage() {
         ) : post.auditStatus === 'REJECTED' ? null : (
           isAuthenticated ? (
           <div className="quick-reply-container">
-            {replyToId && replyToUsername && (
-              <div className="flex items-center gap-2 mt-4 px-3 py-2 bg-blue-50 border border-blue-200 rounded-md text-sm">
-                <span className="text-blue-700">
-                  正在回复 <span className="font-medium">@{replyToUsername}</span>
-                </span>
-                <button
-                  onClick={handleCancelReplyTo}
-                  className="ml-auto text-blue-500 hover:text-blue-700 text-xs"
-                >
-                  取消回复
-                </button>
-              </div>
-            )}
-            <QuickReply onSubmit={handleReplySubmit} />
+            <QuickReply
+              onSubmit={handleReplySubmit}
+              currentUser={user}
+              replyToUsername={replyToUsername}
+              onCancelReplyTo={handleCancelReplyTo}
+              replyToPostOnly={replyToPostOnly}
+              onReplyToPostOnlyChange={setReplyToPostOnly}
+            />
           </div>
         ) : (
           <div className="border-t border-border pt-4 mt-4">

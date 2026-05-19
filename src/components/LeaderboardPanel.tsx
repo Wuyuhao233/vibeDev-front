@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import { Skeleton } from './ui';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from './ui';
 import { ErrorEmpty } from './shared';
-import { normalizeImageUrl } from '../utils/imageUrl';
+import AvatarHoverCard from './AvatarHoverCard';
 
 type Period = 'week' | 'month' | 'all';
 
@@ -133,12 +133,13 @@ export default function LeaderboardPanel() {
                     </span>
 
                     {/* Avatar */}
-                    <Avatar
+                    <AvatarHoverCard
+                      username={entry.username}
+                      avatarUrl={entry.avatarUrl}
+                      level={entry.level}
                       size="sm"
-                    >
-                      {entry.avatarUrl && <AvatarImage src={normalizeImageUrl(entry.avatarUrl)} alt={entry.username} />}
-                      <AvatarFallback>{entry.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
-                    </Avatar>
+                      onClick={() => navigate(`/u/${entry.username}`)}
+                    />
 
                     {/* Username */}
                     <span className={`flex-1 text-sm truncate ${isMe ? 'font-medium text-primary-600' : 'text-foreground'}`}>
