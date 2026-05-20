@@ -4,14 +4,11 @@ import { getBoard, getBoardPosts, type Board } from '../api/board';
 import { getFollowedTags, followTag, unfollowTag, type FollowedTag } from '../api/tag';
 import { useAuthStore } from '../store/authStore';
 import PostCard from '../components/PostCard';
-import SortSwitcher from '../components/SortSwitcher';
 import TagFilterBar from '../components/TagFilterBar';
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '../components/ui';
 import { ErrorEmpty, PaginationComponent } from '../components/shared';
 import { toast } from '../components/ui';
 import type { PostCardData } from '../types/board';
-
-type SortValue = 'hot' | 'latest' | 'trending';
 
 const PAGE_SIZE = 20;
 
@@ -34,7 +31,6 @@ export default function BoardPage() {
   const { isAuthenticated } = useAuthStore();
 
   const tagParam = searchParams.get('tag');
-  const sortParam = (searchParams.get('sort') || 'hot') as SortValue;
   const pageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const activeTagId = tagParam || null;
@@ -82,7 +78,7 @@ export default function BoardPage() {
     try {
       const result = await getBoardPosts(id, {
         tag: tagParam || undefined,
-        sort: sortParam,
+        sort: 'hot',
         page: pageParam,
         limit: PAGE_SIZE,
       });
@@ -102,7 +98,7 @@ export default function BoardPage() {
     } finally {
       setPostsLoading(false);
     }
-  }, [id, tagParam, sortParam, pageParam]);
+  }, [id, tagParam, pageParam]);
 
   useEffect(() => {
     fetchPosts();
@@ -139,10 +135,6 @@ export default function BoardPage() {
         toast.error('关注失败，请重试');
       }
     }
-  };
-
-  const handleSortChange = (sort: SortValue) => {
-    updateParams({ sort: sort === 'hot' ? null : sort, page: null });
   };
 
   const handleTagChange = (tagId: string | null) => {
@@ -228,15 +220,6 @@ export default function BoardPage() {
           onToggleFollow={handleToggleFollow}
         />
       )}
-
-      {/* Sort Switcher */}
-      <div className="flex items-center justify-between mb-4">
-        <SortSwitcher
-          value={sortParam}
-          onChange={handleSortChange}
-          showTrending={true}
-        />
-      </div>
 
       {/* Posts */}
       {postsLoading ? (

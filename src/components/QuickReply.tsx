@@ -1,7 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Avatar, AvatarFallback, AvatarImage, Button } from './ui';
+import { Avatar, AvatarFallback, AvatarImage, Button, toast } from './ui';
 import EmojiPicker from './EmojiPicker';
 import { normalizeImageUrl } from '../utils/imageUrl';
+import { uploadFile } from '../api/upload';
 
 interface QuickReplyProps {
   onSubmit: (content: string) => Promise<void>;
@@ -34,10 +35,13 @@ export default function QuickReply({
   onReplyToPostOnlyChange,
 }: QuickReplyProps) {
   const [content, setContent] = useState('');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (cooldown > 0) {
@@ -55,18 +59,24 @@ export default function QuickReply({
   }, [cooldown]);
 
   const handleSubmit = useCallback(async () => {
-    if (!content.trim() || loading || cooldown > 0 || disabled) return;
+    if ((!content.trim() && imageUrls.length === 0) || loading || cooldown > 0 || disabled) return;
     setLoading(true);
     try {
-      await onSubmit(content);
+      // Append image markdown at the end of content
+      const imageMarkdown = imageUrls.map((url) => `![](${url})`).join('\n');
+      const fullContent = imageUrls.length > 0
+        ? (content.trim() ? content.trim() + '\n\n' + imageMarkdown : imageMarkdown)
+        : content;
+      await onSubmit(fullContent);
       setContent('');
+      setImageUrls([]);
       setCooldown(cooldownSeconds);
     } catch {
       // error handling is done by parent
     } finally {
       setLoading(false);
     }
-  }, [content, loading, cooldown, disabled, cooldownSeconds, onSubmit]);
+  }, [content, imageUrls, loading, cooldown, disabled, cooldownSeconds, onSubmit]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -97,6 +107,58 @@ export default function QuickReply({
     });
     setShowEmoji(false);
   }, [content]);
+
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  const MAX_IMAGE_SIZE_MB = 5;
+  const MAX_IMAGES = 3;
+
+  const handleImageUpload = useCallback(async (file: File) => {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error('仅支持 JPG/PNG/GIF/WebP 格式');
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+      toast.error(`图片大小不能超过 ${MAX_IMAGE_SIZE_MB}MB`);
+      return;
+    }
+    if (imageUrls.length >= MAX_IMAGES) {
+      toast.error(`回复最多上传 ${MAX_IMAGES} 张图片`);
+      return;
+    }
+    setImageUploading(true);
+    try {
+      const result = await uploadFile(file);
+      setImageUrls((prev) => [...prev, result.url]);
+    } catch {
+      toast.error('图片上传失败，请重试');
+    } finally {
+      setImageUploading(false);
+    }
+  }, [imageUrls]);
+
+  const handleImageInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    for (const file of Array.from(files)) {
+      handleImageUpload(file);
+    }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  }, [handleImageUpload]);
+
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = Array.from(e.clipboardData.items);
+    const imageItems = items.filter((item) => item.type.startsWith('image/'));
+    if (imageItems.length > 0) {
+      e.preventDefault();
+      const file = imageItems[0].getAsFile();
+      if (file) handleImageUpload(file);
+    }
+  }, [handleImageUpload]);
+
+  const handleRemoveImage = useCallback((index: number) => {
+    setImageUrls((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   // Auto-resize textarea
   const handleInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -148,11 +210,34 @@ export default function QuickReply({
             value={content}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             placeholder={placeholder}
             rows={3}
             disabled={disabled}
             className="w-full border border-border rounded-lg p-3 text-sm resize-none outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors duration-150 placeholder:text-muted-foreground min-h-[80px] bg-muted/30"
           />
+          {/* Image thumbnails (only show when images exist) */}
+          {imageUrls.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {imageUrls.map((url, i) => (
+                <div key={i} className="relative group w-16 h-16 rounded-md overflow-hidden border border-border">
+                  <img
+                    src={normalizeImageUrl(url)}
+                    alt={`图片 ${i + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(i)}
+                    className="absolute top-0 right-0 w-4 h-4 bg-black/60 text-white text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                    aria-label={`移除图片 ${i + 1}`}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -186,16 +271,38 @@ export default function QuickReply({
             )}
           </div>
 
-          {/* Image upload placeholder */}
+          {/* Hidden file input for image upload */}
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept=".jpg,.jpeg,.png,.gif,.webp"
+            className="hidden"
+            onChange={handleImageInputChange}
+          />
+
+          {/* Image upload button */}
           <button
-            className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors duration-150"
+            onClick={() => imageInputRef.current?.click()}
+            disabled={imageUploading}
+            className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors duration-150 ${
+              imageUploading
+                ? 'text-primary bg-primary/10'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            }`}
             aria-label="图片"
+            title={imageUploading ? '上传中...' : '上传图片'}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
+            {imageUploading ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+            )}
           </button>
 
           {/* Reply-to-post-only checkbox */}
@@ -221,7 +328,7 @@ export default function QuickReply({
           <Button
             variant="default"
             size="sm"
-            disabled={loading || !content.trim() || disabled}
+            disabled={loading || (!content.trim() && imageUrls.length === 0) || disabled}
             onClick={handleSubmit}
             className="px-5"
           >

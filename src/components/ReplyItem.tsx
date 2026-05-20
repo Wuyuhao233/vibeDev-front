@@ -7,6 +7,7 @@ import ViewRepliesDialog from './ViewRepliesDialog';
 import { toast } from './ui';
 import { formatRelativeTime } from '../utils/relativeTime';
 import { normalizeImageUrl } from '../utils/imageUrl';
+import { ReplyContent } from '../utils/replyContent';
 
 interface ReplyItemProps {
   id: string;
@@ -130,8 +131,8 @@ export default function ReplyItem({
             {isDeleted ? (
               <p className="text-sm text-muted-foreground italic">该回复已被删除</p>
             ) : (
-              <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
-                {contentMarkdown}
+              <div className="text-sm text-foreground leading-relaxed">
+                <ReplyContent markdown={contentMarkdown} />
               </div>
             )}
 
@@ -332,8 +333,8 @@ function ChildReplyItem({
         </div>
 
         {/* Content */}
-        <div className="text-xs text-foreground leading-relaxed whitespace-pre-wrap break-words">
-          {reply.contentMarkdown}
+        <div className="text-xs text-foreground leading-relaxed">
+          <ReplyContent markdown={reply.contentMarkdown} />
         </div>
       </div>
       <ViewRepliesDialog

@@ -4,18 +4,16 @@ import { useAuthStore } from '../store/authStore';
 import { getHomeFeed, type FeedItem } from '../api/feed';
 import PostCard from '../components/PostCard';
 import PostGridCard from '../components/PostGridCard';
-import HotListSidebar from '../components/HotListSidebar';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '../components/ui';
 import { ErrorEmpty } from '../components/shared';
 import { toast } from '../components/ui';
 import type { PostCardData } from '../types/board';
 
-type HomeTab = 'recommend' | 'following' | 'trending';
+type HomeTab = 'recommend' | 'following';
 
 const TABS: { key: HomeTab; label: string }[] = [
   { key: 'recommend', label: '推荐' },
   { key: 'following', label: '关注' },
-  { key: 'trending', label: '热榜' },
 ];
 
 const PAGE_SIZE = 20;
@@ -33,7 +31,7 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const rawTab = searchParams.get('tab') || 'recommend';
-  const activeTab: HomeTab = (['recommend', 'following', 'trending'].includes(rawTab) ? rawTab : 'recommend') as HomeTab;
+  const activeTab: HomeTab = (['recommend', 'following'].includes(rawTab) ? rawTab : 'recommend') as HomeTab;
 
   const [posts, setPosts] = useState<PostCardData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -171,11 +169,11 @@ export default function HomePage() {
           </Empty>
         );
       }
-      if (activeTab === 'trending' || activeTab === 'recommend') {
+      if (activeTab === 'recommend') {
         return (
           <Empty>
             <EmptyHeader>
-              <EmptyTitle>暂无热门帖子</EmptyTitle>
+              <EmptyTitle>暂无帖子</EmptyTitle>
               <EmptyDescription>快去发第一个帖子吧</EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
@@ -220,7 +218,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex gap-6">
+    <div>
       {/* Main content area */}
       <div className="flex-1 min-w-0">
         {/* Tab Navigation */}
@@ -266,9 +264,6 @@ export default function HomePage() {
           </div>
         )}
       </div>
-
-      {/* Right sidebar - Hot list */}
-      <HotListSidebar />
     </div>
   );
 }

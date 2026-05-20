@@ -58,6 +58,10 @@ client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (config.data && !(config.data instanceof FormData) && !(config.data instanceof File) && !(config.data instanceof Blob)) {
     config.data = transformKeys(config.data, toSnakeCase);
   }
+  // When sending FormData/File/Blob, remove default Content-Type so browser sets multipart boundary
+  if (config.data instanceof FormData || config.data instanceof File || config.data instanceof Blob) {
+    delete config.headers['Content-Type'];
+  }
   if (config.params) {
     config.params = transformKeys(config.params, toSnakeCase);
   }

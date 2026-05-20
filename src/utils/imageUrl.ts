@@ -1,20 +1,18 @@
 /**
- * Normalize an avatar/image URL to a relative path.
+ * Normalize an avatar/image URL to a full absolute URL.
  *
- * Old backend versions returned full URLs like `http://localhost:8080/uploads/xxx.jpg`.
- * The current backend returns relative paths like `/uploads/xxx.jpg`.
- * This utility strips any origin prefix so the URL works through the Vite proxy.
+ * The backend returns relative paths like `/uploads/xxx.jpg`.
+ * <img> tags don't go through the Vite proxy, so we must
+ * prepend the backend origin to make them directly accessible.
  */
+const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8081';
+
 export function normalizeImageUrl(url: string | null | undefined): string | null {
   if (!url) return null;
-  try {
-    const parsed = new URL(url, 'http://placeholder');
-    // If the URL has an origin (was a full URL), extract just the pathname
-    if (parsed.origin !== 'http://placeholder') {
-      return parsed.pathname;
-    }
-  } catch {
-    // Not a valid URL, return as-is
-  }
+  // Already a full URL — return as-is
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  // Relative path like /uploads/images/... — prepend backend origin
+  if (url.startsWith('/')) return `${BACKEND_ORIGIN}${url}`;
+  // Other (data: URLs, etc.) — return as-is
   return url;
 }

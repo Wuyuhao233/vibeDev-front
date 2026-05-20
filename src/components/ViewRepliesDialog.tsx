@@ -7,6 +7,7 @@ import ReportDialog from './ReportDialog';
 import { toast } from './ui';
 import { formatRelativeTime } from '../utils/relativeTime';
 import { normalizeImageUrl } from '../utils/imageUrl';
+import { ReplyContent } from '../utils/replyContent';
 
 type SortMode = 'hot' | 'newest' | 'oldest';
 
@@ -211,8 +212,8 @@ function ParentReplyCard({
           {reply.isDeleted ? (
             <p className="text-sm text-muted-foreground italic">该回复已被删除</p>
           ) : (
-            <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
-              {reply.contentMarkdown}
+            <div className="text-sm text-foreground leading-relaxed">
+              <ReplyContent markdown={reply.contentMarkdown} />
             </div>
           )}
           {/* Row 3: action bar */}
@@ -345,8 +346,8 @@ function NestedReplyItem({
             </div>
 
             {/* Row 2: Content */}
-            <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
-              {reply.contentMarkdown}
+            <div className="text-sm text-foreground leading-relaxed">
+              <ReplyContent markdown={reply.contentMarkdown} />
             </div>
 
             {/* Row 3: Action bar — same as external ReplyItem */}
