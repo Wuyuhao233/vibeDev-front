@@ -43,6 +43,12 @@ export function clearTokens() {
   refreshToken = null;
 }
 
+/** Restore tokens from persisted state (called on app startup) */
+export function initTokens(access: string, refresh: string) {
+  accessToken = access;
+  refreshToken = refresh;
+}
+
 export function onTokenExpired(cb: () => void) {
   onRefresh = cb;
 }

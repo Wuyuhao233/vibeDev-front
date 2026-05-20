@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui';
 import LevelBadge from './ui/LevelBadge';
 import { normalizeImageUrl } from '../utils/imageUrl';
 import { getUserBrief } from '../api/follow';
-import { followUser, unfollowUser } from '../api/follow';
+import { followUser, unfollowUser, checkFollowing } from '../api/follow';
 import { useAuthStore } from '../store/authStore';
 import { toast } from './ui';
 
@@ -55,12 +55,21 @@ export default function AvatarHoverCard({
         levelTitle: data.levelTitle,
         points: data.points,
       });
+      // Check follow status for non-self users
+      if (isAuthenticated && !isSelf) {
+        try {
+          const followData = await checkFollowing(username);
+          setFollowing(followData.following);
+        } catch {
+          // ignore
+        }
+      }
     } catch {
       // silently fail
     } finally {
       setProfileLoading(false);
     }
-  }, [username, profile, profileLoading]);
+  }, [username, profile, profileLoading, isAuthenticated, isSelf]);
 
   const handleMouseEnter = () => {
     if (timerRef.current) clearTimeout(timerRef.current);

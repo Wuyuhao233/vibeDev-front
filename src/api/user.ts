@@ -16,6 +16,8 @@ export interface UserProfile {
   bannedUntil: string | null;
   createdAt: string;
   lastLoginAt: string | null;
+  followerCount: number;
+  followingCount: number;
 }
 
 export async function getProfile(username: string) {

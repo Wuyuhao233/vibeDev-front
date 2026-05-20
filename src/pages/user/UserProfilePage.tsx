@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import * as userApi from '../../api/user';
 import type { UserProfile } from '../../api/user';
 import { normalizeImageUrl } from '../../utils/imageUrl';
+import { followUser, unfollowUser, checkFollowing } from '../../api/follow';
 import {
   getFolders,
   getFolderItems,
@@ -68,6 +69,8 @@ export default function UserProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState('');
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   const [activeTab, setActiveTab] = useState<TabKey>('posts');
   const [items, setItems] = useState<(PostItem | ReplyItem)[]>([]);
@@ -148,6 +151,14 @@ export default function UserProfilePage() {
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  // Check follow status when viewing another user's profile
+  useEffect(() => {
+    if (!username || !currentUser || currentUser.username === username) return;
+    checkFollowing(username)
+      .then((data) => setIsFollowing(data.following))
+      .catch(() => {/* ignore */});
+  }, [username, currentUser]);
 
   useEffect(() => {
     if (isOwner) fetchFolders();
@@ -283,6 +294,8 @@ export default function UserProfilePage() {
             )}
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <span>积分：{profile.points ?? 0}</span>
+              <span>关注 {profile.followingCount ?? 0}</span>
+              <span>粉丝 {profile.followerCount ?? 0}</span>
               <span>注册于：{formatRelativeTime(profile.createdAt)}</span>
             </div>
             <LevelProgress points={profile.points ?? 0} className="mt-4" />
@@ -294,6 +307,37 @@ export default function UserProfilePage() {
             >
               编辑资料
             </Link>
+          )}
+          {!isOwner && currentUser && (
+            <button
+              onClick={async () => {
+                if (followLoading) return;
+                setFollowLoading(true);
+                try {
+                  if (isFollowing) {
+                    await unfollowUser(username!);
+                    setIsFollowing(false);
+                    toast.success('已取消关注');
+                  } else {
+                    await followUser(username!);
+                    setIsFollowing(true);
+                    toast.success('关注成功');
+                  }
+                } catch {
+                  toast.error('操作失败，请重试');
+                } finally {
+                  setFollowLoading(false);
+                }
+              }}
+              disabled={followLoading}
+              className={`flex-shrink-0 px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ${
+                isFollowing
+                  ? 'text-muted-foreground border border-border hover:bg-muted/30'
+                  : 'text-primary-foreground bg-primary hover:bg-primary/90'
+              }`}
+            >
+              {followLoading ? '...' : isFollowing ? '已关注' : '+ 关注'}
+            </button>
           )}
         </div>
       </div>

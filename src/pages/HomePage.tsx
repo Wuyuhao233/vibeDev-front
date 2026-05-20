@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { getHomeFeed, type FeedItem } from '../api/feed';
-import { getFollowedTags } from '../api/tag';
 import PostCard from '../components/PostCard';
 import PostGridCard from '../components/PostGridCard';
 import HotListSidebar from '../components/HotListSidebar';
@@ -43,7 +42,7 @@ export default function HomePage() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [_total, setTotal] = useState(0);
-  const [hasFollowedTags, setHasFollowedTags] = useState<boolean | null>(null);
+  const [hasCheckedFollow, setHasCheckedFollow] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const initialLoadRef = useRef(false);
@@ -72,6 +71,7 @@ export default function HomePage() {
       }
       setTotal(result.total);
       setHasMore(pageNum * PAGE_SIZE < result.total);
+      if (activeTab === 'following') setHasCheckedFollow(true);
     } catch (err: any) {
       if (!append) setError(err?.message || '加载失败');
       else toast.error('加载更多失败，点击重试');
@@ -87,6 +87,7 @@ export default function HomePage() {
     initialLoadRef.current = true;
     setPage(1);
     setPosts([]);
+    setHasCheckedFollow(false);
     fetchPosts(1, false);
   }, [fetchPosts]);
 
@@ -115,17 +116,6 @@ export default function HomePage() {
       navigate('/login');
     }
   }, [activeTab, isAuthenticated, navigate]);
-
-  // Check followed tags when on following tab
-  useEffect(() => {
-    if (activeTab === 'following' && isAuthenticated) {
-      getFollowedTags()
-        .then((tags) => setHasFollowedTags(tags.length > 0))
-        .catch(() => setHasFollowedTags(false));
-    } else {
-      setHasFollowedTags(null);
-    }
-  }, [activeTab, isAuthenticated]);
 
   const renderContent = () => {
     if (loading) {
@@ -160,33 +150,19 @@ export default function HomePage() {
 
     if (posts.length === 0) {
       if (activeTab === 'following') {
-        if (hasFollowedTags === false) {
-          return (
-            <Empty>
-              <EmptyHeader>
-                <EmptyTitle>你还没有关注的标签</EmptyTitle>
-                <EmptyDescription>去版块页面关注感兴趣的标签吧</EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
-                <Link
-                  to="/board/1"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
-                >
-                  去看看
-                </Link>
-              </EmptyContent>
-            </Empty>
-          );
+        if (!hasCheckedFollow) {
+          // Still loading, no need to show empty yet
+          return null;
         }
         return (
           <Empty>
             <EmptyHeader>
-              <EmptyTitle>关注标签下暂无帖子</EmptyTitle>
-              <EmptyDescription>关注感兴趣的标签，这里会展示你关注的标签下的帖子</EmptyDescription>
+              <EmptyTitle>还没有关注任何人</EmptyTitle>
+              <EmptyDescription>关注感兴趣的用户，这里会展示他们发布的帖子</EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
               <Link
-                to="/board/1"
+                to="/"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors duration-150"
               >
                 去逛逛
