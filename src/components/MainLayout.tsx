@@ -9,6 +9,9 @@ export default function MainLayout() {
   const setBoards = useBoardStore((s) => s.setBoards);
   const location = useLocation();
   const isEditorRoute = location.pathname.startsWith('/post/new');
+  const isSettingsRoute = location.pathname.startsWith('/settings');
+  const isUserProfileRoute = location.pathname.startsWith('/u/');
+  const hideSidebar = isEditorRoute || isSettingsRoute || isUserProfileRoute;
 
   useEffect(() => {
     getBoards()
@@ -25,7 +28,7 @@ export default function MainLayout() {
         </main>
       ) : (
         <div className="max-w-content mx-auto flex px-6 py-6 gap-6">
-          <LeftSidebar />
+          {!hideSidebar && <LeftSidebar />}
           <main className="flex-1 min-w-0">
             <Outlet />
           </main>

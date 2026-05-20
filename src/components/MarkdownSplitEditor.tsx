@@ -7,6 +7,7 @@ import frontmatter from '@bytemd/plugin-frontmatter';
 import zh_Hans from 'bytemd/locales/zh_Hans.json';
 import type { BytemdLocale } from 'bytemd';
 import { useMemo } from 'react';
+import { uploadFile } from '../api/upload';
 
 interface MarkdownSplitEditorProps {
   value: string;
@@ -52,6 +53,19 @@ export default function MarkdownSplitEditor({
         locale={locale}
         maxLength={maxLength}
         editorConfig={editorConfig}
+        uploadImages={async (files: File[]) => {
+          const results = await Promise.all(
+            files.map(async (file) => {
+              const result = await uploadFile(file);
+              return {
+                url: result.url,
+                title: result.filename,
+                alt: result.filename,
+              };
+            }),
+          );
+          return results;
+        }}
       />
     </div>
   );

@@ -43,14 +43,6 @@ export default function Navbar() {
           <Link to="/" className="text-xl font-bold text-foreground hover:text-primary transition-colors duration-150">
             vibeDev
           </Link>
-          {isAuthenticated && (
-            <Link
-              to="/?tab=following"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-150"
-            >
-              关注
-            </Link>
-          )}
         </div>
 
         <div className="flex items-center flex-1 max-w-lg mx-8">
