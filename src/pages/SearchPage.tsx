@@ -59,6 +59,7 @@ export default function SearchPage() {
   const [boardDropdownOpen, setBoardDropdownOpen] = useState(false);
   const boardDropdownRef = useRef<HTMLDivElement>(null);
   const cooldownRef = useRef<ReturnType<typeof setInterval>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Update input value when URL query changes
   useEffect(() => {
@@ -155,9 +156,15 @@ export default function SearchPage() {
     [],
   );
 
-  // Execute search on mount and URL changes
+  // Execute search on mount and URL changes (debounced to prevent StrictMode double-fire)
   useEffect(() => {
-    doSearch(query, scope, boardId, page);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      doSearch(query, scope, boardId, page);
+    }, 200);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [query, scope, boardId, page, doSearch]);
 
   function handleSubmit(q: string) {
