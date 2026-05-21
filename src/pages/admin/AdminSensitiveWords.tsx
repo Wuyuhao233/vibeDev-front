@@ -16,6 +16,7 @@ import {
   Empty,
   EmptyHeader,
   EmptyTitle,
+  EmptyDescription,
   Dialog,
   DialogContent,
   DialogHeader,

@@ -595,47 +595,33 @@ mark.search-highlight {
   height: 100% !important;
 }
 
-/* === Post detail page: ByteMD Viewer dark mode === */
-.dark .markdown-body {
-  color: var(--foreground);
-  background: transparent;
+/* === Override github-markdown-css variables to use app theme tokens === */
+.post-detail .markdown-body {
+  --fgColor-default: var(--foreground) !important;
+  --bgColor-default: transparent !important;
+  --fgColor-muted: var(--muted-foreground) !important;
+  --bgColor-muted: var(--muted) !important;
+  --bgColor-neutral-muted: var(--muted) !important;
+  --borderColor-default: var(--border) !important;
+  --borderColor-muted: var(--border) !important;
+  --fgColor-accent: var(--primary) !important;
+  --borderColor-accent-emphasis: var(--primary) !important;
+  --focus-outlineColor: var(--primary) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
 }
-.dark .markdown-body h1, .dark .markdown-body h2, .dark .markdown-body h3,
-.dark .markdown-body h4, .dark .markdown-body h5, .dark .markdown-body h6 {
-  color: var(--foreground);
-  border-bottom-color: var(--border);
-}
-.dark .markdown-body code {
-  background: var(--muted);
-  color: var(--foreground);
-}
-.dark .markdown-body pre {
-  background: var(--muted);
-}
-.dark .markdown-body pre code {
-  background: transparent;
-}
-.dark .markdown-body blockquote {
-  color: var(--muted-foreground);
-  border-left-color: var(--border);
-}
-.dark .markdown-body table tr {
-  background-color: transparent;
-  border-color: var(--border);
-}
-.dark .markdown-body table th,
-.dark .markdown-body table td {
-  border-color: var(--border);
-}
-.dark .markdown-body table tr:nth-child(2n) {
-  background-color: var(--muted);
-}
-.dark .markdown-body img {
-  background: transparent;
-}
-.dark .markdown-body hr {
-  background-color: var(--border);
-}
-.dark .markdown-body a {
-  color: var(--primary);
+
+.dark .post-detail .markdown-body {
+  --fgColor-default: var(--foreground) !important;
+  --bgColor-default: transparent !important;
+  --fgColor-muted: var(--muted-foreground) !important;
+  --bgColor-muted: var(--muted) !important;
+  --bgColor-neutral-muted: var(--muted) !important;
+  --borderColor-default: var(--border) !important;
+  --borderColor-muted: var(--border) !important;
+  --fgColor-accent: var(--primary) !important;
+  --borderColor-accent-emphasis: var(--primary) !important;
+  --focus-outlineColor: var(--primary) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
 }

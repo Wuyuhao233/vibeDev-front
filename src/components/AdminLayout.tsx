@@ -36,7 +36,7 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-[var(--color-bg-page)] flex">
       {/* Sidebar */}
-      <aside className="w-sidebar flex-shrink-0 bg-card border-r border-border flex flex-col">
+      <aside className="w-sidebar flex-shrink-0 bg-card border-r border-border flex flex-col sticky top-0 h-screen">
         <div className="p-4 border-b border-border">
           <Link to="/" className="text-lg font-bold text-foreground">
             vibeDev

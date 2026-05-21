@@ -39,6 +39,7 @@ import ReviewQueuePage from './pages/admin/ReviewQueuePage';
 import ReviewStatsPage from './pages/admin/ReviewStatsPage';
 import ModeratorAssignmentPage from './pages/admin/ModeratorAssignmentPage';
 import AppealQueuePage from './pages/admin/AppealQueuePage';
+import ModerationPage from './pages/admin/ModerationPage';
 
 export default function App() {
   return (
@@ -113,6 +114,7 @@ export default function App() {
             <Route path="/admin/reports/:id" element={<ReportDetailPage />} />
             <Route path="/admin/sensitive-words" element={<SensitiveWordsPage />} />
             <Route path="/admin/settings" element={<SettingsPageAdmin />} />
+            <Route path="/admin/moderation" element={<ModerationPage />} />
             <Route path="/admin/review-queue" element={<ReviewQueuePage />} />
             <Route path="/admin/review-stats" element={<ReviewStatsPage />} />
             <Route path="/admin/moderator-assignment" element={<ModeratorAssignmentPage />} />
