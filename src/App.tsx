@@ -13,6 +13,7 @@ import PostPage from './pages/PostPage';
 import UserProfilePage from './pages/user/UserProfilePage';
 import SearchPage from './pages/SearchPage';
 import NewPostPage from './pages/NewPostPage';
+import EditPostPage from './pages/EditPostPage';
 import NotificationPage from './pages/NotificationPage';
 import SettingsPage from './pages/SettingsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
@@ -65,6 +66,14 @@ export default function App() {
               element={
                 <AuthGuard>
                   <NewPostPage />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/post/edit/:id"
+              element={
+                <AuthGuard>
+                  <EditPostPage />
                 </AuthGuard>
               }
             />

@@ -52,7 +52,6 @@ export default function PostPage() {
   const [essenceLoading, setEssenceLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [appealOpen, setAppealOpen] = useState(false);
-  const [_editing, setEditing] = useState(false);
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyToUsername, setReplyToUsername] = useState<string | null>(null);
   const [highlightedReplyId, setHighlightedReplyId] = useState<string | null>(null);
@@ -239,8 +238,8 @@ export default function PostPage() {
 
   // Permission checks
   const isAuthor = user?.id === post?.author?.id;
-  const isModerator = false; // V1.0: simplified
-  const isAdmin = user?.id === 1; // simplified admin check
+  const isModerator = user?.role === 'moderator';
+  const isAdmin = user?.role === 'admin';
   const canManage = isAuthor || isModerator || isAdmin;
 
   // Loading
@@ -488,15 +487,24 @@ export default function PostPage() {
       {/* Mod/Admin action bar */}
       {canManage && (
         <div className="flex items-center gap-3 py-3 border-t border-border">
-          {isAuthor && (
-            <button
-              onClick={() => setEditing(true)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors duration-150"
-            >
-              编辑
-            </button>
-          )}
-          {canManage && (
+          {/* Edit: author / moderator / admin */}
+          <button
+            onClick={() => navigate(`/post/edit/${post.id}`)}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors duration-150"
+          >
+            {isModerator || isAdmin ? '管理编辑' : '编辑'}
+          </button>
+
+          {/* Delete: author / moderator / admin */}
+          <button
+            onClick={() => setDeleteOpen(true)}
+            className="text-sm text-muted-foreground hover:text-red-500 transition-colors duration-150"
+          >
+            删除
+          </button>
+
+          {/* Pin & Essence: moderator / admin only */}
+          {(isModerator || isAdmin) && (
             <>
               <button
                 onClick={handleEssenceToggle}
@@ -517,12 +525,6 @@ export default function PostPage() {
                 }`}
               >
                 {pinLoading ? '处理中...' : post.isPinned ? '已置顶' : '置顶'}
-              </button>
-              <button
-                onClick={() => setDeleteOpen(true)}
-                className="text-sm text-muted-foreground hover:text-red-500 transition-colors duration-150"
-              >
-                删除
               </button>
             </>
           )}
