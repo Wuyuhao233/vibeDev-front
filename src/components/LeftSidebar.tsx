@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import { getBoards } from '../api/board';
 import type { Board } from '../api/board';
-import { getFollowedTags, unfollowTag, type FollowedTag } from '../api/tag';
-import { useAuthStore } from '../store/authStore';
-import { toast } from '../components/ui';
 
 interface CachedBoards {
   boards: Board[];
@@ -36,25 +33,12 @@ function saveCache(boards: Board[]) {
   } catch { /* storage full */ }
 }
 
-const COLLAPSED_KEY = 'vibeDev:sidebar:followed-collapsed';
-
 export default function LeftSidebar() {
   const location = useLocation();
   const params = useParams<{ id: string }>();
-  const { isAuthenticated } = useAuthStore();
   const [boards, setBoards] = useState<Board[]>(loadCache() || []);
   const [loading, setLoading] = useState(!boards.length);
   const [error, setError] = useState(false);
-  const [followedTags, setFollowedTags] = useState<FollowedTag[]>([]);
-  const [tagsLoading, setTagsLoading] = useState(false);
-  const [tagsError, setTagsError] = useState(false);
-  const [collapsed, setCollapsed] = useState(() => {
-    try {
-      return localStorage.getItem(COLLAPSED_KEY) === 'true';
-    } catch {
-      return false;
-    }
-  });
 
   useEffect(() => {
     const fetchBoards = async () => {
@@ -73,44 +57,6 @@ export default function LeftSidebar() {
     fetchBoards();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setFollowedTags([]);
-      return;
-    }
-    setTagsLoading(true);
-    setTagsError(false);
-    getFollowedTags()
-      .then((tags) => {
-        setFollowedTags(tags);
-        setTagsLoading(false);
-      })
-      .catch(() => {
-        if (isAuthenticated) setTagsError(true);
-        setTagsLoading(false);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
-
-  const handleUnfollow = async (tag: FollowedTag) => {
-    const prev = followedTags;
-    setFollowedTags((tags) => tags.filter((t) => t.id !== tag.id));
-    try {
-      await unfollowTag(tag.id);
-    } catch {
-      setFollowedTags(prev);
-      toast.error('取消关注失败，请重试');
-    }
-  };
-
-  const toggleCollapsed = () => {
-    const next = !collapsed;
-    setCollapsed(next);
-    try {
-      localStorage.setItem(COLLAPSED_KEY, String(next));
-    } catch { /* storage full */ }
-  };
 
   const isActive = (board: Board) => {
     if (location.pathname.startsWith('/board/')) {
@@ -171,94 +117,6 @@ export default function LeftSidebar() {
             </li>
           ))}
         </ul>
-      )}
-
-      {/* Divider */}
-      <div className="board-sidebar__divider border-t border-border my-4" />
-
-      {/* My Follows */}
-      {isAuthenticated && (
-        <div className="board-sidebar__followed">
-          <button
-            className="board-sidebar__followed-header flex items-center gap-1 text-sm font-semibold text-foreground mb-2 w-full text-left"
-            onClick={toggleCollapsed}
-          >
-            <span>我的关注</span>
-            <svg
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${collapsed ? '' : 'rotate-90'}`}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </button>
-
-          {!collapsed && (
-            <div className="board-sidebar__followed-list">
-              {tagsLoading && (
-                <div className="flex flex-col gap-2">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="h-5 w-full animate-shimmer rounded bg-[var(--color-skeleton)]" />
-                  ))}
-                </div>
-              )}
-
-              {tagsError && !tagsLoading && (
-                <p className="board-sidebar__followed-error text-sm text-muted-foreground">
-                  加载失败
-                </p>
-              )}
-
-              {!tagsLoading && !tagsError && followedTags.length === 0 && (
-                <p className="board-sidebar__followed-empty text-sm text-muted-foreground">
-                  你还没有关注的标签，去版块页面关注感兴趣的标签吧
-                </p>
-              )}
-
-              {!tagsLoading && !tagsError && followedTags.length > 0 && (
-                <ul className="flex flex-col gap-1">
-                  {followedTags.map((tag) => (
-                    <li key={tag.id} className="followed-tag group flex items-center justify-between">
-                      <Link
-                        to={`/board/general?tag=${tag.id}`}
-                        className="followed-tag__name text-sm text-muted-foreground hover:text-primary transition-colors duration-150 truncate flex-1"
-                      >
-                        {tag.name}
-                      </Link>
-                      <button
-                        className="followed-tag__unfollow opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all duration-150 ml-1 flex-shrink-0"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleUnfollow(tag);
-                        }}
-                        title={`取消关注 ${tag.name}`}
-                      >
-                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M18 6L6 18M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {!isAuthenticated && (
-        <div className="board-sidebar__followed">
-          <h4 className="board-sidebar__followed-header text-sm font-semibold text-foreground mb-2">
-            我的关注
-          </h4>
-          <div className="board-sidebar__followed-list">
-            <p className="board-sidebar__followed-empty text-sm text-muted-foreground">
-              关注感兴趣的标签
-            </p>
-          </div>
-        </div>
       )}
     </aside>
   );
