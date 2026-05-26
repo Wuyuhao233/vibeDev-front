@@ -16,6 +16,8 @@ export interface PostCardData {
   likeCount: number;
   replyCount: number;
   collectCount: number;
+  isLiked: boolean;
+  isCollected: boolean;
   createdAt: string;
   isPinned: boolean;
   isEssence: boolean;

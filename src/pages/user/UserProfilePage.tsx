@@ -107,7 +107,7 @@ export default function UserProfilePage() {
         const res = await userApi.getFavorites(username!, page, PAGE_SIZE);
         // Map to CollectionItem shape for consistent rendering
         const mapped: CollectionItem[] = res.items.map((item: any) => ({
-          postId: item.id ?? item.postId,
+          postId: item.postId,
           postTitle: item.title ?? item.postTitle ?? '',
           boardName: item.boardName ?? '',
           collectedAt: item.collectedAt ?? item.createdAt ?? '',
@@ -178,6 +178,15 @@ export default function UserProfilePage() {
           break;
         case 'collections':
           res = await userApi.getFavorites(username, page, PAGE_SIZE);
+          res = {
+            items: (res.items || []).map((item: any) => ({
+              id: Number(item.postId) || 0,
+              title: item.postTitle || '(无标题)',
+              boardName: item.boardName || '',
+              createdAt: item.collectedAt || '',
+            })),
+            total: res.total,
+          };
           break;
         case 'history': {
           const historyRes = await userApi.getBrowseHistory(username!, page, PAGE_SIZE);

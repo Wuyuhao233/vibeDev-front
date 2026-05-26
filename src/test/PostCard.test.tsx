@@ -30,6 +30,8 @@ const basePost: PostCardData = {
   likeCount: 10,
   replyCount: 5,
   collectCount: 2,
+  isLiked: false,
+  isCollected: false,
   createdAt: new Date(Date.now() - 3600000).toISOString(),
   isPinned: false,
   isEssence: false,

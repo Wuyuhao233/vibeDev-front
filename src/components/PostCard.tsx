@@ -4,6 +4,8 @@ import LevelBadge from './ui/LevelBadge';
 import RelativeTime from './ui/RelativeTime';
 import AvatarHoverCard from './AvatarHoverCard';
 import InlineReplies from './InlineReplies';
+import LikeButton from './LikeButton';
+import CollectButton from './CollectButton';
 import { formatCount } from '../utils/formatCount';
 import type { PostCardData } from '../types/board';
 
@@ -66,8 +68,8 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
     >
       <div className="post-card__main flex gap-4">
         <div className="flex-1 min-w-0">
-          {/* Author + Time row */}
-          <div className="post-card__author-row flex items-center gap-2 mb-2">
+          {/* Author + Time + Tags row */}
+          <div className="post-card__author-row flex items-center gap-2 mb-2 flex-wrap">
             <div
               className="post-card__author flex items-center gap-1.5"
             >
@@ -100,6 +102,25 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
                 </span>
               </>
             )}
+
+            {/* Tags inline after time */}
+            {post.tags.length > 0 && (
+              <>
+                <span className="text-muted-foreground/40">·</span>
+                {visibleTags.map((tag) => (
+                  <button
+                    key={tag.id}
+                    className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-muted-foreground bg-muted hover:bg-muted/80 transition-colors duration-150"
+                    onClick={(e) => handleTagClick(e, tag)}
+                  >
+                    {tag.name}
+                  </button>
+                ))}
+                {overflowCount > 0 && (
+                  <span className="text-xs text-muted-foreground">+{overflowCount}</span>
+                )}
+              </>
+            )}
           </div>
 
           {/* Title + Badges */}
@@ -119,24 +140,6 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
             </h3>
           </div>
 
-          {/* Tags */}
-          {post.tags.length > 0 && (
-            <div className="post-card__tags flex items-center gap-1.5 mb-2">
-              {visibleTags.map((tag) => (
-                <button
-                  key={tag.id}
-                  className="tag-chip inline-flex items-center rounded px-2 py-px text-xs text-muted-foreground bg-muted hover:bg-muted/80 transition-colors duration-150"
-                  onClick={(e) => handleTagClick(e, tag)}
-                >
-                  {tag.name}
-                </button>
-              ))}
-              {overflowCount > 0 && (
-                <span className="text-xs text-muted-foreground">+{overflowCount}</span>
-              )}
-            </div>
-          )}
-
           {/* Summary */}
           {post.contentSummary || post.content ? (
             <p className="post-card__summary text-sm text-muted-foreground line-clamp-3 leading-relaxed pl-3 border-l-2 border-border mb-3">
@@ -146,12 +149,13 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
 
           {/* Stats row */}
           <div className="post-card__stats flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
-            <span className="post-card__stat--like inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-red-500 transition-colors duration-150">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
-                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" fill="none" />
-              </svg>
-              {formatCount(post.likeCount)}
-            </span>
+            <LikeButton
+              targetType="post"
+              targetId={post.id}
+              initialLiked={post.isLiked}
+              initialCount={post.likeCount}
+              className="text-xs"
+            />
             <button
               className="post-card__stat--reply inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-500 transition-colors duration-150"
               onClick={(e) => {
@@ -164,12 +168,12 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
               </svg>
               {formatCount(post.replyCount)}
             </button>
-            <span className="post-card__stat--collect inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-amber-500 transition-colors duration-150">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-muted-foreground">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" fill="none" />
-              </svg>
-              {formatCount(post.collectCount)}
-            </span>
+            <CollectButton
+              postId={post.id}
+              initialCollected={post.isCollected}
+              initialCount={post.collectCount}
+              className="text-xs"
+            />
           </div>
         </div>
 

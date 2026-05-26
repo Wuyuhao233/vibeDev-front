@@ -21,6 +21,8 @@ export interface FeedItem {
   createdAt: string;
   isPinned: boolean;
   isEssence: boolean;
+  isLiked: boolean;
+  isCollected: boolean;
 }
 
 export interface FeedResult {

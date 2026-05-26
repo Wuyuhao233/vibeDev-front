@@ -22,6 +22,8 @@ const mockFeedResult = {
       likeCount: 5,
       replyCount: 3,
       collectCount: 1,
+      isLiked: false,
+      isCollected: false,
       createdAt: new Date(Date.now() - 3600000).toISOString(),
       isPinned: false,
       isEssence: false,

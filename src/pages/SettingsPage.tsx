@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import * as userApi from '../api/user';
@@ -18,7 +18,7 @@ import { formatRelativeTime } from '../utils/relativeTime';
 import { normalizeImageUrl } from '../utils/imageUrl';
 import * as notificationApi from '../api/notification';
 
-type SettingsTab = 'profile' | 'security' | 'notifications' | 'data';
+type SettingsTab = 'profile' | 'security' | 'notifications';
 
 interface SettingsTabItem {
   key: SettingsTab;
@@ -29,7 +29,6 @@ const SETTINGS_TABS: SettingsTabItem[] = [
   { key: 'profile', label: '个人信息' },
   { key: 'security', label: '安全设置' },
   { key: 'notifications', label: '通知设置' },
-  { key: 'data', label: '数据管理' },
 ];
 
 export default function SettingsPage() {
@@ -37,7 +36,7 @@ export default function SettingsPage() {
 
   const getInitialTab = (): SettingsTab => {
     const tab = searchParams.get('tab');
-    if (tab === 'security' || tab === 'notifications' || tab === 'data') {
+    if (tab === 'security' || tab === 'notifications') {
       return tab;
     }
     return 'profile';
@@ -72,7 +71,6 @@ export default function SettingsPage() {
         {activeTab === 'profile' && <ProfileSection />}
         {activeTab === 'security' && <SecuritySection />}
         {activeTab === 'notifications' && <NotificationSection />}
-        {activeTab === 'data' && <DataSection />}
       </div>
     </div>
   );
@@ -784,158 +782,15 @@ function DeactivateSection() {
   );
 }
 
-/* ========== Data Section ========== */
-
-function DataSection() {
-  const [scope, setScope] = useState('all');
-  const [status, setStatus] = useState<'idle' | 'processing' | 'ready' | 'expired' | 'error'>('idle');
-  const [taskId, setTaskId] = useState<string | null>(null);
-  const [fileInfo, setFileInfo] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const pollRef = useRef<ReturnType<typeof setInterval>>();
-
-  const handleExport = async () => {
-    setLoading(true);
-    try {
-      const res = await userApi.exportData(user!.username, scope);
-      if (res.status === 'processing') {
-        setTaskId(res.taskId);
-        setStatus('processing');
-        startPolling(res.taskId);
-      } else if (res.status === 'ready') {
-        setTaskId(res.taskId);
-        setFileInfo(res);
-        setStatus('ready');
-      }
-    } catch {
-      toast.error('导出请求失败，请稍后重试');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const startPolling = (id: string) => {
-    let count = 0;
-    pollRef.current = setInterval(async () => {
-      count++;
-      try {
-        const res = await userApi.getExportStatus(user!.username, id);
-        if (res.status === 'ready') {
-          clearInterval(pollRef.current);
-          setFileInfo(res);
-          setStatus('ready');
-        } else if (res.status === 'error') {
-          clearInterval(pollRef.current);
-          setStatus('error');
-        } else if (count >= 120) {
-          clearInterval(pollRef.current);
-          toast.warning('导出超时，请稍后查看');
-          setStatus('idle');
-        }
-      } catch {
-        // continue polling
-      }
-    }, 10000);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
-
-  const handleDownload = () => {
-    if (taskId) {
-      window.open(`/api/users/me/export-data/${taskId}/download`, '_blank');
-    }
-  };
-
-  return (
-    <div className="bg-card rounded-lg shadow-card p-6">
-      <h2 className="text-lg font-semibold text-foreground mb-6">数据导出</h2>
-
-      {status === 'idle' && (
-        <div>
-          <p className="text-sm text-muted-foreground mb-4">
-            你可以申请导出个人数据，包括帖子、回复、收藏和浏览次数。
-            导出格式为 JSON，导出完成后可下载。
-          </p>
-          <div className="flex items-center gap-4 mb-4">
-            <label className="text-sm text-foreground">导出范围：</label>
-            <select
-              value={scope}
-              onChange={(e) => setScope(e.target.value)}
-              className="border border-border rounded-md px-3 py-1.5 text-sm"
-            >
-              <option value="all">全部数据</option>
-              <option value="posts">仅帖子</option>
-              <option value="replies">仅回复</option>
-              <option value="collections">仅收藏</option>
-            </select>
-          </div>
-          <Button onClick={handleExport} disabled={loading}>
-            申请导出
-          </Button>
-        </div>
-      )}
-
-      {status === 'processing' && (
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="animate-spin-slow w-5 h-5 border-2 border-primary border-t-transparent rounded-full" />
-            <span className="text-sm text-foreground">正在生成导出文件...</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            文件准备好后，你将在此页面看到下载按钮。
-            你也可以关闭页面，稍后回到此页面查看。
-          </p>
-        </div>
-      )}
-
-      {status === 'ready' && (
-        <div>
-          <div className="mb-4 text-2xl text-emerald-500">✓</div>
-          <p className="text-sm text-foreground mb-2">导出文件已生成</p>
-          {fileInfo && (
-            <p className="text-sm text-muted-foreground mb-4">
-              {fileInfo.size && `大小: ${fileInfo.size}`}
-              {fileInfo.itemCounts && ` · 包含: 帖子 (${fileInfo.itemCounts.posts}), 回复 (${fileInfo.itemCounts.replies}), 收藏 (${fileInfo.itemCounts.collections})`}
-            </p>
-          )}
-          <Button onClick={handleDownload}>下载文件</Button>
-        </div>
-      )}
-
-      {status === 'expired' && (
-        <div>
-          <div className="mb-4 text-2xl text-amber-500">⚠</div>
-          <p className="text-sm text-foreground mb-2">导出文件已过期</p>
-          <p className="text-sm text-muted-foreground mb-4">下载链接已过期，你可以重新申请导出。</p>
-          <Button onClick={() => setStatus('idle')}>重新申请导出</Button>
-        </div>
-      )}
-
-      {status === 'error' && (
-        <div>
-          <div className="mb-4 text-2xl text-red-500">✕</div>
-          <p className="text-sm text-foreground mb-2">导出失败</p>
-          <p className="text-sm text-muted-foreground mb-4">导出过程中发生错误，请稍后重试。</p>
-          <Button onClick={() => setStatus('idle')}>重新申请导出</Button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ========== Notification Section ========== */
 
 const EVENT_LABELS: Record<string, string> = {
-  reply: '帖子被回复',
-  like: '获得点赞',
-  collect: '帖子被收藏',
-  system: '系统通知',
-  mention: '被 @提及',
-  follow: '有人关注',
+  post_replied: '帖子被回复',
+  reply_quoted: '回复被引用',
+  received_like: '获得点赞',
+  post_collected: '帖子被收藏',
+  post_essenced: '帖子被加精',
+  post_pinned: '帖子被置顶',
   user_banned: '账号状态变更',
 };
 
@@ -1014,8 +869,8 @@ function NotificationSection() {
                   <td className="py-3">
                     <span className="inline-flex items-center gap-2">
                       {isBanned && (
-                        <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="11" rx="2" />
+                        <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="11" width="18" height="11" rx="2" />
                           <path d="M7 11V7a5 5 0 0110 0v4" />
                         </svg>
                       )}

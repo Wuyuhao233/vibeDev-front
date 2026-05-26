@@ -21,8 +21,6 @@ const mockUploadAvatar = vi.fn().mockResolvedValue({ url: '/avatar.png' });
 const mockChangePassword = vi.fn().mockResolvedValue({});
 const mockGetLoginHistory = vi.fn().mockResolvedValue({ items: [], total: 0 });
 const mockDeactivateAccount = vi.fn().mockResolvedValue({});
-const mockExportData = vi.fn().mockResolvedValue({ status: 'processing', taskId: 'task-1' });
-const mockGetExportStatus = vi.fn().mockResolvedValue({ status: 'processing' });
 const mockGetCasBinding = vi.fn().mockResolvedValue({ is_bound: false, cas_username: null, bound_at: null });
 const mockBindCas = vi.fn().mockResolvedValue({});
 const mockUnbindCas = vi.fn().mockResolvedValue({});
@@ -34,8 +32,6 @@ vi.mock('../api/user', () => ({
   changePassword: (...args: any[]) => mockChangePassword(...args),
   getLoginHistory: (...args: any[]) => mockGetLoginHistory(...args),
   deactivateAccount: (...args: any[]) => mockDeactivateAccount(...args),
-  exportData: (...args: any[]) => mockExportData(...args),
-  getExportStatus: (...args: any[]) => mockGetExportStatus(...args),
   getCasBinding: (...args: any[]) => mockGetCasBinding(...args),
   bindCas: (...args: any[]) => mockBindCas(...args),
   unbindCas: (...args: any[]) => mockUnbindCas(...args),
@@ -82,7 +78,7 @@ describe('SettingsPage', () => {
     expect(screen.getByText('设置')).toBeTruthy();
     expect(screen.getByText('个人信息')).toBeTruthy();
     expect(screen.getByText('安全设置')).toBeTruthy();
-    expect(screen.getByText('数据管理')).toBeTruthy();
+    expect(screen.getByText('通知设置')).toBeTruthy();
   });
 
   it('shows profile fields after loading', async () => {
@@ -106,16 +102,6 @@ describe('SettingsPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('修改密码')).toBeTruthy();
-    });
-  });
-
-  it('switches to data section', async () => {
-    renderPage();
-    const dataBtn = screen.getByText('数据管理');
-    await userEvent.click(dataBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText('数据导出')).toBeTruthy();
     });
   });
 

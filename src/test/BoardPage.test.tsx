@@ -35,6 +35,8 @@ const mockPostsResult = {
       likeCount: 3,
       replyCount: 2,
       collectCount: 0,
+      isLiked: false,
+      isCollected: false,
       createdAt: new Date().toISOString(),
       isPinned: false,
       isEssence: false,
