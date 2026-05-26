@@ -175,6 +175,16 @@ export default function UserProfilePage() {
           break;
         case 'replies':
           res = await userApi.getUserReplies(username, page, PAGE_SIZE);
+          res = {
+            items: (res.items || []).map((item: any) => ({
+              id: item.id,
+              postId: item.postId,
+              postTitle: item.postTitle || '(无标题)',
+              content: item.contentSummary || '',
+              createdAt: item.createdAt || '',
+            })),
+            total: res.total,
+          };
           break;
         case 'collections':
           res = await userApi.getFavorites(username, page, PAGE_SIZE);
