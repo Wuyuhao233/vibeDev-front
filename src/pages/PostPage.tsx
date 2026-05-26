@@ -415,54 +415,59 @@ export default function PostPage() {
       )}
 
       {/* Action bar */}
-      <div className="flex items-center gap-6 py-4 border-t border-border">
-        {isAuthenticated ? (
-          <>
-            <LikeButton
-              targetType="post"
-              targetId={post.id}
-              initialLiked={post.isLikedByCurrentUser}
-              initialCount={post.likeCount}
-            />
-            <CollectButton
-              postId={post.id}
-              initialCollected={post.isCollectedByCurrentUser}
-              initialCount={post.collectCount}
-            />
-          </>
-        ) : (
-          <>
-            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" />
-              </svg>
-              {post.likeCount}
-            </span>
-            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" />
-              </svg>
-              {post.collectCount}
-            </span>
-          </>
-        )}
+      <div className="py-4 border-t border-border space-y-3">
+        {/* Row 1: Like + Collect (centered) */}
+        <div className="flex items-center justify-center gap-6">
+          {isAuthenticated ? (
+            <>
+              <LikeButton
+                targetType="post"
+                targetId={post.id}
+                initialLiked={post.isLikedByCurrentUser}
+                initialCount={post.likeCount}
+                className="text-base"
+              />
+              <CollectButton
+                postId={post.id}
+                initialCollected={post.isCollectedByCurrentUser}
+                initialCount={post.collectCount}
+                className="text-base"
+              />
+            </>
+          ) : (
+            <>
+              <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" strokeWidth="2" />
+                </svg>
+                {post.likeCount}
+              </span>
+              <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" strokeWidth="2" />
+                </svg>
+                {post.collectCount}
+              </span>
+            </>
+          )}
+        </div>
 
-        <div className="flex-1" />
+        {/* Row 2: Report + Reply count (left-aligned) */}
+        <div className="flex items-center gap-6">
+          {isAuthenticated && !isAuthor && (
+            <button
+              onClick={() => setReportOpen(true)}
+              className="text-sm text-muted-foreground hover:text-red-500 transition-colors duration-150"
+            >
+              举报
+            </button>
+          )}
 
-        {/* Report button (non-author only) */}
-        {isAuthenticated && !isAuthor && (
-          <button
-            onClick={() => setReportOpen(true)}
-            className="text-sm text-muted-foreground hover:text-red-500 transition-colors duration-150"
-          >
-            举报
-          </button>
-        )}
-
-        {/* Stats */}
-        <span className="text-sm text-muted-foreground">
-          {post.replyCount} 条回复
-        </span>
+          {/* Stats */}
+          <span className="text-sm text-muted-foreground">
+            {post.replyCount} 条回复
+          </span>
+        </div>
       </div>
 
       {/* Mod/Admin action bar */}
@@ -538,7 +543,7 @@ export default function PostPage() {
       )}
 
       {/* Replies section */}
-      <div className="mt-8 pt-6 border-t border-border">
+      <div className="pt-6 border-t border-border">
         <ReplyTree
           replies={replies}
           total={repliesTotal}

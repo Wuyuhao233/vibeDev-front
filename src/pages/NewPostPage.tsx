@@ -65,6 +65,17 @@ export default function NewPostPage() {
   const [content, setContent] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
 
+  // Extract image URLs from markdown content
+  const imageUrls = useMemo(() => {
+    const urls: string[] = [];
+    const mdRegex = /!\[.*?\]\((https?:\/\/\S+?)(?:\s+"[^"]*")?\s*\)/g;
+    let match;
+    while ((match = mdRegex.exec(content)) !== null) {
+      urls.push(match[1]);
+    }
+    return [...new Set(urls)];
+  }, [content]);
+
   // UI state
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -375,16 +386,36 @@ export default function NewPostPage() {
               </div>
             )}
 
-            {/* Cover image URL */}
+            {/* Cover image URL — dropdown from post images */}
             <div>
-              <label className="block text-sm text-foreground mb-1">封面图 URL（可选）</label>
-              <input
-                type="text"
+              <label className="block text-sm text-foreground mb-1">
+                封面图（可选，从正文图片中选择）
+              </label>
+              <select
                 value={coverImageUrl}
                 onChange={(e) => setCoverImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-primary"
-              />
+                className="w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-primary bg-card"
+              >
+                <option value="">不设置封面</option>
+                {imageUrls.map((url, i) => (
+                  <option key={i} value={url}>
+                    {url.length > 60 ? url.slice(0, 60) + '…' : url}
+                  </option>
+                ))}
+              </select>
+              {imageUrls.length === 0 && content && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  正文中未检测到图片，请先在正文中插入图片（Markdown: ![](url)）
+                </p>
+              )}
+              {coverImageUrl && (
+                <img
+                  src={coverImageUrl}
+                  alt="封面预览"
+                  className="mt-2 w-24 h-16 object-cover rounded border border-border mx-auto block"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              )}
             </div>
           </div>
 

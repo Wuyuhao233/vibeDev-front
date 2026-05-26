@@ -175,7 +175,7 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
 
         {/* Cover image */}
         {post.coverImageUrl && (
-          <div className="post-card__cover flex-shrink-0">
+          <div className="post-card__cover flex-shrink-0 flex items-center justify-center">
             <img
               src={post.coverImageUrl}
               alt=""
