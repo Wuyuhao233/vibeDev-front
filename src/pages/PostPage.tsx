@@ -15,10 +15,8 @@ import { toast } from '../components/ui';
 import PostDetailSkeleton from '../components/PostDetailSkeleton';
 import LikeButton from '../components/LikeButton';
 import CollectButton from '../components/CollectButton';
-import SharePanel from '../components/SharePanel';
 import ReportDialog from '../components/ReportDialog';
 import AppealDialog from '../components/AppealDialog';
-// import type { ShareCardData } from '../components/ShareCard';
 import ReplyTree from '../components/ReplyTree';
 import QuickReply from '../components/QuickReply';
 import { formatRelativeTime } from '../utils/relativeTime';
@@ -278,7 +276,6 @@ export default function PostPage() {
   if (!post) return null;
 
   const level = Math.min(Math.max(post.author.level, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6;
-  const postUrl = `${window.location.origin}/post/${post.id}`;
 
   return (
     <div className="post-detail max-w-4xl mx-auto">
@@ -432,22 +429,6 @@ export default function PostPage() {
               initialCollected={post.isCollectedByCurrentUser}
               initialCount={post.collectCount}
             />
-            <SharePanel
-              url={postUrl}
-              title={post.title}
-              cardData={{
-                title: post.title,
-                authorName: post.author.username,
-                authorAvatar: post.author.avatarUrl,
-                boardName: post.boardName,
-                excerpt: post.contentMarkdown
-                  ? post.contentMarkdown.replace(/[#*`>\-\[\]!()|~]/g, '').slice(0, 120)
-                  : '',
-                createdAt: post.createdAt,
-                replyCount: post.replyCount,
-                likeCount: post.likeCount,
-              }}
-            />
           </>
         ) : (
           <>
@@ -480,7 +461,7 @@ export default function PostPage() {
 
         {/* Stats */}
         <span className="text-sm text-muted-foreground">
-          {post.shareCount} 次分享 · {post.replyCount} 条回复
+          {post.replyCount} 条回复
         </span>
       </div>
 

@@ -52,9 +52,9 @@ interface ReplyItem {
 }
 
 const TABS: TabItem[] = [
-  { key: 'posts', label: '我的帖子' },
-  { key: 'replies', label: '我的回复' },
-  { key: 'collections', label: '我的收藏', requiresAuth: true },
+  { key: 'posts', label: '帖子' },
+  { key: 'replies', label: '回复' },
+  { key: 'collections', label: '收藏', requiresAuth: true },
   { key: 'history', label: '浏览历史', requiresAuth: true },
   { key: 'points', label: '积分记录', requiresAuth: true },
 ];
@@ -355,7 +355,7 @@ export default function UserProfilePage() {
                   : 'text-muted-foreground border-transparent hover:text-foreground'
               }`}
             >
-              {tab.label}
+              {isOwner ? `我的${tab.label}` : `TA的${tab.label}`}
             </button>
           ))}
           {isOwner && activeTab === 'collections' && (
