@@ -92,24 +92,32 @@ client.interceptors.response.use(
       return Promise.reject(new ApiError('NETWORK_ERROR', msg));
     }
 
-    const code = error.response.data?.errorCode || `HTTP_${error.response.status}`;
+    const status = error.response.status;
+    const code = error.response.data?.errorCode || `HTTP_${status}`;
     const message = error.response.data?.message;
 
-    // Auto-refresh token on 401
-    if (error.response.status === 401 && refreshToken) {
-      try {
-        const res = await axios.post('/api/v1/auth/refresh-token', { refresh_token: refreshToken });
-        const { access_token: newAccess, refresh_token: newRefresh } = res.data.data;
-        setTokens(newAccess, newRefresh);
-        // Retry original request
-        const config = error.config!;
-        config.headers.Authorization = `Bearer ${newAccess}`;
-        return client(config);
-      } catch {
-        clearTokens();
-        onRefresh?.();
-        return Promise.reject(new ApiError('TOKEN_EXPIRED (10002)'));
+    // Handle auth failures (401 & 403) → try refresh or redirect to login
+    if (status === 401 || status === 403) {
+      if (refreshToken) {
+        try {
+          const res = await axios.post('/api/v1/auth/refresh-token', { refresh_token: refreshToken });
+          const { access_token: newAccess, refresh_token: newRefresh } = res.data.data;
+          setTokens(newAccess, newRefresh);
+          // Retry original request with new token
+          const config = error.config!;
+          config.headers.Authorization = `Bearer ${newAccess}`;
+          return client(config);
+        } catch {
+          // Refresh failed → token truly expired, redirect to login
+          clearTokens();
+          onRefresh?.();
+          return Promise.reject(new ApiError('TOKEN_EXPIRED (10002)'));
+        }
       }
+      // No refresh token available → redirect to login
+      clearTokens();
+      onRefresh?.();
+      return Promise.reject(new ApiError('UNAUTHORIZED (10001)'));
     }
 
     return Promise.reject(new ApiError(code, message));

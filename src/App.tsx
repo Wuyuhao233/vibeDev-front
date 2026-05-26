@@ -1,10 +1,13 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import ThemeInitializer from './components/ThemeInitializer';
 import AuthGuard from './components/AuthGuard';
 import AdminGuard from './components/AdminGuard';
 import MainLayout from './components/MainLayout';
 import AdminLayout from './components/AdminLayout';
+import { onTokenExpired } from './api/client';
+import { useAuthStore } from './store/authStore';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -41,9 +44,25 @@ import ModeratorAssignmentPage from './pages/admin/ModeratorAssignmentPage';
 import AppealQueuePage from './pages/admin/AppealQueuePage';
 import ModerationPage from './pages/admin/ModerationPage';
 
+function TokenExpiryHandler() {
+  const navigate = useNavigate();
+  const logout = useAuthStore((s) => s.logout);
+
+  useEffect(() => {
+    onTokenExpired(() => {
+      logout().finally(() => {
+        navigate('/login', { replace: true });
+      });
+    });
+  }, [navigate, logout]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <TokenExpiryHandler />
       <ThemeInitializer />
       <Toaster position="top-center" richColors />
       <Routes>
