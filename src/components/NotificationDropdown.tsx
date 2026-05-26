@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 import { useNotificationStore } from '../store/notificationStore';
 import { getNotifications, markAsRead, getNotificationCategory, getNotificationPath, type Notification } from '../api/notification';
 import { toast } from './ui';
@@ -23,15 +24,21 @@ const NOTIFICATION_ICONS: Record<string, string> = {
 
 export default function NotificationDropdown() {
   const navigate = useNavigate();
-  const { unreadCount, setUnreadCount, startPolling } = useNotificationStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { unreadCount, setUnreadCount, startPolling, stopPolling } = useNotificationStore();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    startPolling();
-  }, [startPolling]);
+    if (isAuthenticated) {
+      startPolling();
+      return () => stopPolling();
+    } else {
+      stopPolling();
+    }
+  }, [startPolling, stopPolling, isAuthenticated]);
 
   useEffect(() => {
     if (!open) return;

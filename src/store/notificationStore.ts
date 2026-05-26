@@ -21,14 +21,24 @@ export const useNotificationStore = create<NotificationState>((set) => ({
   reset: () => set({ unreadCount: 0 }),
   startPolling: () => {
     if (pollTimer) return;
-    getUnreadCount()
-      .then((count) => set({ unreadCount: count }))
-      .catch(() => {});
     pollTimer = setInterval(() => {
       getUnreadCount()
         .then((count) => set({ unreadCount: count }))
-        .catch(() => {});
+        .catch((err) => {
+          // Stop polling if 401/403 (not authenticated)
+          if (err?.response?.status === 401 || err?.response?.status === 403) {
+            stopPolling();
+          }
+        });
     }, 30000);
+    // Initial fetch
+    getUnreadCount()
+      .then((count) => set({ unreadCount: count }))
+      .catch((err) => {
+        if (err?.response?.status === 401 || err?.response?.status === 403) {
+          stopPolling();
+        }
+      });
   },
   stopPolling: () => {
     if (pollTimer) {

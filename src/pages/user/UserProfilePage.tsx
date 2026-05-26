@@ -179,9 +179,18 @@ export default function UserProfilePage() {
         case 'collections':
           res = await userApi.getFavorites(username, page, PAGE_SIZE);
           break;
-        case 'history':
-          res = await userApi.getBrowseHistory(username!, page, PAGE_SIZE);
+        case 'history': {
+          const historyRes = await userApi.getBrowseHistory(username!, page, PAGE_SIZE);
+          res = {
+            items: (historyRes.items || []).map((item: any) => ({
+              id: item.postId,
+              title: item.postTitle || '(无标题)',
+              createdAt: item.viewedAt || '',
+            })),
+            total: historyRes.total,
+          };
           break;
+        }
         default:
           res = { items: [], total: 0 };
       }
