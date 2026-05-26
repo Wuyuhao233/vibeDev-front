@@ -205,11 +205,13 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Grid for remaining posts */}
+        {/* Waterfall layout for remaining posts */}
         {posts.length > 1 && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="columns-2 gap-4">
             {posts.slice(1).map((post) => (
-              <PostGridCard key={post.id} post={post} showBoard />
+              <div key={post.id} className="break-inside-avoid mb-4">
+                <PostGridCard post={post} showBoard />
+              </div>
             ))}
           </div>
         )}
