@@ -8,6 +8,10 @@ function formatPercent(v: number): string {
   return (v * 100).toFixed(1) + '%';
 }
 
+function formatCost(v: number): string {
+  return '¥' + (v < 0.01 ? v.toFixed(6) : v.toFixed(2));
+}
+
 function DonutChart({ label, value, total, color }: { label: string; value: number; total: number; color: string }) {
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
@@ -170,7 +174,7 @@ export default function ReviewStatsPage() {
           <StatCard label="月度预算" value={`¥${Number(cost.monthlyBudget).toFixed(0)}`} />
           <StatCard
             label="本月已花费"
-            value={`¥${Number(cost.monthlyCost).toFixed(2)}`}
+            value={formatCost(Number(cost.monthlyCost))}
             color={cost.isBudgetExceeded ? 'text-red-500' : 'text-foreground'}
           />
           <StatCard label="今日 API 调用" value={cost.dailyApiCalls} suffix=" 次" />
