@@ -2,8 +2,8 @@ import type { CollectionFolder } from '../api/collection';
 
 interface FolderTabsProps {
   folders: CollectionFolder[];
-  selectedFolderId: number | null;
-  onFolderChange: (folderId: number | null) => void;
+  selectedFolderId: string | null;
+  onFolderChange: (folderId: string | null) => void;
   showNewButton?: boolean;
   onNewFolder?: () => void;
 }
@@ -38,7 +38,6 @@ export default function FolderTabs({
           }`}
         >
           {folder.name}
-          <span className="ml-1 text-xs text-muted-foreground">({folder.itemCount})</span>
         </button>
       ))}
       {showNewButton && (

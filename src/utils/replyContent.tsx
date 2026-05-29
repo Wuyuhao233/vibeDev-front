@@ -38,7 +38,7 @@ export function ReplyContent({ markdown, imageClassName }: { markdown: string; i
           {images.map((url, i) => (
             <img
               key={i}
-              src={normalizeImageUrl(url)}
+              src={normalizeImageUrl(url) ?? undefined}
               alt={`图片 ${i + 1}`}
               className={`rounded-md max-h-60 object-contain ${imageClassName ?? ''}`}
               loading="lazy"

@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { collectPost, uncollectPost } from '../api/post';
-import { addToFolder } from '../api/collection';
 import { toast } from './ui';
 import FolderSelector from './FolderSelector';
 

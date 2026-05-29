@@ -135,7 +135,13 @@ export default function PostCard({ post, showBoard = false }: PostCardProps) {
                 精
               </span>
             )}
-            <h3 className="post-card__title-text text-lg font-medium text-foreground truncate hover:text-primary transition-colors duration-150">
+            <h3
+              className="post-card__title-text text-lg font-medium text-foreground truncate hover:text-primary transition-colors duration-150 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/post/${post.id}`);
+              }}
+            >
               {post.title}
             </h3>
           </div>

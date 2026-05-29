@@ -12,5 +12,5 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   boards: [],
   loaded: false,
   setBoards: (boards) => set({ boards, loaded: true }),
-  getBoard: (slug) => get().boards.find((b) => b.slug === slug),
+  getBoard: (slug) => get().boards.find((b) => b.id === slug),
 }));

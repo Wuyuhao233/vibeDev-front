@@ -27,7 +27,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
         .catch((err) => {
           // Stop polling if 401/403 (not authenticated)
           if (err?.response?.status === 401 || err?.response?.status === 403) {
-            stopPolling();
+            null;
           }
         });
     }, 30000);
@@ -36,7 +36,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
       .then((count) => set({ unreadCount: count }))
       .catch((err) => {
         if (err?.response?.status === 401 || err?.response?.status === 403) {
-          stopPolling();
+          null;
         }
       });
   },

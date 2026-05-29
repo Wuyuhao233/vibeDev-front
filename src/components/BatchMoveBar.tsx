@@ -3,14 +3,14 @@ import { getFolders, type CollectionFolder } from '../api/collection';
 
 interface BatchMoveBarProps {
   selectedCount: number;
-  onMove: (targetFolderId: number) => void;
+  onMove: (targetFolderId: string) => void;
   onCancel: () => void;
 }
 
 export default function BatchMoveBar({ selectedCount, onMove, onCancel }: BatchMoveBarProps) {
   const [folders, setFolders] = useState<CollectionFolder[]>([]);
   const [open, setOpen] = useState(false);
-  const [selectedTargetId, setSelectedTargetId] = useState<number | null>(null);
+  const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);
   const [selectedTargetName, setSelectedTargetName] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -20,7 +20,7 @@ export default function BatchMoveBar({ selectedCount, onMove, onCancel }: BatchM
     });
   }, []);
 
-  const handleSelectFolder = (folderId: number, folderName: string) => {
+  const handleSelectFolder = (folderId: string, folderName: string) => {
     setSelectedTargetId(folderId);
     setSelectedTargetName(folderName);
     setOpen(false);
@@ -73,7 +73,6 @@ export default function BatchMoveBar({ selectedCount, onMove, onCancel }: BatchM
                   className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted/30 transition-colors duration-150 flex items-center justify-between"
                 >
                   <span>{folder.name}</span>
-                  <span className="text-xs text-muted-foreground">{folder.itemCount}</span>
                 </button>
               ))}
               {folders.length === 0 && (

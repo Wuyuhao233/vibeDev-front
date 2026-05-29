@@ -63,6 +63,7 @@ export default function ReplyList({
   if (error) {
     return (
       <ErrorEmpty description={error} onRetry={onRetry} />
+    );
   }
 
   if (!loading && replies.length === 0) {

@@ -3,7 +3,7 @@ import { getFolders, type CollectionFolder } from '../api/collection';
 
 interface FolderSelectorProps {
   open: boolean;
-  onSelect: (folderId: number, folderName: string) => void;
+  onSelect: (folderId: string, folderName: string) => void;
   onClose: () => void;
 }
 
@@ -53,7 +53,7 @@ export default function FolderSelector({ open, onSelect, onClose }: FolderSelect
       ) : (
         <>
           <button
-            onClick={() => onSelect(0, '默认收藏夹')}
+            onClick={() => onSelect('', '默认收藏夹')}
             className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted/30 transition-colors duration-150"
           >
             <span>默认收藏夹</span>
@@ -65,7 +65,6 @@ export default function FolderSelector({ open, onSelect, onClose }: FolderSelect
               className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted/30 transition-colors duration-150 flex items-center justify-between"
             >
               <span>{folder.name}</span>
-              <span className="text-xs text-muted-foreground">{folder.itemCount}</span>
             </button>
           ))}
           {!loading && folders.length === 0 && (

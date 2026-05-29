@@ -58,7 +58,7 @@ beforeEach(() => {
     accessToken: 'token',
     refreshToken: 'refresh',
   });
-  vi.mocked(adminApi.getUsers).mockResolvedValue({ items: mockUsers, total: 3 });
+  vi.mocked(adminApi.getUsers).mockResolvedValue({ items: mockUsers, total: 3, page: 1, pageSize: 10 });
 });
 
 function renderUsers() {
@@ -121,7 +121,7 @@ describe('UsersPage', () => {
   });
 
   it('shows empty state when no users', async () => {
-    vi.mocked(adminApi.getUsers).mockResolvedValue({ items: [], total: 0 });
+    vi.mocked(adminApi.getUsers).mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 10 });
     renderUsers();
     await waitFor(() => {
       expect(screen.getByText('暂无用户')).toBeInTheDocument();

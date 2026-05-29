@@ -5,15 +5,15 @@ import { ErrorEmpty } from './shared';
 
 interface CollectionListProps {
   folders: CollectionFolder[];
-  selectedFolderId: number | null;
+  selectedFolderId: string | null;
   items: CollectionItem[];
   loading: boolean;
   error: string | null;
-  onFolderChange: (folderId: number | null) => void;
+  onFolderChange: (folderId: string | null) => void;
   onRetry: () => void;
   selectable?: boolean;
-  selectedIds?: Set<number>;
-  onToggleSelect?: (postId: number) => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (postId: string) => void;
   onNewFolder?: () => void;
 }
 

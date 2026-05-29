@@ -21,7 +21,7 @@ export default function CollectionFolderManager({ open, onClose }: CollectionFol
   const [error, setError] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -60,7 +60,7 @@ export default function CollectionFolderManager({ open, onClose }: CollectionFol
     setEditName(folder.name);
   };
 
-  const handleSaveRename = async (id: number) => {
+  const handleSaveRename = async (id: string) => {
     const trimmed = editName.trim();
     if (!trimmed || trimmed.length > FOLDER_NAME_MAX) return;
     setSaving(true);
@@ -75,7 +75,7 @@ export default function CollectionFolderManager({ open, onClose }: CollectionFol
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     setSaving(true);
     const ok = await deleteFolder(id);
     setSaving(false);
@@ -162,7 +162,6 @@ export default function CollectionFolderManager({ open, onClose }: CollectionFol
                     <>
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-foreground">{folder.name}</span>
-                        <span className="text-xs text-muted-foreground">{folder.itemCount} 项</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <button

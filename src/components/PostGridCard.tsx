@@ -89,7 +89,13 @@ export default function PostGridCard({ post, showBoard = false }: PostGridCardPr
               精
             </span>
           )}
-          <h3 className="text-sm font-semibold text-foreground line-clamp-2 leading-snug">
+          <h3
+            className="text-sm font-semibold text-foreground line-clamp-2 leading-snug cursor-pointer hover:text-primary transition-colors duration-150"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/post/${post.id}`);
+            }}
+          >
             {post.title}
           </h3>
         </div>

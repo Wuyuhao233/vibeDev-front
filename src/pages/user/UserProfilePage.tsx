@@ -7,7 +7,7 @@ import { normalizeImageUrl } from '../../utils/imageUrl';
 import { followUser, unfollowUser, checkFollowing } from '../../api/follow';
 import {
   getFolders,
-  getFolderItems,
+  getFavorites,
   moveItems,
   type CollectionFolder,
   type CollectionItem,
@@ -81,13 +81,13 @@ export default function UserProfilePage() {
   // Collection folder management
   const [managerOpen, setManagerOpen] = useState(false);
   const [folders, setFolders] = useState<CollectionFolder[]>([]);
-  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [collectionItems, setCollectionItems] = useState<CollectionItem[]>([]);
   const [collectionLoading, setCollectionLoading] = useState(false);
   const [collectionError, setCollectionError] = useState<string | null>(null);
 
   // Batch move state
-  const [selectedPostIds, setSelectedPostIds] = useState<Set<number>>(new Set());
+  const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [moving, setMoving] = useState(false);
 
   const canManageFolders = isOwner && (profile?.level ?? 0) >= 3;
@@ -103,32 +103,19 @@ export default function UserProfilePage() {
     setCollectionLoading(true);
     setCollectionError(null);
     try {
-      if (selectedFolderId === null) {
-        const res = await userApi.getFavorites(username!, page, PAGE_SIZE);
-        // Map to CollectionItem shape for consistent rendering
-        const mapped: CollectionItem[] = res.items.map((item: any) => ({
-          postId: item.postId,
-          postTitle: item.title ?? item.postTitle ?? '',
-          boardName: item.boardName ?? '',
-          collectedAt: item.collectedAt ?? item.createdAt ?? '',
-        }));
-        setCollectionItems(mapped);
+      const res = await getFavorites(page, PAGE_SIZE, selectedFolderId ?? undefined);
+      if (res) {
+        setCollectionItems(res.items);
         setTotal(res.total);
       } else {
-        const res = await getFolderItems(selectedFolderId, page - 1, PAGE_SIZE);
-        if (res) {
-          setCollectionItems(res.items);
-          setTotal(res.total);
-        } else {
-          setCollectionError('收藏夹功能暂未开放');
-        }
+        setCollectionError('收藏功能暂未开放');
       }
     } catch {
       setCollectionError('加载失败');
     } finally {
       setCollectionLoading(false);
     }
-  }, [username, selectedFolderId, page]);
+  }, [page, selectedFolderId]);
 
   const fetchProfile = useCallback(async () => {
     if (!username) return;
@@ -230,7 +217,7 @@ export default function UserProfilePage() {
     }
   }, [fetchTabData, fetchCollectionItems, activeTab, folders]);
 
-  const handleToggleSelect = (postId: number) => {
+  const handleToggleSelect = (postId: string) => {
     setSelectedPostIds((prev) => {
       const next = new Set(prev);
       if (next.has(postId)) {
@@ -242,7 +229,7 @@ export default function UserProfilePage() {
     });
   };
 
-  const handleBatchMove = async (targetFolderId: number) => {
+  const handleBatchMove = async (targetFolderId: string) => {
     if (selectedPostIds.size === 0 || moving) return;
     setMoving(true);
     const postIds = Array.from(selectedPostIds);
