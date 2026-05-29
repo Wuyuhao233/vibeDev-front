@@ -219,7 +219,7 @@ export default function PostsPage() {
                           <span className="text-sm text-foreground truncate block max-w-xs">{p.title}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{p.boardId || '-'}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{boards.find(b => b.id === p.boardId)?.name || p.boardId?.slice(0, 8) || '-'}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${st.cls}`}>{st.text}</span>
                       </td>

@@ -74,13 +74,18 @@ export default function ReviewQueuePage() {
 
   const getCategoryLabel = (cat: string) => {
     const map: Record<string, string> = {
-      political: '涉政',
-      spam: '垃圾广告',
-      abuse: '辱骂',
-      adult: '色情',
-      normal: '正常',
+      '涉政': '涉政',
+      '色情': '色情',
+      '暴力': '暴力',
+      '垃圾广告': '垃圾广告',
+      '辱骂攻击': '辱骂攻击',
+      '违禁品': '违禁品',
+      '其他违规': '其他违规',
+      '正常': '正常',
+      'unknown': '待分类',
+      '': '待分类',
     };
-    return map[cat] || cat;
+    return map[cat] || '其他';
   };
 
   return (

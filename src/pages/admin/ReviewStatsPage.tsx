@@ -104,7 +104,7 @@ export default function ReviewStatsPage() {
         <h2 className="text-base font-semibold text-foreground mb-3">AI 准确率</h2>
         <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
           <div className="flex items-center gap-8">
-            <DonutChart label="通过率" value={totalProcessed} total={totalProcessed} color="#10b981" />
+            <DonutChart label="通过率" value={queue.todayApproved} total={totalProcessed} color="#10b981" />
             <div className="flex-1 space-y-3">
               <div>
                 <div className="flex justify-between text-xs text-muted-foreground mb-1">
